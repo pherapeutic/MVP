@@ -14,10 +14,11 @@ class CreateUserTherapistTypesTable extends Migration
     public function up()
     {
         Schema::create('user_therapist_types', function (Blueprint $table) {
-            $table->id();
-            $table->string('user_id');
-            $table->string('therapist_type_id');
+            $table->bigIncrements('id');
+            $table->bigInteger('user_id');
+            $table->integer('therapist_type_id');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

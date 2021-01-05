@@ -1,0 +1,23 @@
+/* 09-11-2020 */
+.logo{
+    width: 80%;
+}
+@media (max-width: 992px) {
+    .logo{
+        width: 20%;
+    }
+}
+/* 10-11-2020 */
+.disabled-input{
+    pointer-events: none;
+    background: #80808021;
+    cursor: no-drop;
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0; 
+}

@@ -14,9 +14,10 @@ class CreateTherapistTypesTable extends Migration
     public function up()
     {
         Schema::create('therapist_types', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('title');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

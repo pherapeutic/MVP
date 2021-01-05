@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use App\Models\User;
+use Auth;
 
 class LoginController extends Controller
 {
@@ -43,8 +46,40 @@ class LoginController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function showLoginForm()
+    // public function showLoginForm()
+    // {
+    //     return view('auth.adminlogin');
+    // }
+
+    public function login(Request $request)
     {
-        return view('auth.adminlogin');
+        $this->validateLogin($request);
+
+        if ($this->hasTooManyLoginAttempts($request)) {
+            $this->fireLockoutEvent($request);
+
+            return $this->sendLockoutResponse($request);
+        }
+
+        if(Auth::attempt(['email' => $request->email, 'password' => $request->password, 'role' => User::ADMIN_ROLE])) {
+            return redirect()->route('admin.home');
+        }  else {
+            $this->incrementLoginAttempts($request);
+            return $this->sendFailedLoginResponse($request);
+        }
+
+        $this->incrementLoginAttempts($request);
+        return $this->sendFailedLoginResponse($request);
+    }
+
+    /**
+     * Logout the authenticated user
+     */
+    public function logout(Request $request)
+    {
+        $this->guard()->logout();
+        $request->session()->flush();
+        $request->session()->regenerate();
+        return redirect()->route('login')->with('success_message', 'Logout successfully.');
     }
 }

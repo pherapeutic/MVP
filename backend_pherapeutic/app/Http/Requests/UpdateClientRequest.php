@@ -24,10 +24,13 @@ class UpdateClientRequest extends FormRequest
      */
     public function rules(Request $request)
     {
+        $userId = ($this->segment(4)) ? ($this->segment(4)) : ('NULL');
+
         return [
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'nullable|email|unique:users,email,'.$request->user_id.',id,deleted_at,NULL',
+            'email' => 'required|email|unique:users,email,'.$userId.',id,deleted_at,NULL',
+            'languages' => 'required'
         ];
     }
 
@@ -39,15 +42,13 @@ class UpdateClientRequest extends FormRequest
     public function messages()
     {
         return [
-            'first_name.required' => 'This field is required',
-            'first_name.max'  => 'Please enter maximum 255 characters',
+            'first_name.required' => 'Please enter first name',
+            'last_name.required'  => 'Please enter last name',
 
-            'last_name.required' => 'This field is required',
-            'last_name.max'  => 'Please enter maximum 255 characters',
-
+            'email.required'  => 'Please enter your email',
             'email.unique'  => 'This email already exist',
             'email.email'  => 'Please enter a valid email',
-            'email.max'  => 'Please enter maximum 255 characters',
+            'languages.required'  => 'Please select languages',
         ];
     }
 }

@@ -4,17 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Softdeletes;
+use App\Models\Answers;
 
 class Questions extends Model
 {
-    use HasFactory;
+    use HasFactory, Softdeletes;
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'answer_id',
+        //'answer_id',
         'title',
         'status',
     ];
@@ -26,7 +28,7 @@ class Questions extends Model
      * @return Array of all users
      */
     public function getAllQuestions(){
-        return self::all();
+        return self::where('status','1')->orderBy('ordering', 'ASC')->get()->all();
     }
 
     /**
@@ -58,5 +60,33 @@ class Questions extends Model
      */
     public function updateQuestion($id, $inputArr){
         return self::where('id', $id)->update($inputArr);
+    }
+
+    public function answers()
+    {
+        return $this->hasMany('App\Models\Answers', 'question_id');
+    }
+
+    public function getResponseArr(){
+        $returnArr = [
+            'id' => $this->id,
+            'title' => $this->title,
+            'status' => $this->status,
+        ];
+        $answerData = self::getAnswer($returnArr['id']);
+        $returnArr['answer'] = $answerData;
+        return $returnArr;
+    }
+
+    public function getAnswer($questionId){
+        $answers = Answers::where('question_id', $questionId)->get()->all();
+        $ansReturnArr = array();
+        if(!$answers){
+            return null;
+        }
+        foreach ($answers as $answer) {
+            array_push($ansReturnArr, $answer->getResponseArr());
+        }
+        return $ansReturnArr;
     }
 }

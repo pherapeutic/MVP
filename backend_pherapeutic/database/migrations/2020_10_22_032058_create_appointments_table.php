@@ -14,11 +14,11 @@ class CreateAppointmentsTable extends Migration
     public function up()
     {
         Schema::create('appointments', function (Blueprint $table) {
-            $table->id();
-            $table->string('user_id');
-            $table->string('therapist_id');
-            $table->enum('status', array('waiting', 'connected','completed','payment done','disconnected'));
-            $table->boolean('is_trail');
+            $table->bigIncrements('id');
+            $table->bigInteger('user_id');
+            $table->bigInteger('therapist_id');
+            $table->enum('status', array('0', '1', '2', '3', '4'))->default('0')->comment('0 => Waiting, 1 => Connected, 2 => Completed, 3 => Payment done, 4 => Disconnected');
+            $table->enum('is_trail', array('0', '1'))->default('0')->comment('0 => No, 1 => Yes');
             $table->dateTime('ended_at')->nullable();
             $table->timestamps();
         });

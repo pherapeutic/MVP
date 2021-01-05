@@ -55,6 +55,23 @@ return [
             'visibility' => 'public',
         ],
 
+        'profile-images' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/profile-images'),
+            'url' => env('APP_URL').'/storage/profile-images',
+            'visibility' => 'public',
+            'permissions' => [
+                'file' => [
+                    'public' => 0775,
+                    'private' => 0700,
+                ],
+                'dir' => [
+                    'public' => 0775,
+                    'private' => 0700,
+                ],
+            ],
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\TherapistTypes;
+use App\Models\TherapistType;
 use Validator;
 
 class TherapistTypeController extends Controller
@@ -24,7 +24,7 @@ class TherapistTypeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index(Request $request, TherapistTypes $TTypes)
+    public function index(Request $request, TherapistType $TTypes)
     {
         if ($request->ajax()) {
             $typesColl = $TTypes->getAllTherapistTypes();
@@ -65,7 +65,7 @@ class TherapistTypeController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, TherapistTypes $TTypes)
+    public function store(Request $request, TherapistType $TTypes)
     {
         //echo"<pre>";print_r($request->all());die;
         $rules = [
@@ -105,7 +105,7 @@ class TherapistTypeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id,  TherapistTypes $TTypes)
+    public function edit($id,  TherapistType $TTypes)
     {
 
         $TTypes = $TTypes->getTherapistTypeById($id);
@@ -135,7 +135,7 @@ class TherapistTypeController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }else{
-            $TTypes = new TherapistTypes();
+            $TTypes = new TherapistType();
             $TTypes = $TTypes->getTherapistTypeById($id);
             if(!$TTypes){
                 return redirect()->back()->with('error', 'This therapist type does not exist');
@@ -157,7 +157,7 @@ class TherapistTypeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id, TherapistTypes $TTypes)
+    public function destroy($id, TherapistType $TTypes)
     {
         $typesObj = $TTypes->getTherapistTypeById($id);
 

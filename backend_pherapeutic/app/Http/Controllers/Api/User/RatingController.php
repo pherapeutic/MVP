@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Rating;
 use App\Models\FeedbackNotes;
 use App\Models\Appointments;
+use App\Models\CallLogs;
 use Validator;
 class RatingController extends Controller
 {
@@ -26,10 +27,20 @@ class RatingController extends Controller
      * @return \Illuminate\Contracts\Support\Renderable
      */
 
-    public function getRating(Request $request, Rating $rating){
-        $respone = $rating->getAllRatings();
-        if(!empty($respone)){
-            return returnSuccessResponse('Rating list',$respone);
+    public function getRating(Request $request, CallLogs $callLogs){
+
+        $userObj = $this->request->user();
+        if (!$userObj) {
+            return $this->notAuthorizedResponse('User is not authorized');
+        }
+
+        $callLogs = $callLogs->getAllTherapistCallLog($userObj->id);
+        $responeArr = array();
+        foreach ($callLogs as $callLog) {
+            array_push($responeArr, $callLog->ratings);
+        }
+        if(!empty($responeArr)){
+            return returnSuccessResponse('Rating list',$responeArr);
         }else{
             return returnNotFoundResponse('Not found');   
         }
@@ -53,11 +64,11 @@ class RatingController extends Controller
         }
     }
     
-    public function postRating(Request $request, Rating $rating){
+    public function clientPostRating(Request $request, Rating $rating){
         $rules = [
-            //'client_id' => 'required',
-            'appointment_id' => 'required',
+            'call_logs_id' => 'required',
             'rating' => 'required',
+            'comment' => 'required',
         ];
         $userObj = $this->request->user();
         $inputArr = $request->all();
@@ -65,27 +76,32 @@ class RatingController extends Controller
         if ($validator->fails()) {
             $validateerror = $validator->errors()->all();
             return $this->validationErrorResponse($validateerror[0]);
+        }
+
+        $ratingExist = $rating->getRatingByCallLogId($inputArr['call_logs_id']);
+        if($ratingExist){
+            return returnValidationErrorResponse('Call rating is already post');            
+        }
+
+        $respone = $rating->saveNewRating($inputArr);
+        //$userrating = $rating->getRatingByClientId($userObj->id);
+        // $inputArr['client_id'] = $userObj->id;
+        // if($userrating){
+        //     $respone = $rating->updateUserRating($userObj->id,$inputArr);
+        // }else{
+        //     $respone = $rating->saveNewRating($inputArr);
+        // }
+        
+        if($respone){
+            return returnSuccessResponse('Thanks for rating !');
         }else{
-            $respone = $rating->saveNewRating($inputArr);
-            //$userrating = $rating->getRatingByClientId($userObj->id);
-            // $inputArr['client_id'] = $userObj->id;
-            // if($userrating){
-            //     $respone = $rating->updateUserRating($userObj->id,$inputArr);
-            // }else{
-            //     $respone = $rating->saveNewRating($inputArr);
-            // }
-            
-            if($respone){
-                return returnSuccessResponse('Thanks for rating !');
-            }else{
-                return returnNotFoundResponse('Something wrong');
-           }
-        }    
+            return returnNotFoundResponse('Something wrong');
+        }
     }
 
-    public function postFeedback(Request $request, FeedbackNotes $feedback){
+    public function therapistPostFeedback(Request $request, FeedbackNotes $feedback){
         $rules = [
-            'appointment_id' => 'required',
+            'call_logs_id' => 'required',
             'feedback_note' => 'required',
         ];
         $userObj = $this->request->user();
@@ -95,6 +111,7 @@ class RatingController extends Controller
             $validateerror = $validator->errors()->all();
             return $this->validationErrorResponse($validateerror[0]);
         }else{
+            $inputArr['feedback_by'] = $userObj->id;
             $respone = $feedback->saveNewFeedback($inputArr);
 
             if($respone){

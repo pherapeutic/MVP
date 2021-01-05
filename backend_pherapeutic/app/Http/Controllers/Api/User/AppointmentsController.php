@@ -8,6 +8,7 @@ use App\Models\Rating;
 use App\Models\FeedbackNotes;
 use App\Models\Appointments;
 use Validator;
+use Carbon\Carbon;
 class AppointmentsController extends Controller
 {
     /**
@@ -57,8 +58,10 @@ class AppointmentsController extends Controller
             $rating = Rating::where('appointment_id', '=', $appointment->id)->first();
             if($rating){
                 $appointment['rating'] = $rating->rating;
+                $appointment['comment'] = $rating->comment;
             }else{
                 $appointment['rating'] ="0";
+                $appointment['comment'] ="";
             }
         }
 
@@ -82,8 +85,10 @@ class AppointmentsController extends Controller
             $rating = Rating::where('appointment_id', '=', $appointment->id)->first();
             if($rating){
                 $appointment['rating'] = $rating->rating;
+                $appointment['comment'] = $rating->comment;                
             }else{
                 $appointment['rating'] ="0";
+                $appointment['comment'] ="";
             }
         }
 
@@ -222,4 +227,71 @@ class AppointmentsController extends Controller
 
         return returnErrorResponse('Something went wrong. Please try again later'); 
     }
+
+
+    public function getTherapistAppointmentRequest(Request $request, Appointments $appointments){
+
+        $rules = [
+            'status' => 'required',
+        ];
+        $inputArr = $request->all();
+        $validator = Validator::make($inputArr, $rules);
+        if ($validator->fails()) {
+            $validateerror = $validator->errors()->all();
+            return $this->validationErrorResponse($validateerror[0]);
+        }
+        $userObj = $this->request->user();
+        if (!$userObj) {
+            return $this->notAuthorizedResponse('User is not authorized');
+        }
+
+        $appointmentRequestArr = $appointments->getTherapistAppointmentRequests($userObj->id, $inputArr['status']);
+        $returnArr = array();
+        foreach ($appointmentRequestArr as $key => $appointmentRequestObj) {
+            $data = $appointmentRequestObj->getResponseArr();
+            array_push($returnArr, $data);
+        }
+
+        if(!empty($returnArr)){
+            return returnSuccessResponse('Get appointment request',$returnArr);
+        }else{
+            return returnNotFoundResponse('Not found');
+        }
+    }
+
+    public function changeAppointmentStatus(Request $request, Appointments $appointments){
+
+        $rules = [
+            'appointment_id' => 'required',
+            'status' => 'required',
+        ];
+        $inputArr = $request->all();
+        $validator = Validator::make($inputArr, $rules);
+        if ($validator->fails()) {
+            $validateerror = $validator->errors()->all();
+            return $this->validationErrorResponse($validateerror[0]);
+        }
+        $userObj = $this->request->user();
+        if (!$userObj) {
+            return $this->notAuthorizedResponse('User is not authorized');
+        }
+        $appointmentObj = $appointments->getAppointmentById($inputArr['appointment_id']);
+        if(!$appointmentObj){
+            return returnNotFoundResponse('Appointment not found');            
+        }
+        $updateData = [];
+        if($inputArr['status'] == '2'){
+            $updateData['ended_at'] = Carbon::now();
+        }
+        $updateData['status'] = $inputArr['status'];
+
+        $hasUpdate = $appointments->updateAppointment($appointmentObj->id, $updateData);
+
+        if(!empty($hasUpdate)){
+            return returnSuccessResponse('Appointment status update',$hasUpdate);
+        }else{
+            return returnNotFoundResponse('Not found');
+        }
+    }
+
 }

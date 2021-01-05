@@ -14,11 +14,12 @@ class CreateQuestionsTable extends Migration
     public function up()
     {
         Schema::create('questions', function (Blueprint $table) {
-            $table->id();
-            $table->string('answer_id')->nullable();
+            $table->bigIncrements('id');
+            $table->bigInteger('answer_id');
             $table->string('title');
-            $table->enum('status', array('active', 'in-active'));
+            $table->enum('status', array('0', '1'))->default('1')->comment("0 => In-Active, 1 => Active");
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

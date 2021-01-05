@@ -15,14 +15,14 @@ class Rating extends Model
      * @var array
      */
     protected $fillable = [
-        'appointment_id',
+        'call_logs_id',
         'rating',
         'comment',
     ];
 
     /**
-     * Created By Parmod KUmar
-     * Created At 22-10-2020
+     * Created By Ak Tiwari
+     * Created At 30-12-2020
      * @param NULL
      * @return Array of all rating
      */
@@ -31,8 +31,8 @@ class Rating extends Model
     }
 
     /**
-     * Created By Parmod KUmar
-     * Created At 22-10-2020
+     * Created By Ak Tiwari
+     * Created At 30-12-2020
      * @var array of rating input details
      * @return object of rating
      * This function use to save new uer's detail in Database
@@ -42,8 +42,8 @@ class Rating extends Model
     }
 
     /**
-     * Created By Parmod KUmar
-     * Created At 22-10-2020
+     * Created By Ak Tiwari
+     * Created At 30-12-2020
      * @param rating id
      * @return rating object
      */
@@ -56,9 +56,14 @@ class Rating extends Model
     }
 
 
+    public function getRatingByCallLogId($call_logs_id){
+        return self::where('call_logs_id', $call_logs_id)->first();
+    }
+
+
     /**
-     * Created By Parmod KUmar
-     * Created At 22-10-2020
+     * Created By Ak Tiwari
+     * Created At 30-12-2020
      * @param rating id , fields array
      * @return updated
      */

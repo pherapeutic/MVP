@@ -15,7 +15,7 @@ class FeedbackNotes extends Model
      * @var array
      */
     protected $fillable = [
-        'appointment_id',
+        'call_logs_id',
         'feedback_note',
         'feedback_by',
     ];
@@ -48,4 +48,9 @@ class FeedbackNotes extends Model
     public function updateUserFeedback($appointment_id, $inputArr){
         return self::where('appointment_id', $appointment_id)->update($inputArr);
     }
+    
+    public function feedbackBy()
+    {
+        return $this->belongsTo('App\Models\User', 'feedback_by', 'id');
+    }    
 }

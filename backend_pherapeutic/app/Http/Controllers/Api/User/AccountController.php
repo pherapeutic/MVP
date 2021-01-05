@@ -2,162 +2,228 @@
 
 namespace App\Http\Controllers\Api\User;
 
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Notifications\TempEmailVerify;
 use App\Models\User;
 use App\Models\TherapistProfile;
 use App\Models\Languages;
-use App\Models\UserLanguages;
+use App\Models\UserLanguage;
+use App\Models\UserTherapistType;
 use App\Models\Address;
+use App\Http\Requests\UserUpdateRequest;
+use App\Http\Requests\ChangePasswordRequest;
 use Validator;
-use Dirape\Token\Token;
+
 class AccountController extends Controller
 {
-    public function update(Request $request){
+    public function update(UserUpdateRequest $request, UserLanguage $userLanguage, TherapistProfile $therapistProfile, UserTherapistType $userTherapistType){
         
         $userObj = $this->request->user();
         if (!$userObj) {
             return $this->notAuthorizedResponse('User is not authorized');
         }
 
-        $rules = [
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'language_id' => 'required',
-             'email' => 'nullable|email|unique:users,email,'.$userObj->id.',id,deleted_at,NULL',
-        ];
-        if($userObj->role == "Therapist"){
-            $rules['qaulification'] = 'required';
-            $rules['experience'] = 'required';
-            $rules['specialism'] = 'required';
-        }
         $inputArr = $request->all();
-        $validator = Validator::make($inputArr, $rules);
-        if ($validator->fails()) {
-            $validateerror = $validator->errors()->all();
-            return $this->validationErrorResponse($validateerror[0]);
-        }
-        if($userObj->role == "Therapist"){
-            $profile = new TherapistProfile();
-            $Profilearr['qaulification'] = $inputArr['qaulification'];
-            $Profilearr['experience'] = $inputArr['experience'];
-            $Profilearr['specialism'] = $inputArr['specialism'];
-            $profile->updateTherapistProfile($userObj->id,$Profilearr);
-            unset($inputArr['qaulification']);
-            unset($inputArr['experience']);
-            unset($inputArr['specialism']);
-        }
-        
-        $msg = 'Profile updated successfully! ';
-        $sendverifyemail = false;
-        if($inputArr['email'] != $userObj->email){
-            $inputArr['temp_email'] = $inputArr['email'];
+        $userArr = [
+            'first_name' => $inputArr['first_name'],
+            'last_name' => $inputArr['last_name'],
+            'image' => (isset($inputArr['image']) && $inputArr['image']) ? ($inputArr['image']) : (null)
+        ];
 
-           // $inputArr['verify_temp_email_token'] = (new Token())->Unique('users', 'api_token', 60);
-            $verificationOtp = $userObj->generateOtp();
-            $inputArr['verification_otp'] = $verificationOtp;
-            unset($inputArr['email']);
-            $msg .= 'Please verify your email, otp 123456';
-            //$sendverifyemail =true;
+        if($userArr['image']){
+            $userArr['old_image'] = $userObj->image;
         }
-        $userlanguage = new UserLanguages();
-        $userlanguage->updateUserLanguages($userObj->id,['language_id' =>$inputArr['language_id'] ]);
-        unset($inputArr['language_id']);
-        $userObj->updateUser($userObj->id, $inputArr);
 
-        if($sendverifyemail){
-            $user_data = $userObj;
-            $user_data->mail = $inputArr['temp_email'];
-            $user_data->mail_subject = 'Please verify your email';
-            $user_data->message = "Your verification code is: ".$verificationOtp;
-            //$user_data->verify_url = route('emailverification');
-            $user_data->notify(new TempEmailVerify($user_data));
+        $hasUpdated = $userObj->updateUser($userObj->id, $userArr);
+        if(!$hasUpdated){
+            return returnErrorResponse('Unable to update profile');
         }
-        $returnArr = $userObj->getResponseArr();
 
-        $userlang = $userlanguage->getUserLanguagesById($userObj->id);
-        if($userlang){
-          $returnArr['language_id'] = $userlang->language_id;  
+        $languagesArr = $request->get('languages');
+        if(is_array($languagesArr)){
+            UserLanguage::where('user_id', $userObj->id)->delete();
+            foreach ($languagesArr as $key => $languageId) {
+                $userLanguageArr = [
+                    'user_id' => $userObj->id,
+                    'language_id' => $languageId
+                ];
+                $userLanguage->saveNewUserLanguages($userLanguageArr);
+            }
         }
-        
-        if($userObj->role =="Therapist"){
-            $therapist = new TherapistProfile();
-            $profile = $therapist->getTherapistProfileById($userObj->id);
-            if($profile){
-                $returnArr['address'] = $profile->address;      
-                $returnArr['latitude'] = $profile->latitude;      
-                $returnArr['longitude'] = $profile->longitude;      
-                $returnArr['experience'] = $profile->experience;      
-                $returnArr['qaulification'] = $profile->qaulification;      
-            }  
+
+        if($userObj->role == User::THERAPIST_ROLE){
+            $therapistPofileArr = [
+                'user_id' => $userObj->id,
+                'experience' => $request->get('experience'),
+                'qualification' => $request->get('qualification'),
+                'address' => $request->get('address'),
+                'latitude' => $request->get('latitude'),
+                'longitude' => $request->get('longitude')
+            ];
+            $therapistProfile->updateTherapistProfile($therapistPofileArr);
+
+            $therapistTypesArr = $request->get('specialism');
+            if(is_array($therapistTypesArr)){
+                UserTherapistType::where('user_id', $userObj->id)->delete();
+                foreach ($therapistTypesArr as $key => $therapistTypeId) {
+                    $userTherapistTypeArr = [
+                        'user_id' => $userObj->id,
+                        'therapist_type_id' => $therapistTypeId
+                    ];
+                    $userTherapistType->saveNewUserTherapistTypes($userTherapistTypeArr);
+                }
+            }
         }
-        
-        return $this->successResponse($returnArr, $msg);  
+
+        $updatedUser = User::find($userObj->id);
+        $returnArr = $updatedUser->getResponseArr();
+        $authToken = $updatedUser->createToken('authToken')->plainTextToken;
+        $returnArr['auth_token'] = $authToken;
+        return returnSuccessResponse('User updated successfully', $returnArr);  
     }
 
-    public function changeEmailVerify(Request $request){
+    public function changeOnlineStatus(Request $request){
+        
+        $userObj = $this->request->user();
+        if (!$userObj) {
+            return $this->notAuthorizedResponse('User is not authorized');
+        }
+        
+        //Update latitude and longitude when change the status.
+        if($userObj->therapistProfile){
+            $profileObj = $userObj->therapistProfile;
+            $profileObj->latitude = ($request->get('latitude') ? ($request->get('latitude')) : $profileObj->latitude);
+            $profileObj->longitude = ($request->get('longitude') ? ($request->get('longitude')) : $profileObj->longitude);
+
+            $hasUpdatedProfile = $profileObj->save();            
+        }
+
+        $userObj->online_status = ($userObj->online_status == '0') ? ('1') : ('0');
+        $hasUpdated = $userObj->save();
+
+        if($hasUpdated){
+            $updatedUser = User::find($userObj->id);
+            $returnArr = $updatedUser->getResponseArr();
+            $returnArr['auth_token'] = $request->bearerToken();
+            return returnSuccessResponse('Online status updated successfully', $returnArr);
+        }
+        return returnErrorResponse('Unable to update online status');
+    }
+
+    public function changeNotificationStatus(Request $request){
+        
         $userObj = $this->request->user();
         if (!$userObj) {
             return $this->notAuthorizedResponse('User is not authorized');
         }
 
-        $rules = [
-            'user_id' => 'required',
-            'otp' => 'required'
-        ];
+        $userObj->notification_status = ($userObj->notification_status == '0') ? ('1') : ('0');
+        $hasUpdated = $userObj->save();
 
-        $input = $request->all();
-        $validator = Validator::make($input, $rules);
-        if ($validator->fails()) {
-            return $this->validationErrorResponse($validator->errors()->all());
+        if($hasUpdated){
+            $updatedUser = User::find($userObj->id);
+            $returnArr = $updatedUser->getResponseArr();
+            $returnArr['auth_token'] = $request->bearerToken();
+            return returnSuccessResponse('Notification status updated successfully', $returnArr);
         }
-
-        $userObj = User::where('id', $input['user_id'])->where('verification_otp', $input['otp'])->first();
-        if (!$userObj) {
-            return $this->notFoundResponse('Invalid OTP');
-        }
-        $userObj->email = $userObj->temp_email;
-        $userObj->temp_email = null;
-        $userObj->verification_otp = null;
-
-        $userObj->save();
-
-        return $this->successResponse([], 'Otp verified successfully');
-
+        return returnErrorResponse('Unable to update online status');
     }
 
-    public function resendPrimaryEmailOtp(Request $request)
+    public function changePassword(ChangePasswordRequest $request){
+        $userObj = $this->request->user();
+        if (!$userObj) {
+            return $this->notAuthorizedResponse('User is not authorized');
+        }
+
+        if(!Hash::check($request->old_password, $userObj->password)){
+            throw new HttpResponseException(returnValidationErrorResponse('Invalid old password'));
+        }
+
+        $inputArr['password'] = Hash::make($request->get('password'));
+        $hasUpdated = $userObj->updateUser($userObj->id, $inputArr);
+        if(!$hasUpdated){
+            return returnErrorResponse('Unable to update profile');
+        }
+
+        $updatedUser = User::find($userObj->id);
+        $returnArr = $updatedUser->getResponseArr();
+        $authToken = $updatedUser->createToken('authToken')->plainTextToken;
+        $returnArr['auth_token'] = $authToken;
+        return returnSuccessResponse('Password updated successfully', $returnArr);
+    }
+
+    // public function changeEmailVerify(Request $request){
+    //     $userObj = $this->request->user();
+    //     if (!$userObj) {
+    //         return $this->notAuthorizedResponse('User is not authorized');
+    //     }
+
+    //     $rules = [
+    //         'user_id' => 'required',
+    //         'otp' => 'required'
+    //     ];
+
+    //     $input = $request->all();
+    //     $validator = Validator::make($input, $rules);
+    //     if ($validator->fails()) {
+    //         return $this->validationErrorResponse($validator->errors()->all());
+    //     }
+
+    //     $userObj = User::where('id', $input['user_id'])->where('verification_otp', $input['otp'])->first();
+    //     if (!$userObj) {
+    //         return $this->notFoundResponse('Invalid OTP');
+    //     }
+    //     $userObj->email = $userObj->temp_email;
+    //     $userObj->temp_email = null;
+    //     $userObj->verification_otp = null;
+
+    //     $userObj->save();
+
+    //     return $this->successResponse([], 'Otp verified successfully');
+
+    // }
+
+    // public function resendPrimaryEmailOtp(Request $request)
+    // {
+    //     $rules = [
+    //         'user_id' => 'required'
+    //     ];
+
+    //     $input = $request->all();
+    //     $validator = Validator::make($input, $rules);
+    //     if ($validator->fails()) {
+    //         return $this->validationErrorResponse($validator->errors()->all());
+    //     }
+
+    //     $user = User::where('id', $input['user_id'])->first();
+    //     if (!$user) {
+    //         return $this->notFoundResponse('User not found with this user id');
+    //     }
+
+    //     $verificationOtp = $user->verification_otp;
+
+    //     if(!$verificationOtp){
+    //         $verificationOtp = $user->generateOtp();
+    //         $user->verification_otp = $verificationOtp;
+    //         $user->save();
+    //     }
+        
+    //     return $this->successResponse(['user_id' => $input['user_id']], 'Otp re-send successfully');
+    // } 
+
+    public function logout(Request $request)
     {
-        $rules = [
-            'user_id' => 'required'
-        ];
-
-        $input = $request->all();
-        $validator = Validator::make($input, $rules);
-        if ($validator->fails()) {
-            return $this->validationErrorResponse($validator->errors()->all());
+        $userObj = $request->user();
+        if (!$userObj) {
+            return notAuthorizedResponse('You are not authorized');
         }
 
-        $user = User::where('id', $input['user_id'])->first();
-        if (!$user) {
-            return $this->notFoundResponse('User not found with this user id');
-        }
-
-        $verificationOtp = $user->verification_otp;
-
-        if(!$verificationOtp){
-            $verificationOtp = $user->generateOtp();
-            $user->verification_otp = $verificationOtp;
-            $user->save();
-        }
-
-            // $message = "Your verification code is: ".$verificationOtp;
-            // $user_data = $userObj;
-            // $user_data->mail = $inputArr['temp_email'];
-            // $user_data->mail_subject = 'Please verify your email';
-            // $user_data->message = $message;
-            // $user_data->notify(new TempEmailVerify($user_data));
-        return $this->successResponse(['user_id' => $input['user_id']], 'Otp re-send successfully');
-    } 
+        $userObj->tokens()->delete();
+        $userObj->fcm_token = null;
+        $userObj->save();
+        return returnSuccessResponse('User logged out successfully');
+    }
 }

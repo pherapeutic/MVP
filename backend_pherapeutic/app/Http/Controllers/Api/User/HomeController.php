@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\TherapistProfile;
 use App\Models\Languages;
 use App\Models\UserLanguages;
+use App\Models\CallLogs;
 use Validator;
 use Hash;
 use Auth;
@@ -22,41 +23,31 @@ class HomeController extends Controller
         $this->request = $request;
     }
 
-    public function profile(Request $request)
+    public function profile(Request $request, CallLogs $callLogs)
     {
         try {
-            $userDetailArr = $this->request->user();
-
-            if ( ! $userDetailArr) {
+            $userObj = $this->request->user();
+            if ( ! $userObj) {
                 throw new \Exception('Unable to get profile');
             }
 
-            $userlanguage = new UserLanguages();
-            $userlang = $userlanguage->getUserLanguagesById($userDetailArr->id);
-            if($userlang){
-              $userDetailArr['language_id'] = $userlang->language_id;  
-            }
-
-            if($userDetailArr->role == "Therapist"){
-                $therapist   = new TherapistProfile();
-                $userprofile = $therapist->getTherapistProfileById($userDetailArr->id);
-                if($userprofile){
-                    $userDetailArr['address'] = $userprofile->address;
-                    $userDetailArr['experience'] = $userprofile->experience;
-                    $userDetailArr['qaulification'] = $userprofile->qaulification;
+            $returnArr = $userObj->getResponseArr();
+            //calculate therapist rating
+            $callLogs = $callLogs->getAllTherapistCallLog($userObj->id);
+            $addRating = 0;
+            $totalRating = 1;
+            foreach ($callLogs as $callLog) {
+                if($callLog->ratings){
+                    $addRating += $callLog->ratings->rating;
+                    $totalRating = $callLog->ratings->count();
                 }
             }
-            return response()->json([
-                'status_code' => 200,
-                'message' => 'User profile.',
-                'data' => $userDetailArr
-            ]);
+            $ratingAvg = $addRating/$totalRating;
+            $returnArr['rating'] = $ratingAvg;
+
+            return returnSuccessResponse('Profile detail', $returnArr);
         } catch (Exception $error) {
-            return response()->json([
-                'status_code' => 500,
-                'message' => 'Unable to get profile',
-                'error' => $error,
-            ]);
+            return returnErrorResponse('Unable to get profile');
         }
     }
 
@@ -226,6 +217,104 @@ class HomeController extends Controller
         }else{
             $userObj->updateUser($userObj->id, $inputArr);
             return $this->successResponse($inputArr, "Successfully update"); 
+        }
+    }
+
+    public function agoraToken(Request $request){
+        $userObj = $this->request->user();
+        if (!$userObj) {
+            return $this->notAuthorizedResponse('User is not authorized');
+        }
+        $rules = [
+            'channel_name' => 'required',
+            'uid' => 'required',
+        ];
+        $inputArr = $request->all();
+        $validator = Validator::make($inputArr, $rules);
+        if ($validator->fails()) {
+            $validateerror = $validator->errors()->all();
+            return $this->validationErrorResponse($validateerror[0]);
+        }
+
+        try{
+
+            $appID = \Config::get('services.agora.app_id');
+            $appCertificate = \Config::get('services.agora.app_certificate');
+
+            $agoraToken = agoraCallForToken($appID, $appCertificate, $inputArr['channel_name'], $inputArr['uid']);
+
+            if(!$agoraToken){
+                $result = array(
+                  "statusCode" => 404,  // $this-> successStatus
+                  "message" => 'Something went wrong.'
+                );
+              return response()->json($result);                  
+            }
+
+            $result =  array(
+                "statusCode" => 200, 
+                "message" => 'Token Generated Successfully',
+                "data" => [
+                  'token' => $agoraToken
+                ]
+            );
+            return response()->json($result);            
+
+        } catch(\Exception $ex){
+            $result = array(
+                "statusCode" => 401,
+                "message" => $ex->getMessage()
+            );
+            return response()->json($result );
+        }
+    }
+
+    public function agoraTokenRtm(Request $request){
+        $userObj = $this->request->user();
+        if (!$userObj) {
+            return $this->notAuthorizedResponse('User is not authorized');
+        }
+        $rules = [
+            //'channel_name' => 'required',
+            'uid' => 'required',
+        ];
+        $inputArr = $request->all();
+        $validator = Validator::make($inputArr, $rules);
+        if ($validator->fails()) {
+            $validateerror = $validator->errors()->all();
+            return $this->validationErrorResponse($validateerror[0]);
+        }
+
+        try{
+
+            $appID = \Config::get('services.agora.app_id');
+            $appCertificate = \Config::get('services.agora.app_certificate');
+
+            $agoraToken = agoraCallForRtmToken($appID, $appCertificate, $inputArr['uid']);
+
+            if(!$agoraToken){
+                $result = array(
+                  "statusCode" => 404,  // $this-> successStatus
+                  "message" => 'Something went wrong.'
+                );
+              return response()->json($result);                  
+            }
+
+            $result =  array(
+                "statusCode" => 200, 
+                "message" => 'Rtm Token Generated Successfully',
+                "data" => [
+                  'token' => $agoraToken
+                ]
+            );
+            return response()->json($result);            
+
+        } catch(\Exception $ex){
+            $result = array(
+                "statusCode" => 401,
+                "message" => $ex->getMessage()
+            );
+            return response()->json($result );
         }
     }
 

@@ -16,7 +16,8 @@ class Answers extends Model
      */
     protected $fillable = [
         'question_id',
-        'title'
+        'title',
+        'point',
     ];
 
     /**
@@ -59,4 +60,15 @@ class Answers extends Model
     public function updateAnswer($id, $inputArr){
         return self::where('id', $id)->update($inputArr);
     }
+
+    public function getResponseArr(){
+        $returnArr = [
+            'id' => $this->id,
+            'question_id' => $this->question_id,
+            'title' => $this->title,
+            'point' => $this->point,
+        ];
+        return $returnArr;
+    }
+    
 }

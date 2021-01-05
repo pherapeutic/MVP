@@ -7,7 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateTherapistRequest;
 use App\Http\Requests\UpdateTherapistRequest;
 use App\Models\User;
+use App\Models\UserLanguage;
+use App\Models\UserTherapistType;
 use App\Models\TherapistProfile;
+
 class TherapistController extends Controller
 {
     /**
@@ -27,36 +30,40 @@ class TherapistController extends Controller
      */
     public function index(Request $request, User $user)
     {
-        $page_title = 'Datatables';
-        $page_description = 'This is datatables test page';
         if ($request->ajax()) {
-            $usersColl = $user->getAllTherapists();
+            $userColl = $user->getAllTherapists();
             //echo "<pre>"; print_r($usersColl); die;
-            return datatables()->of($usersColl)
+            return datatables()->of($userColl)
                 ->addIndexColumn()
-                ->addColumn('id', function ($user) {
-                   return $user->id;
+                ->addColumn('id', function ($userObj) {
+                return $userObj->id;
                 })
-                ->addColumn('first_name', function ($user) {
-                    return ($user->first_name) ? ($user->first_name) : 'N/A';
+                ->addColumn('name', function ($userObj) {
+                    return ($userObj->full_name) ? ($userObj->full_name) : 'N/A';
                 })
-                ->addColumn('last_name', function ($user) {
-                    return ($user->last_name) ? ($user->last_name) : 'N/A';
+                ->addColumn('email', function ($userObj) {
+                    return ($userObj->email) ? ($userObj->email) : 'N/A';
                 })
-                ->addColumn('email', function ($user) {
-                    return ($user->email) ? ($user->email) : 'N/A';
+                ->addColumn('languages', function ($userObj) {
+                    return ($userObj->getLanguagesString()) ? ($userObj->getLanguagesString()) : 'N/A';
                 })
-                ->addColumn('action', function ($user) {
+                ->addColumn('qualification', function ($userObj) {
+                    return (optional($userObj->therapistProfile)->qualification) ? ($userObj->therapistProfile->qualification) : 'N/A';
+                })
+                ->addColumn('experience', function ($userObj) {
+                    return (optional($userObj->therapistProfile)->experience) ? ($userObj->therapistProfile->experience.' Year(s)') : 'N/A';
+                })
+                ->addColumn('action', function ($userObj) {
                     $btn = '';
-                    $btn = '<a href="therapist/'.$user->id.'/edit" title="Edit"><i class="fas fa-edit mr-1"></i></a>';
-                    $btn .='<a href="javascript:void(0);" data-id="'.$user->id.'" class="text-danger delete-datatable-record" title="Delete"><i class="fas fa-trash ml-1"></i></a>';
+                    $btn = '<a href="therapist/'.$userObj->id.'/edit" title="Edit"><i class="fas fa-edit mr-1"></i></a>';
+                    $btn .='<a href="javascript:void(0);" data-id="'.$userObj->id.'" class="text-danger delete-datatable-record" title="Delete"><i class="fas fa-trash ml-1"></i></a>';
                     
                     return $btn;
                 })
                 ->rawColumns(['action'])
                 ->make(true);
         }
-        return view('admin.users.therapist.index', compact('page_title', 'page_description'));
+        return view('admin.users.therapist.index');
     }
 
     /**
@@ -75,39 +82,50 @@ class TherapistController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(CreateTherapistRequest $request, User $user)
+    public function store(CreateTherapistRequest $request, User $user, TherapistProfile $therapistProfile, UserLanguage $userlanguage, UserTherapistType $userTherapistType)
     {
-        //echo"<pre>";print_r($request->all());die;
-        
         $inputArr = $request->except(['_token', 'confirm_password']);
-
-        $userarr['role'] = $inputArr['role'];
-        $userarr['first_name'] = $inputArr['first_name'];
-        $userarr['last_name'] = $inputArr['last_name'];
-        $userarr['email'] = $inputArr['email'];
-        $userarr['password'] = $inputArr['password'];
-
-        $profilearr['address'] = $inputArr['address'];
-        $profilearr['experience'] = $inputArr['experience'];
-        $profilearr['qaulification'] = $inputArr['qaulification'];
-        $profilearr['specialism'] = $inputArr['specialism'];
-      
-
-        $userObj = $user->saveNewUser($userarr);
-        //$usr = $user->create($inputArr['user']);
-        $profilearr['latitude']   = '';
-        $profilearr['longitude'] = '';
-        $profilearr['user_id']    = $userObj->id;
-        //profile
-        $profile = new TherapistProfile();
-        $profile->create($profilearr);
-        //$user->therapistprofile()->create($inputArr['profile']);
-        //echo"<pre>";print_r($request->all());die;
+        
+        $userArr = [
+            'first_name' => $inputArr['first_name'],
+            'last_name' => $inputArr['last_name'],
+            'email' => $inputArr['email'],
+            'password' => $inputArr['password'],
+            'role' => '1'
+        ];
+        $userObj = $user->saveNewUser($userArr);
         if(!$userObj){
-            return redirect()->back()->with('error', 'Unable to add therapist. Please try again later.');
+            return redirect()->back()->with('error', 'Unable to create new therapist. Please try again later.');
         }
 
-        return redirect()->route('therapist.index')->with('success', 'Therapist account added successfully.');
+        $therapistProfileArr = [
+            'user_id' => $userObj->id,
+            'address' => ($inputArr['address']) ? ($inputArr['address']) : (null),
+            'latitude' => ($inputArr['latitude']) ? ($inputArr['latitude']) : (null),
+            'longitude' => ($inputArr['longitude']) ? ($inputArr['longitude']) : (null),
+            'experience' => ($inputArr['experience']) ? ($inputArr['experience']) : (null),
+            'qualification' => ($inputArr['qualification']) ? ($inputArr['qualification']) : (null),
+        ];
+        $therapistProfileObj =  $therapistProfile->saveTherapistProfile($therapistProfileArr);
+
+        $languagesArr = $request->get('languages');
+        foreach ($languagesArr as $key => $languageId) {
+            $userLanguageArr = [
+                'user_id' => $userObj->id,
+                'language_id' => $languageId
+            ];
+            $userlanguage->saveNewUserLanguages($userLanguageArr);
+        }
+
+        $specialismsArr = $request->get('specialisms');
+        foreach ($specialismsArr as $key => $specialismId) {
+            $userSpecialismArr = [
+                'user_id' => $userObj->id,
+                'therapist_type_id' => $specialismId
+            ];
+            $userTherapistType->saveNewUserTherapistTypes($userSpecialismArr);
+        }
+        return redirect()->route('admin.therapist.index')->with('success_message', 'New therapist created successfully.');
     }
 
     /**
@@ -130,14 +148,13 @@ class TherapistController extends Controller
     public function edit($id,  User $user)
     {
 
-        $user = $user->getUserById($id);
-        $profile = TherapistProfile::where('user_id','=',$id)->first();
-        //echo"<pre>";print_r($user);die;
-        if(!$user){
-            return redirect()->back()->with('error', 'therapist does not exist');
+        $userObj = $user->getUserById($id);
+        if(!$userObj){
+            return redirect()->back()->with('error', 'Therapist does not exist');
         }
 
-        return view('admin.users.therapist.edit', compact('user','profile'));
+        $therapistProfile = $userObj->therapistProfile;
+        return view('admin.users.therapist.edit', compact('userObj', 'therapistProfile'));
     }
 
     /**
@@ -147,38 +164,55 @@ class TherapistController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateTherapistRequest $request, $id)
+    public function update($id, UpdateTherapistRequest $request, User $user, TherapistProfile $therapistProfile, UserLanguage $userlanguage, UserTherapistType $userTherapistType)
     {
-       //echo"<pre>";print_r($request->all());die;
-       $inputArr = $request->except(['_token', 'confirm_password']);
-
-        //$userarr['role'] = $inputArr['role'];
-        $userarr['first_name'] = $inputArr['first_name'];
-        $userarr['last_name'] = $inputArr['last_name'];
-        $userarr['email'] = $inputArr['email'];
-        //$userarr['password'] = $inputArr['password'];
-
-        $profilearr['address'] = $inputArr['address'];
-        $profilearr['experience'] = $inputArr['experience'];
-        $profilearr['qaulification'] = $inputArr['qaulification'];
-        $profilearr['specialism'] = $inputArr['specialism'];
-        $user = new User();
-        $user = $user->getUserById($id);
-        if(!$user){
+        $userObj = $user->getUserById($id);
+        if(!$userObj){
             return redirect()->back()->with('error', 'This therapist does not exist');
         }
 
-        $inputArr = $request->except(['_token', 'user_id', '_method']);
-        $hasUpdated = $user->updateUser($id, $userarr);
+        $inputArr = $request->except(['_token', '_method']);
+        $userArr = [
+            'first_name' => $inputArr['first_name'],
+            'last_name' => $inputArr['last_name']
+        ];
+        $hasUpdated = $userObj->updateUser($id, $userArr);
 
-        $profile =TherapistProfile::where('user_id','=',$id)->first();
-        //echo"<pre>";print_r($inputArr['profile']);die;
-        $profile->update($profilearr);
-
-        if($hasUpdated){
-            return redirect()->route('therapist.index')->with('success', 'Therapist updated successfully.');
+        if(!$hasUpdated){
+            return redirect()->back()->with('error_message', 'Unable to update therapist. Please try again later.');
         }
-        return redirect()->back()->with('error', 'Unable to update therapist. Please try again later.');
+
+        $therapistProfileArr = [
+            'user_id' => $userObj->id,
+            'address' => ($inputArr['address']) ? ($inputArr['address']) : (null),
+            'latitude' => ($inputArr['latitude']) ? ($inputArr['latitude']) : (null),
+            'longitude' => ($inputArr['longitude']) ? ($inputArr['longitude']) : (null),
+            'experience' => ($inputArr['experience']) ? ($inputArr['experience']) : (null),
+            'qualification' => ($inputArr['qualification']) ? ($inputArr['qualification']) : (null),
+        ];
+        $therapistProfileObj =  $therapistProfile->updateTherapistProfile($therapistProfileArr);
+
+        $languagesArr = $request->get('languages');
+        UserLanguage::where('user_id', $userObj->id)->delete();
+        foreach ($languagesArr as $key => $languageId) {
+            $userLanguageArr = [
+                'user_id' => $userObj->id,
+                'language_id' => $languageId
+            ];
+            $userlanguage->saveNewUserLanguages($userLanguageArr);
+        }
+        
+        $specialismsArr = $request->get('specialisms');
+        UserTherapistType::where('user_id', $userObj->id)->delete();
+        foreach ($specialismsArr as $key => $specialismId) {
+            $userSpecialismArr = [
+                'user_id' => $userObj->id,
+                'therapist_type_id' => $specialismId
+            ];
+            $userTherapistType->saveNewUserTherapistTypes($userSpecialismArr);
+        }
+        return redirect()->route('admin.therapist.index')->with('success_message', 'Therapist updated successfully.');
+        
     }
 
     /**
@@ -190,14 +224,14 @@ class TherapistController extends Controller
     public function destroy($id, User $user)
     {
         $userObj = $user->getUserById($id);
-
         if(!$userObj){
             return returnNotFoundResponse('This therapist does not exist');
         }
 
         $hasDeleted = $userObj->delete();
         if($hasDeleted){
-            return returnSuccessResponse('therapist deleted successfully');
+            $userObj->therapistProfile()->delete();
+            return returnSuccessResponse('Therapist deleted successfully');
         }
 
         return returnErrorResponse('Something went wrong. Please try again later');

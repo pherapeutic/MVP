@@ -14,14 +14,14 @@ class CreateTherapistProfilesTable extends Migration
     public function up()
     {
         Schema::create('therapist_profiles', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('user_id');
-            $table->string('address');
+            $table->string('address')->nullable();
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
-            $table->string('experience');
+            $table->integer('experience');
             $table->string('specialism');
-            $table->string('qaulification');
+            $table->string('qualification');
             $table->softDeletes();
             $table->timestamps();
         });
