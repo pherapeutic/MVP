@@ -14,11 +14,11 @@ class CreatePaymentsTable extends Migration
     public function up()
     {
         Schema::create('payments', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->bigInteger('appointment_id');
+            $table->id();
+            $table->string('appointment_id');
             $table->string('txn_id');
             $table->string('card_id');
-            $table->enum('status', array('Pending', 'Completed'));
+            $table->enum('status', array('pending', 'completed'));
             $table->timestamps();
         });
     }

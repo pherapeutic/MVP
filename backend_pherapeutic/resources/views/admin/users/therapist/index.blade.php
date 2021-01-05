@@ -1,7 +1,7 @@
-@extends('layouts.admin')
+{{-- Extends layout --}}
+@extends('layouts.admin.app')
 
-@section('title') Therapist list @endsection
-
+{{-- Content --}}
 @section('content')
 
     <div class="card card-custom">
@@ -13,7 +13,7 @@
             </div>
             <div class="card-toolbar">
                 <!--begin::Button-->
-                <a href="{{route('admin.therapist.create')}}" class="btn btn-primary font-weight-bolder">
+                <a href="{{route('therapist.create')}}" class="btn btn-primary font-weight-bolder">
                 <span class="svg-icon svg-icon-md">
                     <!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
                     <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
@@ -24,7 +24,7 @@
                         </g>
                     </svg>
                     <!--end::Svg Icon-->
-                </span>Add New Therapist</a>
+                </span>New Therapist</a>
                 <!--end::Button-->
             </div>
         </div>
@@ -34,12 +34,10 @@
             <table class="table table-bordered table-hover" id="therapist_datatable">
                 <thead>
                 <tr>
-                    <th>Sr. No.</th>
-                    <th>Name</th>
+                    <th>Therapist ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
                     <th>Email</th>
-                    <th>Languages</th>
-                    <th>Qualification</th>
-                    <th>Experience</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -60,7 +58,19 @@
 
 @endsection
 
-@push('page_script')
+{{-- Styles Section --}}
+@section('styles')
+    <link href="{{ asset('assets/plugins/datatables.bundle.css') }}" rel="stylesheet" type="text/css"/>
+@endsection
+
+{{-- Scripts Section --}}
+@section('scripts')
+    {{-- vendors --}}
+    <script src="{{ asset('js/sweetalert.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/plugins/datatables.bundle.js') }}" type="text/javascript"></script>
+    {{-- page scripts --}}
+    <script src="{{ asset('assets/plugins/basic/basic.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/app.js') }}" type="text/javascript"></script>
     <script>
         var base_url ="{{url('/')}}";
         function getTherapists(){
@@ -72,14 +82,13 @@
                     type: 'GET',
                 },
                 columns: [
-                    {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-                    { data: 'name', name: 'name' },
+                    {data: 'id', name: 'id', orderable: false, searchable: false},
+                    { data: 'first_name', name: 'first_name' },
+                    { data: 'last_name', name: 'last_name' },
                     { data: 'email', name: 'email' },
-                    { data: 'languages', name: 'languages' },
-                    { data: 'qualification', name: 'qualification' },
-                    { data: 'experience', name: 'experience' },
                     { data: 'action', name: 'action', orderable: false, searchable: false},
-                ]
+                ],
+                order: [[1, 'desc']]
             });
         }
 
@@ -94,4 +103,4 @@
             getTherapists();
         });
     </script>
-@endpush
+@endsection

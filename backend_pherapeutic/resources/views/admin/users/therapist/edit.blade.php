@@ -1,221 +1,176 @@
-@extends('layouts.admin')
+{{-- Extends layout --}}
+@extends('layouts.admin.app')
 
-@section('title') Edit therapist @endsection
-
+{{-- Content --}}
 @section('content')
 
-<div class="row">
-  <div class="col-lg-12">
-    <div class="card card-custom gutter-b example example-compact">
-        <div class="card-header">
-          <h3 class="card-title">Edit therapist</h3>
-          <!-- <div class="card-toolbar">
-              <div class="example-tools justify-content-center">
-                <span class="example-toggle" data-toggle="tooltip" title="View code"></span>
-                <span class="example-copy" data-toggle="tooltip" title="Copy code"></span>
-              </div>
-          </div> -->
-        </div>
-        <!--begin::Form-->
-        <form class="form" method="POST" action="{{route('admin.therapist.update', $userObj->id)}}">
-          <div class="card-body">
-            @csrf
-            @method('put')
-              <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                        <label>First Name</label>
-                        <input type="text" name="first_name" class="form-control form-control-solid" value="{{ (old('first_name')) ? (old('first_name')) : ($userObj->first_name) }}" placeholder="Enter first name" required/>
-                        @if ($errors->has("first_name"))
-                          <span class="form-text text-danger">
-                              {{ $errors->first("first_name") }}
-                          </span>
-                        @endif
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Last Name</label>
-                        <input type="text" name="last_name" class="form-control form-control-solid" value="{{ (old('last_name')) ? (old('last_name')) : ($userObj->last_name) }}" placeholder="Enter last name" required/>
-                        @if ($errors->has("last_name"))
-                              <span class="form-text text-danger">
-                              {{ $errors->first("last_name") }}
-                              </span>
-                        @endif
-                    </div>
-                  </div>
-              </div>
+<div class="container">
+   <div class="row">
+    <div class="col-lg-12">
+      <div class="card card-custom gutter-b example example-compact">
+         <div class="card-header">
+            <h3 class="card-title">Edit therapist</h3>
+            <!-- <div class="card-toolbar">
+               <div class="example-tools justify-content-center">
+                  <span class="example-toggle" data-toggle="tooltip" title="View code"></span>
+                  <span class="example-copy" data-toggle="tooltip" title="Copy code"></span>
+               </div>
+            </div> -->
+         </div>
+         <!--begin::Form-->
+         <form class="form" method="POST" action="{{route('therapist.update',$user->id)}}">
+            <div class="card-body">
+              @csrf
+              @method('put')
+               <div class="form-group">
+                <input type="hidden" value="{{ $user->id }}" name="user_id"/>
+                <!-- <input type="hidden" value="Therapist" name="user[role]"/> -->
+                  <label>First Name:</label>
+                  <input type="text" name="first_name" class="form-control form-control-solid" value="{{ old('first_name') ? old('first_name') : $user->first_name }}" placeholder="Enter first name" />
+                  @if ($errors->has("first_name"))
+                      <span class="form-text text-muted">
+                        {{ $errors->first("first_name") }}
+                      </span>
+                  @endif
+               </div>
+               <div class="form-group">
+                  <label>Last Name:</label>
+                  <input type="text" name="last_name" class="form-control form-control-solid" value="{{ old('last_name') ? old('last_name') : $user->last_name }}" placeholder="Enter last name" />
+                  @if ($errors->has("last_name"))
+                        <span class="form-text text-muted">
+                          {{ $errors->first("last_name") }}
+                        </span>
+                    @endif
+               </div>
+               <div class="form-group">
+                  <label>Email address:</label>
+                  <input type="email" name="email" class="form-control form-control-solid" value="{{ old('email') ? old('email') : $user->email }}" placeholder="Enter email" />
+                  @if ($errors->has("email"))
+                      <span class="form-text text-muted">
+                        {{ $errors->first("email") }}
+                      </span>
+                    @endif
+               </div>
+               <!-- start profile -->
+               @if($profile)
+               <div class="form-group">
+                  <label>Address:</label>
+                  <input type="text" name="address" class="form-control form-control-solid" value="{{ old('address') ? old('address') : $profile->address }}" placeholder="Enter Address" />
+                  @if ($errors->has("address"))
+                        <span class="form-text text-muted">
+                          {{ $errors->first("address") }}
+                        </span>
+                    @endif
+               </div>
+               <div class="form-group">
+                  <label>Specialism:</label>
+                  <input type="text" name="specialism" class="form-control form-control-solid" value="{{ old('specialism') ? old('specialism') : $profile->specialism }}" placeholder="Enter Specialism" />
+                  @if ($errors->has("specialism"))
+                        <span class="form-text text-muted">
+                          {{ $errors->first("specialism") }}
+                        </span>
+                    @endif
+               </div>
 
-              <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" name="email" class="form-control form-control-solid disabled-input" value="{{ (old('email')) ? (old('email')) : ($userObj->email) }}" placeholder="Enter email" required/>
-                        @if ($errors->has("email"))
-                          <span class="form-text text-danger">
-                              {{ $errors->first("email") }}
-                          </span>
-                        @endif
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <!-- start profile -->
-                    <div class="form-group">
-                        <label>Address</label>
-                        <input type="hidden" id="latitude" name="latitude" value="{{ (old('latitude')) ? (old('latitude')) : ($therapistProfile->latitude) }}"/>
-                        <input type="hidden" id="longitude" name="longitude" value="{{ (old('longitude')) ? (old('longitude')) : ($therapistProfile->longitude) }}"/>
-                        <input type="text" id="address" name="address" class="form-control form-control-solid" value="{{ (old('address')) ? (old('address')) : ($therapistProfile->address) }}" placeholder="Enter Address" required/>
-                        @if ($errors->has("address"))
-                              <span class="form-text text-danger">
-                              {{ $errors->first("address") }}
-                              </span>
-                        @elseif ($errors->has("latitude"))
-                              <span class="form-text text-danger">
-                              {{ $errors->first("latitude") }}
-                              </span>
-                        @elseif ($errors->has("longitude"))
-                              <span class="form-text text-danger">
-                              {{ $errors->first("longitude") }}
-                              </span>
-                        @endif
-                    </div>
-                  </div>
-              </div>
-              
-              <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Qualification</label>
-                        <input type="text" name="qualification" class="form-control form-control-solid" value="{{ (old('qualification')) ? (old('qualification')) : ($therapistProfile->qualification) }}" placeholder="Enter Qualification" required/>
-                        @if ($errors->has("qualification"))
-                              <span class="form-text text-danger">
-                              {{ $errors->first("qualification") }}
-                              </span>
-                        @endif
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Experience (In Years)</label>
-                        <input type="number" name="experience" class="form-control form-control-solid" value="{{ (old('experience')) ? (old('experience')) : ($therapistProfile->experience) }}" placeholder="Enter Experience" min="0" required/>
-                        @if ($errors->has("experience"))
-                              <span class="form-text text-danger">
-                              {{ $errors->first("experience") }}
-                              </span>
-                        @endif
-                    </div>
-                  </div>
-              </div>
-
-              <div class="row">
-                  @php
-                    $therapistTypeIds = (old('specialisms')) ? (old('specialisms')) : (array());
-                    if(!$therapistTypeIds){
-                      $userTherapistTypes = $userObj->userTherapistTypes;
-                      foreach($userTherapistTypes as $key => $userTherapistType){
-                          array_push($therapistTypeIds, $userTherapistType->therapist_type_id);
-                      }
-                    }
-                  @endphp
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Specialism</label>
-                        <select class="form-control select2" id="specialisms" name="specialisms[]" multiple="multiple" required>
-                          @foreach(getTherapistTypes() as $therapistTypeId => $therapistType)
-                              <option value="{{ $therapistTypeId }}" {{ ($therapistTypeIds && in_array($therapistTypeId, $therapistTypeIds)) ? ('selected="selected"') : ('') }}>{{ $therapistType }}</option>
-                          @endforeach
-                        </select>
-                        @if ($errors->has("specialism"))
-                              <span class="form-text text-danger">
-                              {{ $errors->first("specialism") }}
-                              </span>
-                        @endif
-                    </div>
-                  </div>
-
-                  @php
-                    $languageIds = (old('languages')) ? (old('languages')) : (array());
-                    if(!$languageIds){
-                      $userLanguages = $userObj->userLanguages;
-                      foreach($userLanguages as $key => $userLanguage){
-                          array_push($languageIds, $userLanguage->language_id);
-                      }
-                    }
-                  @endphp
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Select languages which therapist can speak</label>
-                        <select class="form-control select2" id="languages" name="languages[]" multiple="multiple" required>
-                          @foreach(getLanguages() as $languageId => $language)
-                              <option value="{{ $languageId }}" {{ ($languageIds && in_array($languageId, $languageIds)) ? ('selected="selected"') : ('') }}>{{ $language }}</option>
-                          @endforeach
-                        </select>
-                        @if ($errors->has('languages'))
-                              <span class="form-text text-danger">{{ $errors->first('languages') }}</span>
-                        @endif
-                    </div>
-                  </div>
-              </div>
-              
-              <!-- end profile -->
+               <div class="form-group">
+                  <label>Experience:</label>
+                  <input type="text" name="experience" class="form-control form-control-solid" value="{{ old('experience') ? old('experience') : $profile->experience }}" placeholder="Enter Experience" />
+                  @if ($errors->has("experience"))
+                        <span class="form-text text-muted">
+                          {{ $errors->first("experience") }}
+                        </span>
+                    @endif
+               </div>
+               <div class="form-group">
+                  <label>Qaulification:</label>
+                  <input type="text" name="qaulification" class="form-control form-control-solid" value="{{ old('qaulification') ? old('qaulification') : $profile->qaulification }}" placeholder="Enter Qaulification" />
+                  @if ($errors->has("qaulification"))
+                        <span class="form-text text-muted">
+                          {{ $errors->first("qaulification") }}
+                        </span>
+                    @endif
+               </div>
+               @else
+                <div class="form-group">
+                  <label>Address:</label>
+                  <input type="text" name="address" class="form-control form-control-solid" value="{{old('address')}}" placeholder="Enter Address" />
+                  @if ($errors->has("address"))
+                        <span class="form-text text-muted">
+                          {{ $errors->first("address") }}
+                        </span>
+                    @endif
+               </div>
+               <div class="form-group">
+                  <label>Specialism:</label>
+                  <input type="text" name="specialism" class="form-control form-control-solid" value="{{old('specialism')}}" placeholder="Enter Specialism" />
+                  @if ($errors->has("specialism"))
+                        <span class="form-text text-muted">
+                          {{ $errors->first("specialism") }}
+                        </span>
+                    @endif
+               </div>
+               <div class="form-group">
+                  <label>Experience:</label>
+                  <input type="text" name="experience" class="form-control form-control-solid" value="{{old('profile[experience]')}}" placeholder="Enter Experience" />
+                  @if ($errors->has("experience"))
+                        <span class="form-text text-muted">
+                          {{ $errors->first("experience") }}
+                        </span>
+                    @endif
+               </div>
+               <div class="form-group">
+                  <label>Qaulification:</label>
+                  <input type="text" name="qaulification" class="form-control form-control-solid" value="{{old('qaulification')}}" placeholder="Enter Qaulification" />
+                  @if ($errors->has("qaulification"))
+                        <span class="form-text text-muted">
+                          {{ $errors->first("qaulification") }}
+                        </span>
+                    @endif
+               </div>
+               @endif
+               <!-- end profile -->
+              {{--
+               <div class="form-group">
+                  <label>Password:</label>
+                  <input type="password" name="password" class="form-control form-control-solid" placeholder="Password" />
+                    @if ($errors->has('password'))
+                        <span class="form-text text-muted">
+                            {{ $errors->first('password') }}
+                        </span>
+                    @endif
+               </div>
+               <div class="form-group">
+                  <label>Confirm Password:</label>
+                  <input type="password" name="confirm_password" class="form-control form-control-solid" placeholder="Confirm Password" />
+                    @if ($errors->has('confirm_password'))
+                        <span class="form-text text-muted">
+                            {{ $errors->first('confirm_password') }}
+                        </span>
+                    @endif
+                  
+               </div>
+            --}}
             </div>
-          <div class="card-footer">
-              <button type="submit" class="btn btn-primary mr-2">Submit</button>
-            <!--  <button type="reset" class="btn btn-secondary">Cancel</button> -->
-          </div>
-        </form>
-        <!--end::Form-->
+            <div class="card-footer">
+               <button type="submit" class="btn btn-primary mr-2">Submit</button>
+              <!--  <button type="reset" class="btn btn-secondary">Cancel</button> -->
+            </div>
+         </form>
+         <!--end::Form-->
+      </div>
     </div>
-  </div>
+   </div>
 </div>
 
 @endsection
 
-@push('page_script')
-  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyAYPbdVQNA2a_iUyiCYAGr0Xdced_kZrKU&libraries=places" ></script>
-  <script src="{{ asset('assets/js/pages/crud/forms/widgets/select2.js') }}"></script>
-  <script>
-      $('#languages').select2({
-         placeholder: "Select languages",
-      });
-      
-      $('#specialisms').select2({
-         placeholder: "Select specialisms",
-      });
+{{-- Styles Section --}}
+@section('styles')
+    
+@endsection
 
-      function initialize() {
-         var address = (document.getElementById('address'));
-         var autocomplete = new google.maps.places.Autocomplete(address);
-         autocomplete.setTypes(['geocode']);
-         google.maps.event.addListener(autocomplete, 'place_changed', function() {
-                  var place = autocomplete.getPlace();
-                  if (!place.geometry) {
-                     return;
-                  }
 
-               var address = '';
-               if (place.address_components) {
-                  address = [
-                     (place.address_components[0] && place.address_components[0].short_name || ''),
-                     (place.address_components[1] && place.address_components[1].short_name || ''),
-                     (place.address_components[2] && place.address_components[2].short_name || '')
-                     ].join(' ');
-               }
-               /*********************************************************************/
-               /* var address contain your autocomplete address *********************/
-               /* place.geometry.location.lat() && place.geometry.location.lat() ****/
-               /* will be used for current address latitude and longitude************/
-               /*********************************************************************/
-               
-         // document.getElementById('lat').innerHTML = place.geometry.location.lat();
-         // document.getElementById('long').innerHTML = place.geometry.location.lng();
-               $("#latitude").val(place.geometry.location.lat());
-               $("#longitude").val(place.geometry.location.lng());
-         });
-      }
-
-      google.maps.event.addDomListener(window, 'load', initialize);
-  </script>
-@endpush
+{{-- Scripts Section --}}
+@section('scripts')
+   
+@endsection

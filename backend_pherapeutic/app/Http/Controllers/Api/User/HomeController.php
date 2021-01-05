@@ -25,15 +25,38 @@ class HomeController extends Controller
     public function profile(Request $request)
     {
         try {
-            $userObj = $this->request->user();
-            if ( ! $userObj) {
+            $userDetailArr = $this->request->user();
+
+            if ( ! $userDetailArr) {
                 throw new \Exception('Unable to get profile');
             }
 
-            $returnArr = $userObj->getResponseArr();
-            return returnSuccessResponse('Profile detail', $returnArr);
+            $userlanguage = new UserLanguages();
+            $userlang = $userlanguage->getUserLanguagesById($userDetailArr->id);
+            if($userlang){
+              $userDetailArr['language_id'] = $userlang->language_id;  
+            }
+
+            if($userDetailArr->role == "Therapist"){
+                $therapist   = new TherapistProfile();
+                $userprofile = $therapist->getTherapistProfileById($userDetailArr->id);
+                if($userprofile){
+                    $userDetailArr['address'] = $userprofile->address;
+                    $userDetailArr['experience'] = $userprofile->experience;
+                    $userDetailArr['qaulification'] = $userprofile->qaulification;
+                }
+            }
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'User profile.',
+                'data' => $userDetailArr
+            ]);
         } catch (Exception $error) {
-            return returnErrorResponse('Unable to get profile');
+            return response()->json([
+                'status_code' => 500,
+                'message' => 'Unable to get profile',
+                'error' => $error,
+            ]);
         }
     }
 

@@ -48,9 +48,4 @@ class FeedbackNotes extends Model
     public function updateUserFeedback($appointment_id, $inputArr){
         return self::where('appointment_id', $appointment_id)->update($inputArr);
     }
-    
-    public function feedbackBy()
-    {
-        return $this->belongsTo('App\Models\User', 'feedback_by', 'id');
-    }    
 }

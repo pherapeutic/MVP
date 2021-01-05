@@ -7,8 +7,6 @@ use App\Http\Requests\CreateClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\UserLanguage;
-
 class ClientController extends Controller
 {
     /**
@@ -29,26 +27,26 @@ class ClientController extends Controller
     public function index(Request $request, User $user)
     {
         if ($request->ajax()) {
-            $userColl = $user->getAllClients();
-            
-            return datatables()->of($userColl)
+            $usersColl = $user->getAllClients();
+            //echo "<pre>"; print_r($usersColl); die;
+            return datatables()->of($usersColl)
                 ->addIndexColumn()
-                ->addColumn('id', function ($userObj) {
-                   return $userObj->id;
+                ->addColumn('id', function ($user) {
+                   return $user->id;
                 })
-                ->addColumn('name', function ($userObj) {
-                    return ($userObj->full_name) ? ($userObj->full_name) : 'N/A';
+                ->addColumn('first_name', function ($user) {
+                    return ($user->first_name) ? ($user->first_name) : 'N/A';
                 })
-                ->addColumn('email', function ($userObj) {
-                    return ($userObj->email) ? ($userObj->email) : 'N/A';
+                ->addColumn('last_name', function ($user) {
+                    return ($user->last_name) ? ($user->last_name) : 'N/A';
                 })
-                ->addColumn('languages', function ($userObj) {
-                    return ($userObj->getLanguagesString()) ? ($userObj->getLanguagesString()) : 'N/A';
+                ->addColumn('email', function ($user) {
+                    return ($user->email) ? ($user->email) : 'N/A';
                 })
-                ->addColumn('action', function ($userObj) {
+                ->addColumn('action', function ($user) {
                     $btn = '';
-                    $btn = '<a href="client/'.$userObj->id.'/edit" title="Edit"><i class="fas fa-edit mr-1"></i></a>';
-                    $btn .='<a href="javascript:void(0);" data-id="'.$userObj->id.'" class="text-danger delete-datatable-record" title="Delete"><i class="fas fa-trash ml-1"></i></a>';
+                    $btn = '<a href="client/'.$user->id.'/edit" title="Edit"><i class="fas fa-edit mr-1"></i></a>';
+                    $btn .='<a href="javascript:void(0);" data-id="'.$user->id.'" class="text-danger delete-datatable-record" title="Delete"><i class="fas fa-trash ml-1"></i></a>';
                     
                     return $btn;
                 })
@@ -74,26 +72,15 @@ class ClientController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(CreateClientRequest $request, User $user, UserLanguage $userlanguage)
+    public function store(CreateClientRequest $request, User $user)
     {
-        $languagesArr = $request->get('languages');
-        $inputArr = $request->except(['_token', 'confirm_password', 'languages']);
-        $inputArr['role'] = '0';
-        
+        $inputArr = $request->except(['_token', 'confirm_password']);
         $userObj = $user->saveNewUser($inputArr);
         if(!$userObj){
-            return redirect()->back()->with('error_message', 'Unable to create new client. Please try again later.');
+            return redirect()->back()->with('error', 'Unable to add Customer. Please try again later.');
         }
 
-        foreach ($languagesArr as $key => $languageId) {
-            $userLanguageArr = [
-                'user_id' => $userObj->id,
-                'language_id' => $languageId
-            ];
-            $userlanguage->saveNewUserLanguages($userLanguageArr);
-        }
-
-        return redirect()->route('admin.client.index')->with('success_message', 'New client created successfully.');
+        return redirect()->route('client.index')->with('success', 'Customer account added successfully.');
     }
 
     /**
@@ -116,12 +103,12 @@ class ClientController extends Controller
     public function edit($id,  User $user)
     {
 
-        $userObj = $user->getUserById($id);
-        if(!$userObj){
-            return redirect()->back()->with('error_message', 'Customer does not exist');
+        $user = $user->getUserById($id);
+        if(!$user){
+            return redirect()->back()->with('error', 'Customer does not exist');
         }
 
-        return view('admin.users.client.edit', compact('userObj'));
+        return view('admin.users.client.edit', compact('user'));
     }
 
     /**
@@ -131,31 +118,22 @@ class ClientController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update($id, UpdateClientRequest $request, User $user, Userlanguage $userlanguage)
+    public function update(UpdateClientRequest $request, $id)
     {
-        $userObj = $user->getUserById($id);
-        if(!$userObj){
-            return redirect()->back()->with('error_message', 'This Customer does not exist');
+        //echo"<pre>";print_r($request->all());die;
+        $user = new User();
+        $user = $user->getUserById($id);
+        if(!$user){
+            return redirect()->back()->with('error', 'This Customer does not exist');
         }
 
-        $languagesArr = $request->get('languages');
-        $inputArr = $request->except(['_token', '_method', 'languages']);
-        $hasUpdated = $userObj->updateUser($id, $inputArr);
-        
-        if(!$hasUpdated){
-            return redirect()->back()->with('error_message', 'Unable to update client. Please try again later.');
-        }
+        $inputArr = $request->except(['_token', 'user_id', '_method']);
+        $hasUpdated = $user->updateUser($id, $inputArr);
 
-        UserLanguage::where('user_id', $userObj->id)->delete();
-        foreach ($languagesArr as $key => $languageId) {
-            $userLanguageArr = [
-                'user_id' => $userObj->id,
-                'language_id' => $languageId
-            ];
-            $userlanguage->saveNewUserLanguages($userLanguageArr);
+        if($hasUpdated){
+            return redirect()->route('client.index')->with('success_message', 'Customer updated successfully.');
         }
-        return redirect()->route('admin.client.index')->with('success_message', 'Client detail updated successfully.');
-        
+        return redirect()->back()->with('error', 'Unable to update customer. Please try again later.');
     }
 
     /**
@@ -169,12 +147,12 @@ class ClientController extends Controller
         $userObj = $user->getUserById($id);
 
         if(!$userObj){
-            return returnNotFoundResponse('This client does not exist');
+            return returnNotFoundResponse('This customer does not exist');
         }
 
         $hasDeleted = $userObj->delete();
         if($hasDeleted){
-            return returnSuccessResponse('Client deleted successfully');
+            return returnSuccessResponse('Customer deleted successfully');
         }
 
         return returnErrorResponse('Something went wrong. Please try again later');

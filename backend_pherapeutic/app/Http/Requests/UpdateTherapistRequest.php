@@ -24,19 +24,28 @@ class UpdateTherapistRequest extends FormRequest
      */
     public function rules(Request $request)
     {
-        $userId = ($this->segment(4)) ? ($this->segment(4)) : ('NULL');
+        // return [
+        //     'user[first_name]' => 'required',
+        //     'user[last_name]' => 'required',
+        //     'user[email]' => 'nullable|email|unique:users,email,'.$request->user_id.'NULL,id,deleted_at,NULL',
+        //     'user[password]' => 'required',
+        //     'user[confirm_password]' => 'required|same:password',
+        //     'profile[address]' => 'required',
+        //     'profile[experience]' => 'required',
+        //     'profile[qaulification]' => 'required'
+
+        // ];
+
+
         return [
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'required|email|unique:users,email,'.$userId.'NULL,id,deleted_at,NULL',
-
-            'qualification' => 'required',
-            'experience' => 'required',
-            'specialisms' => 'required',
-            'languages' => 'required',
+            'email' => 'nullable|email|unique:users,email,'.$request->user_id.'NULL,id,deleted_at,NULL',
+            // 'password' => 'required',
+            // 'confirm_password' => 'required|same:password',
             'address' => 'required',
-            'latitude' => 'required',
-            'longitude' => 'required',
+            'experience' => 'required',
+            'qaulification' => 'required'
         ];
     }
 
@@ -47,23 +56,51 @@ class UpdateTherapistRequest extends FormRequest
      */
     public function messages()
     {
+        // return [
+        //     'user[first_name].required' => 'This field is required',
+        //     'user[first_name].max' => 'Please enter maximum 255 characters',
+
+        //     'user[last_name].required' => 'This field is required',
+        //     'user[last_name].max' => 'Please enter maximum 255 characters',
+
+        //     'profile[address].required' => 'This field is required',
+        //     'profile[experience].required' => 'This field is required',
+        //     'profile[qaulification].required' => 'This field is required',
+
+        //     'user[email].unique'  => 'This email already exist',
+        //     'user[email].email'  => 'Please enter a valid email',
+        //     'user[email].max'  => 'Please enter maximum 255 characters',
+
+
+        //     'user[password].required' => 'This field is required',
+        //     'user[password].max' => 'Please enter maximum 255 characters',
+
+        //     'user[confirm_password].same' => "Password and confirm password doesn't match",
+        //     'user[confirm_password].required' => 'Please enter confirm password',
+            
+        // ];
 
         return [
-            'first_name.required' => 'Please enter first name',
-            'last_name.required'  => 'Please enter last name',
+            'first_name.required' => 'This field is required',
+            'first_name.max' => 'Please enter maximum 255 characters',
 
-            'email.required'  => 'Please enter the email',
+            'last_name.required' => 'This field is required',
+            'last_name.max' => 'Please enter maximum 255 characters',
+
+            'address.required' => 'This field is required',
+            'experience.required' => 'This field is required',
+            'qaulification.required' => 'This field is required',
+
             'email.unique'  => 'This email already exist',
             'email.email'  => 'Please enter a valid email',
-            
-            'qualification.required'  => 'Please enter the qualification',
-            'experience.required'  => 'Please enter the experience',
-            'specialism.required'  => 'Please enter the specialism',
-            'languages.required'  => 'Please select languages',
-            'address.required'  => 'Please enter the address',
+            'email.max'  => 'Please enter maximum 255 characters',
 
-            'latitude.required'  => 'Please select address from suggested addresses',
-            'longitude.required'  => 'Please select address from suggested addresses',
+
+            // 'password.required' => 'This field is required',
+            // 'password.max' => 'Please enter maximum 255 characters',
+
+            // 'confirm_password.same' => "Password and confirm password doesn't match",
+            // 'confirm_password.required' => 'Please enter confirm password',
             
         ];
     }

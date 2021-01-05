@@ -4,18 +4,25 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TherapistProfile extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $guarded = [];
+    protected $fillable = [
+        'user_id',
+        'address',
+        'latitude',
+        'longitude',
+        'experience',
+        'specialism',
+        'qaulification',
+    ];
 
     /**
      * Get the user that owns the phone.
@@ -40,7 +47,7 @@ class TherapistProfile extends Model
      * @param user id , fields array
      * @return updated
      */
-    public function updateTherapistProfile($inputArr){
-        return self::updateOrCreate(['user_id' => $inputArr['user_id']], $inputArr);
+    public function updateTherapistProfile($id, $inputArr){
+        return self::where('user_id', $id)->update($inputArr);
     }
 }

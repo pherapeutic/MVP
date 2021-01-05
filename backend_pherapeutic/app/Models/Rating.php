@@ -56,11 +56,6 @@ class Rating extends Model
     }
 
 
-    public function getRatingByAppointmentId($appointment_id){
-        return self::where('appointment_id', $appointment_id)->first();
-    }
-
-
     /**
      * Created By Parmod KUmar
      * Created At 22-10-2020

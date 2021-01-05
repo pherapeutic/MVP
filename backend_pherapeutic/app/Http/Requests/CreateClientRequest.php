@@ -26,10 +26,9 @@ class CreateClientRequest extends FormRequest
         return [
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'required|email|unique:users,email,NULL,id,deleted_at,NULL',
+            'email' => 'nullable|email|unique:users,email,NULL,id,deleted_at,NULL',
             'password' => 'required',
             'confirm_password' => 'required|same:password',
-            'languages' => 'required'
         ];
     }
 
@@ -41,19 +40,21 @@ class CreateClientRequest extends FormRequest
     public function messages()
     {
         return [
-            'first_name.required' => 'Please enter first name',
-            'last_name.required'  => 'Please enter last name',
+            'first_name.required' => 'This field is required',
+            'first_name.max'  => 'Please enter maximum 255 characters',
+            
+            'last_name.required' => 'This field is required',
+            'last_name.max'  => 'Please enter maximum 255 characters',
 
-            'email.required'  => 'Please enter your email',
             'email.unique'  => 'This email already exist',
             'email.email'  => 'Please enter a valid email',
+            'email.max'  => 'Please enter maximum 255 characters',
 
-            'password.required' => 'Please enter the password',
+            'password.required' => 'This field is required',
             'password.max' => 'Please enter maximum 255 characters',
 
             'confirm_password.same' => "Password and confirm password doesn't match",
             'confirm_password.required' => 'Please enter confirm password',
-            'languages.required'  => 'Please select languages',
             
         ];
     }

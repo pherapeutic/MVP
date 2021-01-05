@@ -24,21 +24,9 @@ if (! function_exists('returnNotFoundResponse')) {
             'statusCode' => 404,
             'status' => 'not found',
             'message' => $message,
-            'data' => ($data) ? ($data) : ((object) $data)
+            'data' => $data
         ];
-        return response()->json($returnArr, 404);
-    }
-}
-
-if (! function_exists('returnValidationErrorResponse')) {
-    function returnValidationErrorResponse($message = '', $data = array()) {
-        $returnArr = [
-            'statusCode' => 422,
-            'status' => 'vaidation error',
-            'message' => $message,
-            'data' => ($data) ? ($data) : ((object) $data)
-        ];
-        return response()->json($returnArr, 422);
+        return response()->json($returnArr);
     }
 }
 
@@ -48,9 +36,9 @@ if (! function_exists('returnSuccessResponse')) {
             'statusCode' => 200,
             'status' => 'success',
             'message' => $message,
-            'data' => ($data) ? ($data) : ((object) $data)
+            'data' => $data
         ];
-        return response()->json($returnArr, 200);
+        return response()->json($returnArr);
     }
 }
 
@@ -60,22 +48,8 @@ if (! function_exists('returnErrorResponse')) {
             'statusCode' => 500,
             'status' => 'error',
             'message' => $message,
-            'data' => ($data) ? ($data) : ((object) $data)
+            'data' => $data
         ];
-        return response()->json($returnArr, 500);
-    }
-}
-
-if (! function_exists('getLanguages')) {
-    function getLanguages() {
-        $languagesArr = \App\Models\Language::getLanguagesDropdownArr();
-        return $languagesArr;
-    }
-}
-
-if (! function_exists('getTherapistTypes')) {
-    function getTherapistTypes() {
-        $therapistTypesArr = \App\Models\TherapistType::getTherapistTypesDropdownArr();
-        return $therapistTypesArr;
+        return response()->json($returnArr);
     }
 }

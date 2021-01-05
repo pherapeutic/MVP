@@ -43,22 +43,6 @@ class Appointments extends Model
         return self::where('user_id', $id)->get();
     }
 
-    public function getTherapistAppointmentRequests($therapist_id, $status){
-        return self::where('therapist_id', $therapist_id)->where('status', $status)->get();
-    }
-
-    public function getResponseArr(){
-        $returnArr = [
-            'id' => $this->id,
-            'user_id' => $this->user_id,
-            'therapist_id' => $this->therapist_id,
-            'status' => $this->status,
-            'is_trail' => $this->is_trail,
-            'ended_at' => $this->ended_at
-        ];
-        return $returnArr;
-    }
-
     /**
      * Created By Parmod KUmar
      * Created At 22-10-2020
@@ -89,20 +73,4 @@ class Appointments extends Model
     public function updateAppointment($id, $inputArr){
         return self::where('id', $id)->update($inputArr);
     }
-    
-    public function therapist()
-    {
-        return $this->belongsTo('App\Models\User', 'therapist_id', 'id');
-    }
-    
-    public function rating()
-    {
-        return $this->hasMany('App\Models\Rating', 'appointment_id', 'id');
-    }
-   
-    public function feedbackNotes()
-    {
-        return $this->hasMany('App\Models\FeedbackNotes', 'appointment_id', 'id');
-    }
-   
 }

@@ -53,11 +53,11 @@ class RatingController extends Controller
         }
     }
     
-    public function clientPostRating(Request $request, Rating $rating){
+    public function postRating(Request $request, Rating $rating){
         $rules = [
+            //'client_id' => 'required',
             'appointment_id' => 'required',
             'rating' => 'required',
-            'comment' => 'required',
         ];
         $userObj = $this->request->user();
         $inputArr = $request->all();
@@ -65,30 +65,25 @@ class RatingController extends Controller
         if ($validator->fails()) {
             $validateerror = $validator->errors()->all();
             return $this->validationErrorResponse($validateerror[0]);
-        }
-
-        $ratingExist = $rating->getRatingByAppointmentId($inputArr['appointment_id']);
-        if($ratingExist){
-            return returnValidationErrorResponse('Appointment rating is already post');            
-        }
-
-        $respone = $rating->saveNewRating($inputArr);
-        //$userrating = $rating->getRatingByClientId($userObj->id);
-        // $inputArr['client_id'] = $userObj->id;
-        // if($userrating){
-        //     $respone = $rating->updateUserRating($userObj->id,$inputArr);
-        // }else{
-        //     $respone = $rating->saveNewRating($inputArr);
-        // }
-        
-        if($respone){
-            return returnSuccessResponse('Thanks for rating !');
         }else{
-            return returnNotFoundResponse('Something wrong');
-        }
+            $respone = $rating->saveNewRating($inputArr);
+            //$userrating = $rating->getRatingByClientId($userObj->id);
+            // $inputArr['client_id'] = $userObj->id;
+            // if($userrating){
+            //     $respone = $rating->updateUserRating($userObj->id,$inputArr);
+            // }else{
+            //     $respone = $rating->saveNewRating($inputArr);
+            // }
+            
+            if($respone){
+                return returnSuccessResponse('Thanks for rating !');
+            }else{
+                return returnNotFoundResponse('Something wrong');
+           }
+        }    
     }
 
-    public function therapistPostFeedback(Request $request, FeedbackNotes $feedback){
+    public function postFeedback(Request $request, FeedbackNotes $feedback){
         $rules = [
             'appointment_id' => 'required',
             'feedback_note' => 'required',
@@ -100,7 +95,6 @@ class RatingController extends Controller
             $validateerror = $validator->errors()->all();
             return $this->validationErrorResponse($validateerror[0]);
         }else{
-            $inputArr['feedback_by'] = $userObj->id;
             $respone = $feedback->saveNewFeedback($inputArr);
 
             if($respone){

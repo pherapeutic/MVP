@@ -6,8 +6,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Appointments;
 use App\Models\User;
-use App\Models\Rating;
-use Carbon\Carbon;
 class AppointmentsController extends Controller
 {
     /**
@@ -39,24 +37,12 @@ class AppointmentsController extends Controller
                     
                     return ($name) ? ($name) : 'N/A';
                 })
-                ->addColumn('therapist_name', function ($appointments) use ($user) {
-                    $name = $user->getUserNameId($appointments->therapist_id);
-                    return ($name) ? ($name) : 'N/A';
-                })
+                // ->addColumn('therapist_name', function ($appointments) use ($user) {
+                //     $name = $user->getUserNameId($appointments->therapist_id);
+                //     return ($name) ? ($name) : 'N/A';
+                // })
                 ->addColumn('status', function ($appointments) {
-                    $status = 'N/A';
-                    if($appointments->status == '0'){
-                        $status = '<span class="badge badge-secondary">Waiting</span>';
-                    }else if($appointments->status == '1'){
-                        $status = '<span class="badge badge-info">Connected</span>';
-                    }else if($appointments->status == '2'){
-                        $status = '<span class="badge badge-success">Completed</span>';
-                    }else if($appointments->status == '3'){
-                        $status = '<span class="badge badge-warning">Payment Done</span>';
-                    }else if($appointments->status == '4'){
-                        $status = '<span class="badge badge-danger">Disconnected</span>';
-                    }
-                    return $status;
+                    return ($appointments->status) ? ($appointments->status) : 'N/A';
                 })
                 ->addColumn('is_trail', function ($appointments) {
                     if($appointments->is_trail ==1){
@@ -66,22 +52,14 @@ class AppointmentsController extends Controller
                     }
                     return ($return) ? ($return) : 'N/A';
                 })
-                ->addColumn('ended_at', function ($appointments) {
-                    if($appointments->ended_at){
-                        return Carbon::parse($appointments->ended_at)->format('d M Y');
-                    }else{
-                       return 'No';  
-                    }
-                })
                 ->addColumn('action', function ($appointments) {
                     $btn = '';
-                    $btn = '<a href="appointments/'.$appointments->id.'" title="View"><i class="fas fa-eye mr-1"></i></a>';
                    // $btn = '<a href="appointments/'.$appointments->id.'/edit" title="Edit"><i class="fas fa-edit mr-1"></i></a>';
-                   //  $btn .='<a href="javascript:void(0);" data-id="'.$appointments->id.'" class="text-danger delete-datatable-record" title="Delete"><i class="fas fa-trash ml-1"></i></a>';
+                    //$btn .='<a href="javascript:void(0);" data-id="'.$appointments->id.'" class="text-danger delete-datatable-record" title="Delete"><i class="fas fa-trash ml-1"></i></a>';
                     
                     return $btn;
                 })
-                ->rawColumns(['action','status'])
+                ->rawColumns(['action'])
                 ->make(true);
         }
         return view('admin.appointments.index');
@@ -123,11 +101,7 @@ class AppointmentsController extends Controller
      */
     public function show($id)
     {
-        $appointmentObj = Appointments::find($id);
-        if(!$appointmentObj){
-            return redirect()->route('admin.appointments.index')->with('error_message', 'Appointment not found.');            
-        }
-        return view('admin.appointments.show',compact('appointmentObj'));
+        //
     }
 
     /**
