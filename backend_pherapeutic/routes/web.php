@@ -45,7 +45,11 @@ Route::middleware('auth')->prefix('admin')->namespace('Admin')->name('admin.')->
 	Route::resource('languages', 'LanguagesController');
 
 	Route::resource('questionnaire', 'QuestionnaireController');	
-	Route::post('question-ordering/{order}', 'QuestionnaireController@ordering');	
+	Route::post('question-ordering/{order}', 'QuestionnaireController@ordering');
+
+	Route::resource('settings', 'SettingController');
+
+	Route::resource('payments', 'PaymentsController');
 	//End Admin Route
 });
 

@@ -102,7 +102,7 @@
 							//}else{ 
                                 if(!isset($noUser)){?>
 							
-							     <a  href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_IEIjvfVWcwrxe1vRIUk6qGcQVgig0JkC&amp;&scope=read_write&redirect_uri="<?php config('app.APP_URL'); ?>"/sendcurltostrip&amp;state=state" class="connect-button"><span>Connect with Stripe</span></a>
+							     <a  href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_Ia9OMeH4j9G9HPRqZfFRy8E7R0cb0d1H&amp;&scope=read_write&redirect_uri="<?php config('app.APP_URL'); ?>"/sendcurltostrip&amp;state=state" class="connect-button"><span>Connect with Stripe</span></a>
 						<?php 	}
                            // } ?>
 							</p>

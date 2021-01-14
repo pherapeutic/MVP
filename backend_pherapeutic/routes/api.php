@@ -34,7 +34,6 @@ Route::prefix('v1')->group(function () {
 
         // Route::post('findTherapist', 'User\HomeController@findTherapist')->name('findTherapist');
 
-        // Route::get('/getRating', 'User\RatingController@getRating')->name('getRating');
         // Route::get('/getFeedback', 'User\RatingController@getFeedback')->name('getFeedback');
 
         //User Routes
@@ -66,6 +65,7 @@ Route::prefix('v1')->group(function () {
 
             Route::post('/clientPostRating', 'RatingController@clientPostRating')->name('clientPostRating');
             Route::post('/therapistPostFeedback', 'RatingController@therapistPostFeedback')->name('therapistPostFeedback');
+            Route::get('/getRating', 'RatingController@getRating')->name('getRating');
             
             // Route::post('/UpdateRating', 'RatingController@UpdateRating')->name('UpdateRating');
             //Route::post('/DeleteRating', 'RatingController@DeleteRating')->name('DeleteRating');
@@ -85,10 +85,20 @@ Route::prefix('v1')->group(function () {
             Route::get('/getUserCards', 'PaymentController@getUserCards')->name('getUserCards');
             Route::delete('/deleteUserCard', 'PaymentController@deleteUserCard')->name('deleteUserCard');
             Route::post('/createDefaultCard', 'PaymentController@createDefaultCard')->name('createDefaultCard');
+            Route::post('/amountHold', 'PaymentController@amountHoldBeforeCall')->name('amountHoldBeforeCall');
             Route::post('/makePayment', 'PaymentController@makePayment')->name('makePayment');
+            //Agora authentication token
+            Route::post('/agoraToken', 'HomeController@agoraToken')->name('agoraToken');
+            Route::post('/agoraTokenRtm', 'HomeController@agoraTokenRtm')->name('agoraTokenRtm');
 
             //Therapist Notification Routes
-            Route::get('/sendVideoCallNotificationToTherapist/{therapistId?}','NotificationController@sendVideoCallNotificationToTherapist');            
+            Route::get('/sendVideoCallNotificationToTherapist/{therapistId?}','NotificationController@sendVideoCallNotificationToTherapist');
+
+            //Call logs Route
+            Route::post('/createCall', 'PaymentController@createCall')->name('createCall');
+            Route::post('/updateCallLog', 'CallLogsController@updateCallLog')->name('updateCallLog');
+            Route::get('/getTherapistCallLog', 'CallLogsController@getTherapistCallLog')->name('getTherapistCallLog');
+            Route::get('/getClientCallLog', 'CallLogsController@getClientCallLog')->name('getClientCallLog');
 
         });
     });

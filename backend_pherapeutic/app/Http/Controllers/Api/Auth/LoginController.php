@@ -75,8 +75,11 @@ class LoginController extends Controller
             return $this->returnResponse($response);         
         }
         //end otp verified check
+        $userObj->fill([
+            'fcm_token' => $request->input('fcm_token')
+        ]);        
+        $userObj->save();
 
-        
         $authToken = $userObj->createToken('authToken')->plainTextToken;
         $returnArr = $userObj->getResponseArr();
         $returnArr['auth_token'] = $authToken;
@@ -164,6 +167,13 @@ class LoginController extends Controller
         $userToken = $request->get('social_token');
         $isExistUser = User::where('social_token',$userToken)->first();
         if($isExistUser){
+
+            if($request->has('fcm_token')){
+                $isExistUser->fill([
+                    'fcm_token' => $request->input('fcm_token')
+                ]);
+                $isExistUser->save();
+            }
 
             $authToken = $isExistUser->createToken('authToken')->plainTextToken;
             $returnArr = $isExistUser->getResponseArr();

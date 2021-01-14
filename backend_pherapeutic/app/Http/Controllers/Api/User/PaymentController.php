@@ -7,9 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Models\UserAnswers;
 use App\Models\TherapistType;
 use App\Models\Appointments;
+use App\Models\CallLogs;
+use App\Models\PaymentDetails;
+use App\Models\Settings;
+use App\Models\User;
 use Auth;
 use Validator;
 use Stripe;
+use Carbon\Carbon;
 
 class PaymentController extends Controller
 {
@@ -306,7 +311,7 @@ class PaymentController extends Controller
     return response()->json($result);
   }
 
-  public function makePayment(Request $request){
+  public function amountHoldBeforeCall(Request $request, Appointments $appointment){
     $user = $this->request->user();
     
     if($user->role != '0'){
@@ -319,7 +324,118 @@ class PaymentController extends Controller
 
     $validator = Validator::make($request->all(), [ 
       'card_id' => 'required',
-      //'appointment_id' => 'required'
+      'appointment_id' => 'required',
+    ]);
+
+    if ($validator->fails()) { 
+      $errors = $validator->errors()->all();
+      $result = array(
+        "statusCode" => 401,  // $this-> successStatus
+        "message" => $errors[0]
+      );
+      return response()->json($result );            
+    }
+
+    $input = $request->all();
+    //Get appointment object
+    $appointmentObj = $appointment->getAppointmentById($input['appointment_id']);
+    if(!$appointmentObj){
+        $result = array(
+          "statusCode" => 404,  // $this-> successStatus
+          "message" => 'Appointment not found.'
+        );
+      return response()->json($result ); 
+    }
+    //Get appoint therapist for this appointmet
+    $appointTherapist = $appointmentObj->therapist;
+    if(!$appointTherapist){
+        $result = array(
+          "statusCode" => 404,  // $this-> successStatus
+          "message" => 'Therapist not found.'
+        );
+      return response()->json($result );      
+    }
+    //Check therapist is connect with stripe or not
+    if(!$appointTherapist->stripe_connect_id){
+        $result = array(
+          "statusCode" => 401,  // $this-> successStatus
+          "message" => 'Call could not be connect.'
+        );
+      return response()->json($result );
+    }
+
+    try{
+
+      $charge = \Stripe\Charge::create([
+        'amount' => \Config::get('services.stripe.amount')*100,
+        'currency' => \Config::get('services.stripe.currency'),
+        'description' => 'Payment to pherapeutic for appointment id '.$input['appointment_id'].'',
+        'customer' => $user->stripe_id,
+        'source' => $input['card_id'],
+        'capture' => false,
+      ]);
+
+          //$charge['paid']=false;
+      if($charge['paid']!=true){
+          $result = [
+              "statusCode" => 409, 
+              "message" => 'Transaction failed, '.$charge['failure_message'].', failed code'.$charge['failure_code'].'',
+          ];
+      return response()->json($result);
+      }
+
+
+      //if($charge['paid']){
+        $appointmentPaymentArr = [
+            'appointment_id' => $appointmentObj->id,
+            'charge_id' => $charge['id'],
+            'txn_id' => $charge['balance_transaction'],
+            'amount' => number_format($charge['amount']/100,2),
+            'is_captured' => '0',
+            'card_id' => $charge['payment_method']
+        ];
+
+        PaymentDetails::create($appointmentPaymentArr);
+        //appointment status update
+        $appointmentObj->status = '2';
+        $appointmentObj->save();
+
+      
+        $result = [
+          "statusCode" => 200, 
+          "message" => 'Payment amount hold in you card.',
+          "data" => [
+            'charge_id' => $charge['id']
+          ]
+        ];
+        return response()->json($result);        
+      //}
+
+    } catch(\Exception $ex){
+        $result = array(
+            "statusCode" => 401,
+            "message" => $ex->getMessage()
+        );
+        return response()->json($result );
+    }
+
+
+  }
+
+  public function makePayment(Request $request, Appointments $appointment){
+    $user = $this->request->user();
+    
+    if($user->role != '0'){
+        $result = array(
+          "statusCode" => 401,  // $this-> successStatus
+          "message" => 'User is not authenticated.'
+        );
+      return response()->json($result ); 
+    }
+
+    $validator = Validator::make($request->all(), [ 
+      'appointment_id' => 'required',
+      'charge_id' => 'required'
     ]);
 
     if ($validator->fails()) { 
@@ -333,32 +449,332 @@ class PaymentController extends Controller
 
     $input = $request->all();
 
-    //\Stripe\Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
-    $charge = \Stripe\Charge::create([
-      'amount' => \Config::get('services.stripe.amount'),
-      'currency' => \Config::get('services.stripe.currency'),
-      'source' => 'tok_visa',
-      'description' => 'Payment to pherapeutic',
-    ]);
-
-        //$charge['paid']=false;
-    if($charge['paid']!=true){
-        $result = [
-            "statusCode" => 409, 
-            "message" => 'Transaction failed',
-
-        ];
-    return response()->json($result);
+    //Get appointment object
+    $appointmentObj = $appointment->getAppointmentById($input['appointment_id']);
+    if(!$appointmentObj){
+        $result = array(
+          "statusCode" => 404,  // $this-> successStatus
+          "message" => 'Appointment not found.'
+        );
+      return response()->json($result ); 
+    }
+    //Get appoint therapist for this appointmet
+    $appointTherapist = $appointmentObj->therapist;
+    if(!$appointTherapist){
+        $result = array(
+          "statusCode" => 404,  // $this-> successStatus
+          "message" => 'Therapist not found.'
+        );
+      return response()->json($result );      
     }
     
-    $result = [
-      "statusCode" => 200, 
-      "message" => 'Payment Success',
-      "data" => [
-        'txn_id' => $charge['balance_transaction']
-      ]
+    $paymentDetailsObj = PaymentDetails::where('appointment_id', $input['appointment_id'])
+                      ->where('charge_id', $input['charge_id'])->where('is_captured', '0')->first();
+
+    if(!$paymentDetailsObj){
+        $result = array(
+          "statusCode" => 404,  // $this-> successStatus
+          "message" => 'No hold payment found.'
+        );
+      return response()->json($result );       
+    }
+
+    try{
+      //charge done for admin
+      $charge = \Stripe\Charge::retrieve($paymentDetailsObj->charge_id);
+      $charge->capture();
+
+      if($charge['paid']!=true){
+          $result = [
+              "statusCode" => 409, 
+              "message" => 'Transaction failed, '.$charge['failure_message'].', failed code'.$charge['failure_code'].'',
+
+          ];
+      return response()->json($result);
+      }
+
+      $settingObj = Settings::first();
+      $applicationCharge = $settingObj->app_charge;
+      $amount = \Config::get('services.stripe.amount');
+      $amountPercentage = (($amount*$applicationCharge)/100);
+      $therapistAmount = $amount-$amountPercentage;
+
+      // Create a Transfer to a connected therapist account
+      $transfer = \Stripe\Transfer::create([
+        'amount' => $therapistAmount*100,
+        'currency' => \Config::get('services.stripe.currency'),
+        'source_transaction' => $paymentDetailsObj->charge_id,
+        'destination' => $appointTherapist->stripe_connect_id,
+        'transfer_group' => 'Transfer done for appointment id #'.$appointmentObj->id.', transfer to account:'.$appointTherapist->stripe_connect_id.'',
+      ]);
+      //store data in payment details model
+      if($transfer){
+        $paymentDetailsObj->transfer_id = $transfer['id'];
+        $paymentDetailsObj->transfer_amount = number_format($transfer['amount']/100,2);
+        $paymentDetailsObj->transfer_to_account = $transfer['destination'];
+      }
+      $paymentDetailsObj->txn_id = $charge['balance_transaction'];
+      $paymentDetailsObj->is_captured = '1';
+      $paymentDetailsObj->save();
+
+      //appointment status update
+      $appointmentObj->status = '3';
+      $appointmentObj->ended_at = Carbon::now();
+      $appointmentObj->save();      
+
+      $result = [
+        "statusCode" => 200, 
+        "message" => 'Payment Success',
+        "data" => [
+          'txn_id' => $charge['balance_transaction']
+        ]
+      ];
+      return response()->json($result);
+
+    } catch(\Exception $ex){
+        $result = array(
+            "statusCode" => 401,
+            "message" => $ex->getMessage()
+        );
+        return response()->json($result );
+    }
+
+  }
+
+  public function createCall(Request $request, CallLogs $callLogs){
+    $user = $this->request->user();
+    $callerId = $callLogs->generateCallerId();    
+    
+    if($user->role != '0'){
+        $result = array(
+          "statusCode" => 401,  // $this-> successStatus
+          "message" => 'User is not authenticated.'
+        );
+      return response()->json($result ); 
+    }
+
+    $validator = Validator::make($request->all(), [ 
+      'card_id' => 'required',
+      'therapist_id' => 'required',
+    ]);
+
+    if ($validator->fails()) { 
+      $errors = $validator->errors()->all();
+      $result = array(
+        "statusCode" => 401,  // $this-> successStatus
+        "message" => $errors[0]
+      );
+      return response()->json($result );            
+    }
+
+    $input = $request->all();
+
+    //check on going call
+    $lastCallObj = $callLogs->getNotEndedCall($user->id);
+    if($lastCallObj){
+      //make payment
+      $paymentDetailsObj = PaymentDetails::where('call_logs_id', $lastCallObj->id)
+                            ->where('is_captured', '0')->first();
+      $appointTherapist = $lastCallObj->therapist;
+
+      if($lastCallObj->duration > 10){
+
+        try{
+          //charge done for admin
+          $dynamicAmount = $lastCallObj->duration*100;
+          $charge = \Stripe\Charge::retrieve($paymentDetailsObj->charge_id);
+          $charge->capture([
+            'amount' => $dynamicAmount,
+          ]);
+
+          if($charge['paid']!=true){
+              $result = [
+                  "statusCode" => 409, 
+                  "message" => 'Transaction failed, '.$charge['failure_message'].', failed code'.$charge['failure_code'].'',
+
+              ];
+          return response()->json($result);
+          }
+
+          $settingObj = Settings::first();
+          $applicationCharge = $settingObj->app_charge;
+          //$amount = \Config::get('services.stripe.amount');
+          $amount = $lastCallObj->duration;
+          $amountPercentage = (($amount*$applicationCharge)/100);
+          $therapistAmount = $amount-$amountPercentage;
+
+          // Create a Transfer to a connected therapist account
+          $transfer = \Stripe\Transfer::create([
+            'amount' => $therapistAmount*100,
+            'currency' => \Config::get('services.stripe.currency'),
+            'source_transaction' => $paymentDetailsObj->charge_id,
+            'destination' => $appointTherapist->stripe_connect_id,
+            'transfer_group' => 'Transfer done for caller id #'.$lastCallObj->id.', transfer to account:'.$appointTherapist->stripe_connect_id.'',
+          ]);
+          //store data in payment details model
+          if($transfer){
+            $paymentDetailsObj->transfer_id = $transfer['id'];
+            $paymentDetailsObj->transfer_amount = number_format($transfer['amount']/100,2);
+            $paymentDetailsObj->transfer_to_account = $transfer['destination'];
+          }
+          $paymentDetailsObj->txn_id = $charge['balance_transaction'];
+          $paymentDetailsObj->refund_amount = number_format($charge['amount_refunded']/100,2);
+          $paymentDetailsObj->refund_id = $charge['refunds']['data'][0]['id'];
+
+          if($charge['amount'] <= $charge['amount_captured']){
+            $paymentDetailsObj->is_captured = '1';            
+          }else{
+            $paymentDetailsObj->is_captured = '3';
+          }
+          $paymentDetailsObj->save();
+
+          //call log status update
+          $lastCallObj->ended_at = Carbon::now();           
+          $lastCallObj->call_status = '2';           
+          $lastCallObj->payment_status = '2';           
+          $hasUpdate = $lastCallObj->save();      
+
+          // $result = [
+          //   "statusCode" => 200, 
+          //   "message" => 'Payment Success',
+          //   "data" => [
+          //     'txn_id' => $charge['balance_transaction']
+          //   ]
+          // ];
+          // return response()->json($result);
+
+        } catch(\Exception $ex){
+            $result = array(
+                "statusCode" => 401,
+                "message" => $ex->getMessage()
+            );
+            return response()->json($result );
+        }
+
+      }else{
+        //Refund all amount
+        try{
+          $refund = \Stripe\Refund::create(['charge' => $paymentDetailsObj->charge_id]);
+          if($refund){
+            //update payment details
+            if($paymentDetailsObj){
+              $paymentDetailsObj->is_captured = '2';
+              $paymentDetailsObj->refund_id = $refund['id'];
+              $paymentDetailsObj->refund_amount = number_format($refund['amount']/100,2);
+              $paymentDetailsObj->save();
+            }
+
+            //call log status update
+            $lastCallObj->ended_at = Carbon::now();
+            $lastCallObj->call_status = '2';
+            $lastCallObj->payment_status = '3';
+            $hasUpdate = $lastCallObj->save();            
+          }
+        } catch(\Exception $ex){
+            $result = array(
+                "statusCode" => 401,
+                "message" => $ex->getMessage()
+            );
+            return response()->json($result );
+        }
+      }
+    }
+
+    //Get appoint therapist for this appointmet
+    $callTherapist = User::find($input['therapist_id']);
+
+    if(!$callTherapist){
+        $result = array(
+          "statusCode" => 404,  // $this-> successStatus
+          "message" => 'Therapist not found.'
+        );
+      return response()->json($result );      
+    }
+    //Check therapist is connect with stripe or not
+    if(!$callTherapist->stripe_connect_id){
+        $result = array(
+          "statusCode" => 401,  // $this-> successStatus
+          "message" => 'Call could not be connect.'
+        );
+      return response()->json($result );
+    }
+
+    //Check therapist is Online or not
+    if(!$callTherapist->online_status){
+        $result = array(
+          "statusCode" => 401,  // $this-> successStatus
+          "message" => 'Call could not be connected, Therapist is off-line.'
+        );
+      return response()->json($result );
+    }
+    //create call
+    $callCreateArr = [
+        'caller_id' => $callerId,
+        'user_id' => $user->id,
+        'therapist_id' => $input['therapist_id']
     ];
-    return response()->json($result);
+    $hasCreatedCall = CallLogs::create($callCreateArr);
+    if(!$hasCreatedCall){
+        $result = array(
+          "statusCode" => 401,  // $this-> successStatus
+          "message" => 'Call could not be connected, Internal server error.'
+        );
+      return response()->json($result );      
+    }
+
+    try{
+
+      $charge = \Stripe\Charge::create([
+        'amount' => \Config::get('services.stripe.amount')*100,
+        'currency' => \Config::get('services.stripe.currency'),
+        'description' => 'Payment to pherapeutic for caller id '.$callerId.'',
+        'customer' => $user->stripe_id,
+        'source' => $input['card_id'],
+        'capture' => false,
+      ]);
+
+          //$charge['paid']=false;
+      if($charge['paid']!=true){
+          $result = [
+              "statusCode" => 409, 
+              "message" => 'Transaction failed, '.$charge['failure_message'].', failed code'.$charge['failure_code'].'',
+          ];
+      return response()->json($result);
+      }
+
+
+      //if($charge['paid']){
+        $callPaymentArr = [
+            'call_logs_id' => $hasCreatedCall->id,
+            'charge_id' => $charge['id'],
+            'txn_id' => $charge['balance_transaction'],
+            'amount' => number_format($charge['amount']/100,2),
+            'is_captured' => '0',
+            'card_id' => $charge['payment_method']
+        ];
+
+        PaymentDetails::create($callPaymentArr);
+      
+        $result = [
+          "statusCode" => 200, 
+          "message" => 'Payment amount hold in you card.',
+          "data" => [
+            'charge_id' => $charge['id'],
+            'caller_id' => $hasCreatedCall->caller_id
+          ]
+        ];
+        return response()->json($result);        
+      //}
+
+    } catch(\Exception $ex){
+        $result = array(
+            "statusCode" => 401,
+            "message" => $ex->getMessage()
+        );
+        return response()->json($result );
+    }
+
+
   }
 
 }

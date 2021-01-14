@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Pherapeutic</string>
+    <string name="facebook_app_id">711749749453347</string>
+    <string name="fb_login_protocol_scheme">fb711749749453347</string>
+</resources>

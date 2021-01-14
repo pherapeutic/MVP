@@ -165,6 +165,8 @@ class User extends Authenticatable
                 $oldImageName = basename($inputArr['old_image']);
                 Storage::disk('profile-images')->delete($oldImageName);
             }
+        } else {
+            unset($inputArr['image']);
         }
         unset($inputArr['old_image']);
         

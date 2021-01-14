@@ -15,7 +15,7 @@ class FeedbackNotes extends Model
      * @var array
      */
     protected $fillable = [
-        'appointment_id',
+        'call_logs_id',
         'feedback_note',
         'feedback_by',
     ];

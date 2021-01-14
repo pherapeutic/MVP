@@ -46,6 +46,7 @@
                     <form action="{{ route('logout') }}" method="post">
                         @csrf
                         <button type="submit" class="btn btn-sm btn-light-primary font-weight-bolder py-2 px-5">Sign Out</button>
+                        <a href="{{url('admin/settings')}}"><i class="fa fa-cogs" aria-hidden="true"></i></a>
                     </form>
                 </div>
             </div>

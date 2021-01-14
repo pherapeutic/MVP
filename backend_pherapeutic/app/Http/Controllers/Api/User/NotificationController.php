@@ -45,12 +45,13 @@ class NotificationController extends Controller
         } else if($notificationData['device_type'] == '0'){ // for android
             $postdata = [
                 "to" => $notificationData['fcm_token'],
-                "sound" => "default",
-                "data" => [
-                    'data' => $notificationData['data'],
+                "notification" => [
+                    //'data' => $notificationData['data'],
                     "title" => $notificationData['title'],
-                    "text" => $notificationData['message']
-                ]
+                    "text" => $notificationData['message'],
+                    "sound" => "default"
+                ],
+                'data' => $notificationData['data']
             ];
         } else {
             return;
@@ -153,13 +154,16 @@ class NotificationController extends Controller
 
         $fcmToken = $userObj->fcm_token;
         // $fcmToken = 'fZEO0-GlTQifO6qH4xjx__:APA91bFqQlFf01H6JHwQYMLzTUi4ItmYCshWpRcT6rrlhDKQfERBfhcEPcD1bsAmG-xNvRxPhEUxkeZc7ptrEZ10hZTOkcHAvC_P_nV_9rnyHNBmK4xPCwf6aTfw7wJFR_Cnl2TR5N_h';
-        
+        //$request->get('chanel_name')
+        $clientData = $clientObj->getResponseArr();
+        $clientData['channel_name'] = $request->get('channel_name');
+
         $notificationData = [
             'fcm_token' => $fcmToken,
             'device_type' => $userObj->device_type,
-            'title' => 'Get Video Call From Pherapeutic. Client Id: '.$clientObj->id,
-            'message' => 'For help',
-            'data' => $clientObj->getResponseArr()
+            'title' => $clientObj->first_name.' '.$clientObj->last_name.' calling...',
+            'message' => '',
+            'data' => $clientData
         ];
 
         $response = $this->sendNotificationToTherapist($notificationData);

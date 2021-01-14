@@ -30,9 +30,12 @@ class AccountController extends Controller
         $userArr = [
             'first_name' => $inputArr['first_name'],
             'last_name' => $inputArr['last_name'],
-            'image' => (isset($inputArr['image']) && $inputArr['image']) ? ($inputArr['image']) : (null),
-            'old_image' => $userObj->image
+            'image' => (isset($inputArr['image']) && $inputArr['image']) ? ($inputArr['image']) : (null)
         ];
+
+        if($userArr['image']){
+            $userArr['old_image'] = $userObj->image;
+        }
 
         $hasUpdated = $userObj->updateUser($userObj->id, $userArr);
         if(!$hasUpdated){
