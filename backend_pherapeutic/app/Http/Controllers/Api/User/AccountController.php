@@ -20,7 +20,7 @@ use Validator;
 class AccountController extends Controller
 {
     public function update(UserUpdateRequest $request, UserLanguage $userLanguage, TherapistProfile $therapistProfile, UserTherapistType $userTherapistType){
-        
+      
         $userObj = $this->request->user();
         if (!$userObj) {
             return $this->notAuthorizedResponse('User is not authorized');
@@ -43,15 +43,37 @@ class AccountController extends Controller
         }
 
         $languagesArr = $request->get('languages');
-        if(is_array($languagesArr)){
+        //dd($languagesArr);
+        /*if(is_array($languagesArr)){
             UserLanguage::where('user_id', $userObj->id)->delete();
             foreach ($languagesArr as $key => $languageId) {
                 $userLanguageArr = [
                     'user_id' => $userObj->id,
                     'language_id' => $languageId
                 ];
+               
                 $userLanguage->saveNewUserLanguages($userLanguageArr);
             }
+        }*/
+        // $userLanguageArr['user_id'] = $userObj->id;
+        // $userLanguageArr['language_id'] = $languagesArr;
+        // $user_Language = $userLanguage->saveNewUserLanguages($userLanguageArr);
+
+        // if($userObj->role == User::CLIENT_ROLE){
+        //     $userLanguageArr1 = [
+        //         'user_id' => $userObj->id,
+        //         'language_id' => $request->get('language_id'),
+              
+        //     ];
+        //     $user_Language=$userLanguage1->updateUserLanguages($userLanguageArr1);
+       
+        if($userObj->role == User::CLIENT_ROLE){
+            $userLanguageArr= [
+                'user_id' => $userObj->id,
+                'language_id' => $languagesArr
+               
+            ];
+            $userLanguage->updateUserLanguagesnew($userLanguageArr);
         }
 
         if($userObj->role == User::THERAPIST_ROLE){
@@ -64,6 +86,7 @@ class AccountController extends Controller
                 'longitude' => $request->get('longitude')
             ];
             $therapistProfile->updateTherapistProfile($therapistPofileArr);
+        
 
             $therapistTypesArr = $request->get('specialism');
             if(is_array($therapistTypesArr)){

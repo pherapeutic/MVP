@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Storage;
-
+use App\Models\CallLogs;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
@@ -98,8 +98,10 @@ class User extends Authenticatable
      * This function use to save new uer's detail in Database
      */
     public function saveNewUser($inputArr){
+        //dd($inputArr);
         $otp = $this->generateOtp();
         $inputArr['verification_otp'] = $otp;
+        $inputArr['is_verified'] = 1;
         return self::create($inputArr);
     }
 
@@ -180,7 +182,8 @@ class User extends Authenticatable
      * @return array of formated user details
      */
     public function getResponseArr(){
-        // Get user languages
+      
+       
         $userLangauages = $this->userLanguages;
         $languageArr = array();
         foreach ($userLangauages as $key => $userLangauage) {
@@ -209,6 +212,64 @@ class User extends Authenticatable
         $therapistProfile = $this->therapistProfile;
         $returnArr = [
             'user_id' => $this->id,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'email' => $this->email,
+            'role' => $this->role,
+            'languages' => $languageArr,
+            'specialism' => $therapistTypesArr,
+            'address' => ($therapistProfile) ? ($therapistProfile->address) : (null),
+            'latitude' => ($therapistProfile) ? ($therapistProfile->latitude) : (null),
+            'longitude' => ($therapistProfile) ? ($therapistProfile->longitude) : (null),
+            'experience' => ($therapistProfile) ? ($therapistProfile->experience) : (null),
+            'qualification' => ($therapistProfile) ? ($therapistProfile->qualification) : (null),
+            'is_email_verified' => ($this->email_verified_at) ? (true) : (false),
+            'online_status' => $this->online_status,
+            'notification_status' => $this->notification_status,
+            'image' => $this->image,
+            'social_token' => $this->social_token,
+            'login_type' => $this->login_type,
+            'stripe_connect_id' => $this->stripe_connect_id,
+            'stripe_id' => $this->stripe_id
+        ];
+        return $returnArr;
+    }
+
+    public function getResponseCalletIdArr(){
+      
+        $getUserCallerId = CallLogs::where('user_id', $this->id)
+        ->orderBy('id', 'DESC')
+        ->first();
+        $CallerId = $getUserCallerId->caller_id;
+        $userLangauages = $this->userLanguages;
+        $languageArr = array();
+        foreach ($userLangauages as $key => $userLangauage) {
+            if(!$userLangauage->language)
+                continue;
+            
+            $languageArr[] = [
+                'id' => optional($userLangauage->language)->id,
+                'title' => optional($userLangauage->language)->title
+            ];
+        }
+
+        // get user specialism
+        $userTherapistTypes = $this->userTherapistTypes;
+        $therapistTypesArr = array();
+        foreach ($userTherapistTypes as $key => $userTherapistType) {
+            if(!$userTherapistType->therapistType)
+                continue;
+            
+            $therapistTypesArr[] = [
+                'id' => optional($userTherapistType->therapistType)->id,
+                'title' => optional($userTherapistType->therapistType)->title
+            ];
+        }
+        
+        $therapistProfile = $this->therapistProfile;
+        $returnArr = [
+            'user_id' => $this->id,
+            'caller_id' => $CallerId,
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
             'email' => $this->email,

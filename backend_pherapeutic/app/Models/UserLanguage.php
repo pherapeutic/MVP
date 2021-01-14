@@ -22,6 +22,7 @@ class UserLanguage extends Model
     }
 
 	public function saveNewUserLanguages($inputArr){
+        //dd($inputArr);
         return self::create($inputArr);
     }
 
@@ -37,5 +38,9 @@ class UserLanguage extends Model
      */
     public function updateUserLanguages($user_id, $inputArr){
         return self::where('user_id', $user_id)->update($inputArr);
+    }
+
+    public function updateUserLanguagesnew($inputArr){
+        return self::updateOrCreate(['user_id' => $inputArr['user_id']], $inputArr);
     }
 }

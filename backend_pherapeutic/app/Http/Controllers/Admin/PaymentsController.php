@@ -28,6 +28,7 @@ class PaymentsController extends Controller
      */
     public function index(Request $request, PaymentDetails $paymentDetails, User $user)
     {
+        
         if ($request->ajax()) {
             $appointmentsColl = $paymentDetails->getAllPayments();
             return datatables()->of($appointmentsColl)

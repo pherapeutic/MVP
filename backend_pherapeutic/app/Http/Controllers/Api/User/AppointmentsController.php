@@ -9,6 +9,8 @@ use App\Models\FeedbackNotes;
 use App\Models\Appointments;
 use Validator;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
 class AppointmentsController extends Controller
 {
     /**
@@ -73,20 +75,34 @@ class AppointmentsController extends Controller
     }
 
     public function getClientAppointment(Request $request, Appointments $appointments){
-
         $userObj = $this->request->user();
+       
         if (!$userObj) {
             return $this->notAuthorizedResponse('User is not authorized');
         }
-
         $appointments = $appointments->getAllClientAppointments($userObj->id);
-
         foreach ($appointments as $appointment) {
-            $rating = Rating::where('appointment_id', '=', $appointment->id)->first();
+            $paid = DB::table('call_logs')
+            ->orderBy('id', 'DESC')
+            ->join('payment_details', 'call_logs.id', '=', 'payment_details.call_logs_id')
+            ->join('users', 'users.id', '=', 'call_logs.therapist_id')
+            ->select('call_logs.id', 'call_logs.user_id','call_logs.therapist_id',
+             'payment_details.amount', 'payment_details.transfer_amount', 
+             'payment_details.refund_amount','users.first_name','users.last_name','users.image as pic')
+            ->first();
+
+            $rating = Rating::where('id', '=', $appointment->id)->first();
             if($rating){
                 $appointment['rating'] = $rating->rating;
                 $appointment['comment'] = $rating->comment;                
-            }else{
+            }
+            if($paid){
+                $appointment['amount'] = $paid->amount;
+                $appointment['first_name'] = $paid->first_name;
+                $appointment['last_name'] = $paid->last_name;
+                $appointment['image'] = $paid->pic;
+            }
+            else{
                 $appointment['rating'] ="0";
                 $appointment['comment'] ="";
             }
@@ -98,6 +114,52 @@ class AppointmentsController extends Controller
             return returnNotFoundResponse('Not found');   
         }
     }
+
+    /*public function getTherapistList(Request $request, Appointments $appointments){
+        $userObj = $this->request->user();
+       
+        if (!$userObj) {
+            return $this->notAuthorizedResponse('User is not authorized');
+        }
+        //dd($userObj->id);
+        $appointments = $appointments->getAllClientAppointments($userObj->id);
+        //dd($appointments);
+        foreach ($appointments as $appointment) {
+            $paid = DB::table('call_logs')
+            ->orderBy('id', 'DESC')
+            ->join('payment_details', 'call_logs.id', '=', 'payment_details.call_logs_id')
+            ->join('users', 'users.id', '=', 'call_logs.therapist_id')
+            ->select('call_logs.id', 'call_logs.user_id','call_logs.therapist_id',
+             'payment_details.amount', 'payment_details.transfer_amount', 
+             'payment_details.refund_amount','users.first_name','users.last_name',
+             'users.image as pic')
+            ->first();
+            //dd($appointment->id);
+            $rating = Rating::where('id', '=', $appointment->id)->first();
+            if($rating){
+                $appointment['rating'] = $rating->rating;
+                $appointment['comment'] = $rating->comment;                
+            }
+            if($paid){
+                $appointment['amount'] = $paid->amount;
+                $appointment['transfer_amount'] = $paid->transfer_amount;
+                $appointment['refund_amount'] = $paid->refund_amount;
+                $appointment['first_name'] = $paid->first_name;
+                $appointment['last_name'] = $paid->last_name;
+                $appointment['image'] = $paid->pic;
+            }
+            else{
+                $appointment['rating'] ="0";
+                $appointment['comment'] ="";
+            }
+        }
+
+        if(!empty($appointments)){
+            return returnSuccessResponse('Therapist list',$appointments);
+        }else{
+            return returnNotFoundResponse('Not found');   
+        }
+    }*/
     
     public function postAppointment(Request $request, Appointments $appointments){
 

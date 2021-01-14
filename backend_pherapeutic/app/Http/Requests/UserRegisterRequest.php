@@ -29,7 +29,8 @@ class UserRegisterRequest extends FormRequest
         $rulesArr = [
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'required|email|unique:users,email,NULL,id,deleted_at,NULL',
+            //'email' => 'required|email|unique:users,email,NULL,id,deleted_at,NULL',
+            'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required',
             'confirm_password' => 'required|same:password',
             'role' => 'required|boolean',

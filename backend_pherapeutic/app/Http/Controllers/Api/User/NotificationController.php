@@ -22,7 +22,7 @@ class NotificationController extends Controller
     }
 
     public static function sendNotificationToTherapist($notificationData = array()) {  
-
+        //dd($notificationData);
         if(count($notificationData) <= 0){
             return;
         }
@@ -151,11 +151,12 @@ class NotificationController extends Controller
         }
 
         $clientObj = Auth::user();        
-
+        //dd($clientObj);
         $fcmToken = $userObj->fcm_token;
         // $fcmToken = 'fZEO0-GlTQifO6qH4xjx__:APA91bFqQlFf01H6JHwQYMLzTUi4ItmYCshWpRcT6rrlhDKQfERBfhcEPcD1bsAmG-xNvRxPhEUxkeZc7ptrEZ10hZTOkcHAvC_P_nV_9rnyHNBmK4xPCwf6aTfw7wJFR_Cnl2TR5N_h';
         //$request->get('chanel_name')
-        $clientData = $clientObj->getResponseArr();
+        $clientData = $clientObj->getResponseCalletIdArr();
+        //dd($clientData);
         $clientData['channel_name'] = $request->get('channel_name');
 
         $notificationData = [

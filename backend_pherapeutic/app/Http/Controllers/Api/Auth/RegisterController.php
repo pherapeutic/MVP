@@ -35,9 +35,10 @@ class RegisterController extends Controller
             'email' => $request->get('email'),
             'password' => $request->get('password'),
             'role' => $request->get('role')
+     
         ];
+        //dd($userArr);
         $userObj = $user->saveNewUser($userArr);
-
         if(!$userObj){
             return returnErrorResponse('Unable to register user. Please try again later');
         }
@@ -91,11 +92,12 @@ class RegisterController extends Controller
      * @return object with verified user detail and auth token
      * This function use to verify uer's phone number
      */
-    public function verifyOtp(Request $request, User $user)
+    public function verifyOtp(Request $request, User $user, $CallerId = '')
     {
         $rules = [
             'user_id' => 'required',
-            'otp' => 'required'
+            'otp' => 'required',
+
         ];
 
         $inputArr = $request->all();

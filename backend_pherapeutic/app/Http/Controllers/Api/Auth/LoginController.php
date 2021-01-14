@@ -30,6 +30,7 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
+        //dd(10);
         $rules = [
             'email' => 'required|email',
             'password' => 'required',
@@ -59,6 +60,7 @@ class LoginController extends Controller
         }
 
         $userObj = User::all()->where('email', $inputArr['email'])->first();
+        //dd($userObj);
         if ( ! Hash::check($inputArr['password'], $userObj->password, [])) {
             return returnNotFoundResponse('Invalid credentials');
         }
@@ -70,8 +72,10 @@ class LoginController extends Controller
             $response = [
                 'statusCode' => 402,
                 'data' => $returnArr,
+                'is_verified' => 1,
                 'message' => "Email not yet verified"
             ];
+          
             return $this->returnResponse($response);         
         }
         //end otp verified check

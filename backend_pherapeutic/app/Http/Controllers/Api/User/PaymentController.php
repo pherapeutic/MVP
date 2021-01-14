@@ -15,6 +15,7 @@ use Auth;
 use Validator;
 use Stripe;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
@@ -421,6 +422,41 @@ class PaymentController extends Controller
 
 
   }
+  public function getPaymentHistory(Request $request, Appointments $appointments){
+    $userObj = $this->request->user();
+    
+    if (!$userObj) {
+        return $this->notAuthorizedResponse('User is not authorized');
+    }  
+    //dd($userObj->id);
+    $paymenthistory = $appointments->getAllClientAppointments($userObj->id);
+    foreach ($paymenthistory as $appointment) {
+        $userdetails = DB::table('call_logs')
+        ->orderBy('id', 'DESC')
+        ->join('payment_details', 'call_logs.id', '=', 'payment_details.call_logs_id')
+        ->join('users', 'users.id', '=', 'call_logs.user_id')
+        ->select('call_logs.id', 'call_logs.user_id','call_logs.therapist_id',
+         'payment_details.amount', 'payment_details.transfer_amount', 
+         'payment_details.refund_amount','users.first_name','users.last_name','users.image as pic')
+        ->first();
+        if($paymenthistory){
+          $appointment['amount'] = $userdetails->amount;
+          $appointment['transfer_amount'] = $userdetails->transfer_amount;
+          $appointment['refund_amount'] = $userdetails->refund_amount;
+          $appointment['first_name'] = $userdetails->first_name;
+          $appointment['last_name'] = $userdetails->last_name;
+          $appointment['image'] = $userdetails->pic;
+      }
+    }
+        
+        
+    if(!empty($paymenthistory)){
+        return returnSuccessResponse('Payment History',$paymenthistory);
+    }else{
+        return returnNotFoundResponse('Not found');   
+    }
+    }
+
 
   public function makePayment(Request $request, Appointments $appointment){
     $user = $this->request->user();
@@ -470,6 +506,7 @@ class PaymentController extends Controller
     
     $paymentDetailsObj = PaymentDetails::where('appointment_id', $input['appointment_id'])
                       ->where('charge_id', $input['charge_id'])->where('is_captured', '0')->first();
+                      //dd($paymentDetailsObj);
 
     if(!$paymentDetailsObj){
         $result = array(

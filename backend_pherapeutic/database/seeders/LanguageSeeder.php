@@ -14,7 +14,10 @@ class LanguageSeeder extends Seeder
      */
     public function run(Language $language)
     {
-        $languages = ['Hindi', 'English', 'French'];
+        $languages = ['Hindi', 'English', 'French','Afrikaans','Albanian','Arabic','Bengali','Bosnian','Bulgarian','Chinese','Danish','Dutch','Filipino','Finnish','French','German','Greek','Gujarati',
+        'Hebrew','Hungarian','Igbo','Irish','Italian','Japanese','Korean','Kurdish','Lithuanian','Maori',
+        'Norwegian','Panjabi','Polish','Portuguese','Romanian','Serbian','Somali','Spanish','Sudanese','Swahili',
+    'Swedish','Tamil','Thai','Turkish','Urdu','Vietnamese','Welsh','Yoruba','None of these'];
         foreach($languages as $key => $languageName){
             $language->saveNewLanguage(['title' => $languageName]);
         }

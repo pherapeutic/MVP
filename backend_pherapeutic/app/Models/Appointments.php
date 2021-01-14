@@ -77,6 +77,7 @@ class Appointments extends Model
      * @return user object
      */
     public function getAppointmentById($id){
+        //dd($id);
         return self::where('id', $id)->first();
     }
 

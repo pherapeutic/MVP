@@ -29,14 +29,17 @@ class RatingController extends Controller
 
     public function getRating(Request $request, CallLogs $callLogs){
 
+
         $userObj = $this->request->user();
         if (!$userObj) {
             return $this->notAuthorizedResponse('User is not authorized');
         }
-
+      
         $callLogs = $callLogs->getAllTherapistCallLog($userObj->id);
+       
         $responeArr = array();
         foreach ($callLogs as $callLog) {
+        
             array_push($responeArr, $callLog->ratings);
         }
         if(!empty($responeArr)){

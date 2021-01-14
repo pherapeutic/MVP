@@ -9,6 +9,7 @@ use App\Models\TherapistType;
 use App\Models\Appointments;
 use Auth;
 use Validator;
+
 class TherapistController extends Controller
 {
     /**
@@ -58,6 +59,53 @@ class TherapistController extends Controller
                 'longitude' => $userTherapistTypeObj->longitude,
                 'experience' => $userTherapistTypeObj->experience,
                 'qualification' => $userTherapistTypeObj->qualification
+               ];
+            array_push($returnResponse, $data);
+       }
+
+        return $this->successResponse($returnResponse, 'Therapist List.');
+    }
+
+    public function searchTherapistList(Request $request, UserAnswers $userAnswers, TherapistType $therapistType)
+    {
+       $input = $request->all();
+       $userId = Auth::id();
+
+       //Get user point and calculate
+       $userAnswer = $userAnswers->getUserAnswerByUserId($userId);
+       $userPoints = 0;
+       if($userAnswer){
+           foreach ($userAnswer as $value) {
+               $userPoints += $value->points;
+           }
+       }
+       $userTherapistTypeColl = $therapistType->searchTherapistList($userPoints,$input['latitude'],$input['longitude']);
+
+       $returnResponse = array();
+       foreach ($userTherapistTypeColl as $key => $userTherapistTypeObj) {
+          if(in_array($userTherapistTypeObj->appointmentStatus, ['0', '1'])){
+              continue;
+          }
+
+           $data = 
+               ['user_id' => $userTherapistTypeObj->user_id,
+                'first_name' => $userTherapistTypeObj->first_name,
+                'last_name' => $userTherapistTypeObj->last_name,
+                'email' => $userTherapistTypeObj->email,
+                'image' => $userTherapistTypeObj->image,
+                'address' => $userTherapistTypeObj->address,
+                'latitude' => $userTherapistTypeObj->latitude,
+                'longitude' => $userTherapistTypeObj->longitude,
+                'experience' => $userTherapistTypeObj->experience,
+                'qualification' => $userTherapistTypeObj->qualification,
+                'Languages' => $userTherapistTypeObj->title,
+                'Specialism' => $userTherapistTypeObj->name,
+                'rating' => $userTherapistTypeObj->rating,
+                'comment' => $userTherapistTypeObj->comment,
+                'amount' => $userTherapistTypeObj->amount,
+                'transfer_amount' => $userTherapistTypeObj->transfer_amount,
+                'refund_amount' => $userTherapistTypeObj->refund_amount
+                
                ];
             array_push($returnResponse, $data);
        }
