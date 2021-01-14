@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,8 +11,8 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import styles from './styles';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {validateEmail} from '../../utils/validateStrings';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { validateEmail } from '../../utils/validateStrings';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import Geolocation from '@react-native-community/geolocation';
 import constants from '../../utils/constants';
@@ -20,10 +20,10 @@ import Events from '../../utils/events';
 import APICaller from '../../utils/APICaller';
 import SubmitButton from '../../components/submitButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {saveUser} from '../../redux/actions/user';
-import {connect} from 'react-redux';
+import { saveUser } from '../../redux/actions/user';
+import { connect } from 'react-redux';
 
-const {height, width} = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
 
 const SignUp = (props) => {
   const [first_name, setFirstName] = useState('');
@@ -49,8 +49,8 @@ const SignUp = (props) => {
   const [readyToSubmit, setReadyToSibmit] = useState(true);
   const [token, setToken] = useState(null);
 
-  const {navigation, route, dispatch} = props;
-  const {params} = route;
+  const { navigation, route, dispatch } = props;
+  const { params } = route;
 
   // const {params} = props.navigation.state;
 
@@ -73,7 +73,7 @@ const SignUp = (props) => {
     APICaller('getLanguages', 'GET')
       .then((response) => {
         console.log('response getting languages => ', response);
-        const {data, message, status, statusCode} = response['data'];
+        const { data, message, status, statusCode } = response['data'];
         if (status === 'success') {
           storeLanguages([...data]);
         }
@@ -92,7 +92,7 @@ const SignUp = (props) => {
     APICaller('getTherapistTypes', 'GET')
       .then((response) => {
         console.log('response getting specialiites => ', response);
-        const {data, message, status, statusCode} = response['data'];
+        const { data, message, status, statusCode } = response['data'];
         if (status === 'success') {
           storeSpecialities([...data]);
         }
@@ -105,13 +105,15 @@ const SignUp = (props) => {
   const registerUser = async () => {
     Events.trigger('showModalLoader');
 
-    var latitude = '31.104605';
-    var longitude = '77.173424';
+    // var latitude = '31.104605';
+    // var longitude = '77.173424';
+    var latitude = '';
+    var longitude = '';
 
-    // if (location && location.coords) {
-    //   latitude = location.coords.latitude;
-    //   longitude = location.coords.longitude;
-    // }
+    if (location && location.coords) {
+      latitude = location.coords.latitude;
+      longitude = location.coords.longitude;
+    }
 
     var registerObj = {
       first_name,
@@ -159,7 +161,7 @@ const SignUp = (props) => {
       .then((response) => {
         Events.trigger('hideModalLoader');
         console.warn('response after register => ', response);
-        const {data, message, status, statusCode} = response['data'];
+        const { data, message, status, statusCode } = response['data'];
         // const { message } = data;
 
         if (params && (params.fbtoken || params.googletoken)) {
@@ -167,12 +169,12 @@ const SignUp = (props) => {
           dispatch(saveUser(data));
           navigation.navigate('Onboarding');
         } else if (message === 'Your account created successfully.') {
-          navigation.navigate('VerifyEmail', {user_id: data['user_id']});
+          navigation.navigate('VerifyEmail', { user_id: data['user_id'] });
         }
       })
       .catch((error) => {
         console.warn('error after register => ', error);
-        const {data} = error;
+        const { data } = error;
         if (data) {
           Events.trigger('hideModalLoader');
           setAlert(data.message);
@@ -182,6 +184,8 @@ const SignUp = (props) => {
   };
 
   const signUpHandler = () => {
+if(!(params && (params.fbtoken || params.googletoken)))
+{
     if (
       first_name &&
       last_name &&
@@ -190,7 +194,7 @@ const SignUp = (props) => {
       confirm_password &&
       role &&
       language_id &&
-      password === confirm_password
+      password === confirm_password && confirm_password.length >= 6 && password.length >= 6
     ) {
       if (role == 'Therapist') {
         if (!years) {
@@ -214,41 +218,80 @@ const SignUp = (props) => {
       else if (emailError) setAlert('Please Enter Valid Email Address.');
       else if (!password) setAlert('Please Enter Password.');
       else if (!confirm_password) setAlert('Please Enter Confirm Password.');
-      else if (confirm_password !== password)
-        setAlert('Please Enter Same Password.');
+      else if (confirm_password !== password) setAlert('Please Enter Same Password.');
+      else if (!role) setAlert('Please Select Your Role.');
+      else if (!language) setAlert('Please Select Your Language.');
+      else if (password.length < 6) setAlert('Please Fill password at least 6 digit.');
+      else if (confirm_password.length < 6) setAlert('Please Fill password at least 6 digit.');
+      setShowAlert(true);
+    }
+  }
+  else{
+    if (
+      first_name &&
+      last_name &&
+      email &&
+      role &&
+      language_id 
+    ) {
+      if (role == 'Therapist') {
+        if (!years) {
+          setAlert('Please Enter Total Experience.');
+          setShowAlert(true);
+        } else if (!selectedSpeciality) {
+          setAlert('Please Select Speciality');
+          setShowAlert(true);
+        } else {
+          // call api
+          registerUser();
+        }
+      } else {
+        // call api
+        registerUser();
+      }
+    } else {
+      if (!first_name) setAlert('Please Enter First Name.');
+      else if (!last_name) setAlert('Please Enter Last Name.');
+      else if (!email) setAlert('Please Enter Email Address.');
+      else if (emailError) setAlert('Please Enter Valid Email Address.');
+    
       else if (!role) setAlert('Please Select Your Role.');
       else if (!language) setAlert('Please Select Your Language.');
       setShowAlert(true);
     }
+
+  }
   };
 
   const ListView = () => (
-    <View style={{justifyContent: 'center', alignItems: 'center'}}>
-      {languages.map((lang) => {
-        console.log('!!!!!!!!!!');
-        return (
-          <TouchableOpacity
-            onPress={() => {
-              setLanguage_id(lang['id']);
-              setLanguage(lang['title']);
-              setShowLanguages(false);
-            }}
-            style={{
-              height: Dimensions.get('window').height * 0.05,
-              width: Dimensions.get('window').width * 0.6,
-              paddingHorizontal: 2,
-              justifyContent: 'center',
-              alignItems: 'flex-start',
-            }}>
-            <Text>{lang['title']}</Text>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
+    <ScrollView >
+      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        {languages.map((lang) => {
+          console.log('!!!!!!!!!!');
+          return (
+            <TouchableOpacity
+              onPress={() => {
+                setLanguage_id(lang['id']);
+                setLanguage(lang['title']);
+                setShowLanguages(false);
+              }}
+              style={{
+                height: Dimensions.get('window').height * 0.05,
+                width: Dimensions.get('window').width * 0.6,
+                paddingHorizontal: 2,
+                justifyContent: 'center',
+                alignItems: 'flex-start',
+              }}>
+              <Text>{lang['title']}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </ScrollView>
   );
 
   const SpecialitiesList = () => (
-    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
       {specialities.map((speciality) => {
         console.log('!!!!!!!!!!');
         return (
@@ -273,7 +316,7 @@ const SignUp = (props) => {
   );
 
   const Roles = () => (
-    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
       <TouchableOpacity
         onPress={() => {
           setRole('Client');
@@ -312,7 +355,7 @@ const SignUp = (props) => {
     //   keyboardVerticalOffset={'60'}
     //   behavior={'padding'}
     // >
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <Image
         source={constants.images.background}
         resizeMode={'stretch'}
@@ -331,10 +374,10 @@ const SignUp = (props) => {
         <View style={[styles.backButtonView, {}]}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            style={{flex: 1.5, justifyContent: 'center', alignItems: 'center'}}>
+            style={{ flex: 1.5, justifyContent: 'center', alignItems: 'center' }}>
             <Image
               source={constants.images.backIcon}
-              style={{height: 20, width: 10, margin: 10}}
+              style={{ height: 20, width: 10, margin: 10 }}
             />
           </TouchableOpacity>
           <View
@@ -353,7 +396,7 @@ const SignUp = (props) => {
               }}
             />
           </View>
-          <View style={{flex: 1.5}} />
+          <View style={{ flex: 1.5 }} />
         </View>
         <View style={styles.formView}>
           <View style={styles.formWrap}>
@@ -394,7 +437,7 @@ const SignUp = (props) => {
                   value={email}
                   autoCompleteType={'off'}
                   autoCorrect={false}
-                  editable={!(params && (params.fbtoken || params.googletoken))}
+                 // editable={!(params && (params.fbtoken || params.googletoken))}
                   autoCapitalize={'none'}
                   onBlur={() => {
                     if (email.length) setEmailError(validateEmail(email));
@@ -402,39 +445,37 @@ const SignUp = (props) => {
                 />
               </View>
             </View>
-
-            <View style={styles.formField}>
-              <Text style={styles.fieldName}>CREATE PASSWORD</Text>
-              <View style={styles.fieldInputWrap}>
-                <TextInput
-                  style={styles.fieldInput}
-                  secureTextEntry={true}
-                  onChangeText={(text) => setPassword(text)}
-                  value={password}
-                  autoCompleteType={'off'}
-                  autoCorrect={false}
-                />
+            {!(params && (params.fbtoken || params.googletoken)) && (
+              <View style={styles.formField}>
+                <Text style={styles.fieldName}>CREATE PASSWORD</Text>
+                <View style={styles.fieldInputWrap}>
+                  <TextInput
+                    style={styles.fieldInput}
+                    secureTextEntry={true}
+                    onChangeText={(text) => setPassword(text)}
+                    value={password}
+                    autoCompleteType={'off'}
+                    autoCorrect={false}
+                    maxLength={8}
+                  />
+                </View>
               </View>
-            </View>
-
-            <View style={styles.formField}>
-              <Text style={styles.fieldName}>CONFIRM PASSWORD</Text>
-              <View style={styles.fieldInputWrap}>
-                {/* <TextInput
-                  style={styles.fieldInput}
-                  secureTextEntry={true}
-                  onChangeText={text => setConfirmPassword(text)}
-                  value={confirm_password}
-                  autoCompleteType={'off'}
-                  autoCorrect={false}
-                /> */}
-                <TextInput
-                  style={styles.fieldInput}
-                  secureTextEntry={true}
-                  onChangeText={(text) => setConfirmPassword(text)}
-                  value={confirm_password}></TextInput>
+            )}
+            {!(params && (params.fbtoken || params.googletoken)) && (
+              <View style={styles.formField}>
+                <Text style={styles.fieldName}>CONFIRM PASSWORD</Text>
+                <View style={styles.fieldInputWrap}>
+                  <TextInput
+                    style={styles.fieldInput}
+                    secureTextEntry={true}
+                    onChangeText={(text) => setConfirmPassword(text)}
+                    maxLength={8}
+                    value={confirm_password}></TextInput>
+                </View>
               </View>
-            </View>
+            )}
+
+
 
             <View style={styles.formField}>
               <Text style={styles.fieldName}>
@@ -444,7 +485,7 @@ const SignUp = (props) => {
                 <TextInput
                   style={[
                     styles.fieldInput,
-                    {width: Dimensions.get('window').width * 0.7},
+                    { width: Dimensions.get('window').width * 0.7 },
                   ]}
                   onChangeText={(text) => setLanguage(text)}
                   value={role}
@@ -454,7 +495,7 @@ const SignUp = (props) => {
                 />
                 <TouchableOpacity onPress={() => setShowRoles(true)}>
                   <Image
-                    style={{height: 25, width: 25, margin: 3}}
+                    style={{ height: 25, width: 25, margin: 3 }}
                     source={constants.images.downArrow}
                   />
                 </TouchableOpacity>
@@ -462,14 +503,14 @@ const SignUp = (props) => {
             </View>
 
             {role == 'Therapist' ? (
-              <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <View style={styles.formField}>
                   <Text style={styles.fieldName}>SPECIALISM</Text>
                   <View style={styles.fieldInputWrap}>
                     <TextInput
                       style={[
                         styles.fieldInput,
-                        {width: Dimensions.get('window').width * 0.7},
+                        { width: Dimensions.get('window').width * 0.7 },
                       ]}
                       // onChangeText={text => setLanguage(text)}
                       value={selectedSpeciality}
@@ -479,7 +520,7 @@ const SignUp = (props) => {
                     />
                     <TouchableOpacity onPress={() => setShowSpecialism(true)}>
                       <Image
-                        style={{height: 25, width: 25, margin: 3}}
+                        style={{ height: 25, width: 25, margin: 3 }}
                         source={constants.images.downArrow}
                       />
                     </TouchableOpacity>
@@ -501,8 +542,8 @@ const SignUp = (props) => {
                 </View>
               </View>
             ) : (
-              <View />
-            )}
+                <View />
+              )}
 
             <View style={styles.formField}>
               <Text style={styles.fieldName}>LANGUAGE YOU SPEAK</Text>
@@ -510,7 +551,7 @@ const SignUp = (props) => {
                 <TextInput
                   style={[
                     styles.fieldInput,
-                    {width: Dimensions.get('window').width * 0.7},
+                    { width: Dimensions.get('window').width * 0.7 },
                   ]}
                   onChangeText={(text) => setLanguage(text)}
                   value={language}
@@ -518,7 +559,7 @@ const SignUp = (props) => {
                 />
                 <TouchableOpacity onPress={() => setShowLanguages(true)}>
                   <Image
-                    style={{height: 25, width: 25, margin: 3}}
+                    style={{ height: 25, width: 25, margin: 3 }}
                     source={constants.images.downArrow}
                   />
                 </TouchableOpacity>
@@ -542,7 +583,7 @@ const SignUp = (props) => {
           </Text>
           <Text style={styles.footerLinkTextBottom}>
             By continuing, you agree to our{' '}
-            <Text style={{borderBottomColor: '#ffffff', borderBottomWidth: 1}}>
+            <Text onPress={() => navigation.navigate('TermsAndConditions')} style={{ textDecorationLine: 'underline', borderBottomColor: '#ffffff', borderBottomWidth: 1 }}>
               Terms & Conditions.
             </Text>
           </Text>

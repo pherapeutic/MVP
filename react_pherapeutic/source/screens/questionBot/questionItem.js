@@ -13,25 +13,34 @@ import styles from './styles';
 
 const AnswerItem = (props) => {
   const [selected, setSelected] = useState(false)
-  const { info, setRightAnswer, canSelect } = props;
+  const { info, setRightAnswer, canSelect,selectedID } = props;
 
   const { id, title } = info;
+  useEffect(() => {
+    setSelected(false)
+    console.log('asa', info)
+
+  }, []);
+
+  const answeradd = (info) => {
+      setSelected(true)
+      setRightAnswer(info)
+  };
+
   return (
     <TouchableOpacity
-      style={[styles.answerWrap, { borderColor: selected ? constants.colors.lightGreen : '#ffffff' }]}
+      style={[styles.answerWrap, { borderColor: selectedID==info.id ? constants.colors.lightGreen : '#ffffff' }]}
       onPress={() => {
-        if (canSelect) {
-          setSelected(true)
-          setRightAnswer(info)
-        }
+        answeradd(info)
       }}
     >
-      <Text style={[styles.answerText, { color: selected ? constants.colors.lightGreen : '#ffffff' }]} >{title}</Text>
+      <Text style={[styles.answerText, { color: selectedID==info.id ? constants.colors.lightGreen : '#ffffff' }]} >{title}</Text>
     </TouchableOpacity>
   )
 }
 
 const SelectedItem = (props) => {
+
   return (
     <View style={styles.selectedWrap} >
       <Text style={styles.selectedText} >{props.title}</Text>
@@ -41,18 +50,17 @@ const SelectedItem = (props) => {
 
 const QuestionItem = (props) => {
   const [rightAnswer, setRightAnswer] = useState(null)
-
-  console.log('props in question item => ', props);
-  console.log('right answer  ===> ', rightAnswer);
-
+  const [selectedID, setselectedID] = useState('')
   const { data, selectAnswer } = props;
   const { answer, id, status, title } = data;
-
-  useEffect(() => {
+   useEffect(() => {
     if (rightAnswer)
+    {
+      setselectedID(rightAnswer.id)
       selectAnswer(rightAnswer)
-  }, [rightAnswer]);
+    }
 
+  }, [rightAnswer]);
   return (
     <View style={styles.questionItemContainer} >
       <View style={styles.questionWrap} >
@@ -64,6 +72,7 @@ const QuestionItem = (props) => {
             canSelect={!rightAnswer}
             setRightAnswer={setRightAnswer}
             info={answerData}
+            selectedID={selectedID}
           />)
         }
       </View>

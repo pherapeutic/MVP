@@ -23,6 +23,7 @@ const QuestionBot = (props) => {
   const [message, setMessage] = useState('Thank You');
   const [questionsList, setQuestions] = useState([]);
   const [noOfAnswers, setNoOfAnswers] = useState(0);
+  const [currentquestion, setquestioncurrent] = useState();
   const scrollRef = useRef();
 
   const {navigation, dispatch, userData, userToken} = props;
@@ -71,7 +72,11 @@ const QuestionBot = (props) => {
         console.log('response after answering question => ', response['data']);
         const {status, statusCode, message, data} = response['data'];
         if (status === 'success') {
+          setquestioncurrent(answerData.question_id)
+           if(currentquestion!=answerData.question_id)
+           {
           setNoOfAnswers((prevNo) => prevNo + 1);
+          }
         }
       })
       .catch((error) => {
@@ -89,7 +94,6 @@ const QuestionBot = (props) => {
       <ScrollView
         ref={scrollRef}
         onContentSizeChange={() => {
-          // scrollRef.current.scrollTo({ x: 0, y: 0, animated: true })
           scrollRef.current.scrollToEnd();
         }}
         showsVerticalScrollIndicator={false}
@@ -103,12 +107,10 @@ const QuestionBot = (props) => {
               style={{height: 18, width: 10, margin: 10}}
             />
           </TouchableOpacity>
-          <View
+           <View
             style={{flex: 4, justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={styles.headingText}>To get started, we just</Text>
-            <Text style={styles.headingText}>need to learn a bit</Text>
-            <Text style={styles.headingText}>more about you</Text>
-          </View>
+            <Text  style={[styles.headingText,{textAlign:'center'}]}>To get started, we just{"\n"}need to learn a bit{"\n"}more about you</Text>
+           </View> 
           <View style={{flex: 1}}>
             <TouchableOpacity
               onPress={() => navigation.navigate('TherapistDetails')}
@@ -135,6 +137,9 @@ const QuestionBot = (props) => {
               </LinearGradient>
             </TouchableOpacity>
           </View>
+        </View>
+        <View style={{width:width, paddingHorizontal: width * 0.05}}>
+            <Text style={{color: constants.colors.white,fontSize:14}}>Please select one answer.</Text>
         </View>
         {questionsList.length ? (
           questionsList.map((question, index) => {

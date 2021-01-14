@@ -36,6 +36,13 @@ import calling_transparent_bg from '../../../assets/images/calling_transparent_b
 import no_sound from '../../../assets/images/no-sound.png';
 import time_transparent_bg from '../../../assets/images/time_transparent_bg.png';
 import visa from '../../../assets/images/visa.png';
+import shutterstock from '../../../assets/images/shutterstock1281435583.png';
+import Profile from '../../../assets/images/Profile.png';
+import FAQdownarrow from '../../../assets/images/FAQdownarrow.png';
+import NextArrow from '../../../assets/images/Next-Arrow.png';
+import Internerconnection from '../../../assets/images/group.png';
+
+
 export default {
   ic_menu,
   ic_location,
@@ -75,4 +82,9 @@ export default {
   no_sound,
   time_transparent_bg,
   visa,
+  shutterstock,
+  Profile,
+  FAQdownarrow,
+  NextArrow,
+  Internerconnection
 };

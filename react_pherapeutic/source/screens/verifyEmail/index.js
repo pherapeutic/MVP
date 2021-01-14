@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -14,24 +14,24 @@ import constants from '../../utils/constants';
 import styles from './styles';
 import SubmitButton from '../../components/submitButton';
 import APICaller from '../../utils/APICaller';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Events from '../../utils/events';
 import CodeInput from 'react-native-confirmation-code-input';
 // import { Dropdown } from 'react-native-material-dropdown';
 import AwesomeAlert from 'react-native-awesome-alerts';
-import {saveUser} from '../../redux/actions/user';
+import { saveUser } from '../../redux/actions/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
-const {height, width} = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
 
 const VerifyOTP = (props) => {
   const [otp, setOTP] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlert] = useState('OTP is incorrect.');
 
-  const {navigation, route, dispatch} = props;
-  const {params} = route;
+  const { navigation, route, dispatch } = props;
+  const { params } = route;
 
   const verifyOTPHandler = () => {
     if (otp.length == 6) {
@@ -43,7 +43,7 @@ const VerifyOTP = (props) => {
         .then((response) => {
           Events.trigger('showModalLoader');
           console.log('response verifying otp => ', response);
-          const {data, message, status, sttusCode} = response['data'];
+          const { data, message, status, sttusCode } = response['data'];
           if (message == 'Otp verified successfully') {
             AsyncStorage.setItem('userData', JSON.stringify(data));
             dispatch(saveUser(data));
@@ -62,10 +62,37 @@ const VerifyOTP = (props) => {
     }
   };
 
+  const resendOTPHandler = () => {
+    Events.trigger('showModalLoader');
+    const body = {
+      user_id: params['user_id'],
+      otp,
+    };
+    APICaller('resendOtp', 'POST', body)
+      .then((response) => {
+        console.log('response verifying otp => ', response);
+        const { data, message, status, sttusCode } = response['data'];
+        if (message == 'Otp resend successfully!') {
+          Events.trigger('hideModalLoader');
+          setAlert(message);
+          setShowAlert(true);
+        } else {
+           Events.trigger('hideModalLoader');
+           setAlert(message);
+           setShowAlert(true);
+        }
+      })
+      .catch((error) => {
+         Events.trigger('hideModalLoader');
+        setShowAlert(true);
+      });
+  };
+
+
   return (
     <KeyboardAwareScrollView
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{width: '100%', flex: 1}}
+      contentContainerStyle={{ width: '100%', flex: 1 }}
       keyboardVerticalOffset={'60'}
       behavior={'padding'}>
       <View style={styles.container}>
@@ -82,17 +109,17 @@ const VerifyOTP = (props) => {
         <View style={styles.backButtonView}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <Image
               source={constants.images.backIcon}
-              style={{height: 18, width: 10, margin: 10}}
+              style={{ height: 18, width: 10, margin: 10 }}
             />
           </TouchableOpacity>
           <View
-            style={{flex: 5, justifyContent: 'center', alignItems: 'center'}}>
+            style={{ flex: 5, justifyContent: 'center', alignItems: 'center' }}>
             <Text style={styles.headingText}>Verify email</Text>
           </View>
-          <View style={{flex: 1}} />
+          <View style={{ flex: 1 }} />
         </View>
         <View style={styles.content}>
           <View style={styles.heading}>
@@ -120,11 +147,14 @@ const VerifyOTP = (props) => {
                 submitFunction={() => verifyOTPHandler()}
               />
             </View>
-            <View style={[styles.formField, {height: height * 0.03}]}>
+            <View style={[styles.formField, { height: height * 0.03 }]}>
               <Text>
                 Didn't get the code?{' '}
-                <Text style={{color: constants.colors.greenText}}>Resend</Text>
+
               </Text>
+              <TouchableOpacity onPress={() => resendOTPHandler()}>
+                <Text  style={{ color: constants.colors.greenText }}>Resend</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>

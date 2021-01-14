@@ -158,7 +158,6 @@ const ManagePayment = (props) => {
         });
     }
   };
-
   const callTherapist = (data) => {
     // alert(JSON.stringify(therapistDetail));
     console.log('therapist details => ', therapistDetail);
@@ -225,6 +224,7 @@ const ManagePayment = (props) => {
         console.log('error getting user card details => ', error);
       });
   };
+  
   return (
     <View style={styles.container}>
       <Image
@@ -233,7 +233,7 @@ const ManagePayment = (props) => {
         style={styles.containerBackground}
       />
 
-      <Header title="Manage Payment Method" navigation={navigation} />
+      <Header title="Manage payment method" navigation={navigation} />
       <View
         style={{flex: 7, justifyContent: 'flex-start', alignItems: 'center'}}>
         <FlatList
@@ -250,6 +250,8 @@ const ManagePayment = (props) => {
                 <TouchableOpacity
                   style={{
                     marginTop: 20,
+                  
+              
                   }}
                   onPress={() => {
                     createDefaultCard(index, item.id);
@@ -268,6 +270,7 @@ const ManagePayment = (props) => {
                       flexDirection: 'row',
                       justifyContent: 'space-around',
                       alignSelf: 'center',
+                      borderRadius:5
                       // marginVertical: Dimensions.get('window').height * 0.005
                     }}>
                     <Image source={constants.images.visa} />
@@ -323,28 +326,6 @@ const ManagePayment = (props) => {
                     />
                   </LinearGradient>
                 </TouchableOpacity>
-                {/* <TouchableOpacity
-                  onPress={() => {
-                    defaultAlert(
-                      'Are you sure want to set this default card?',
-                      [
-                        {text: 'Cancel'},
-                        {
-                          text: 'Confirm',
-                          onPress: () => createDefaultCard(index, item.id),
-                        },
-                      ],
-                    );
-                  }}>
-                  <Text
-                    style={{
-                      color: 'white',
-                      margin: 10,
-                      fontSize: 15,
-                    }}>
-                    Set as default
-                  </Text>
-                </TouchableOpacity> */}
               </>
             );
           }}
@@ -358,30 +339,11 @@ const ManagePayment = (props) => {
         <View style={{height: 20}} />
         <SubmitButton
           title={'DO THIS LATER'}
-          submitFunction={() => createCall()}
+         // submitFunction={() => createCall()}
+          submitFunction={() => navigation.goBack()}
           customcolors={['#808080', '#808080']}
         />
-       
-
-        {/* <TouchableOpacity
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: '#333333',
-            marginTop: 10,
-            borderRadius: 5,
-          }}
-          onPress={() => navigation.goBack()}>
-          <Text
-            style={{
-              color: constants.colors.white,
-              fontWeight: '500',
-              fontSize: 16,
-              padding: 7,
-            }}>
-            DO THIS LATER
-          </Text>
-        </TouchableOpacity> */}
+   
       </View>
       <AwesomeAlert
         show={showAlert}

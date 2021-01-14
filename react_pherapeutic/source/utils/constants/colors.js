@@ -18,4 +18,5 @@ export default {
   questionBackground: 'rgb(204,204,204)',
   lightBlue: '#3fd8f2',
   red: '#ff0000',
+  blueGreen:'rgb (15,145,159)'
 };

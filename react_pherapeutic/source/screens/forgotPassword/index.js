@@ -78,10 +78,8 @@ const ForgotPassword = (props) => {
         <Image source={constants.images.formsBackground} resizeMode={'stretch'} style={styles.formsBackground} />
         <View style={styles.backButtonView} >
           <View
-            // onPress={() => navigation.goBack()}
             style={{ justifyContent: 'center', alignItems: 'center' }}
           >
-            {/* <Image source={constants.images.backIcon} style={{ height: 18, width: 10, margin: 10 }} /> */}
           </View>
         </View>
         <View style={styles.logoView} >
@@ -172,6 +170,4 @@ const ForgotPassword = (props) => {
     </TouchableWithoutFeedback>
   )
 };
-
-
 export default connect()(ForgotPassword);

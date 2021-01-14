@@ -25,6 +25,11 @@ const ViewProfile = (props) => {
   const [language, setLanguage] = useState('English');
 
   const {navigation, userData, userToken, dispatch, userProfile} = props;
+  
+
+  useEffect(() => {
+    getUserProfile();
+  }, []);
   const {
     address,
     email,
@@ -44,10 +49,6 @@ const ViewProfile = (props) => {
     user_id,
   } = userData;
 
-  useEffect(() => {
-    getUserProfile();
-  }, []);
-
   const getUserProfile = () => {
     const endpoint = 'user/profile';
     const method = 'GET';
@@ -59,6 +60,7 @@ const ViewProfile = (props) => {
     APICaller(endpoint, method, null, headers)
       .then((response) => {
         console.log('response getting user profile => ', response['data']);
+       
         const {status, statusCode, message, data} = response['data'];
         if (status === 'success') {
           dispatch(saveUserProfile(data));

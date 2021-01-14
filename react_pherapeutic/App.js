@@ -2,7 +2,7 @@ import 'react-native-gesture-handler';
 import { enableScreens } from 'react-native-screens';
 enableScreens();
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, SafeAreaView, Dimensions, Text, View, Alert, StatusBar } from 'react-native';
+import { StyleSheet, SafeAreaView, Dimensions, Text, View, Alert, StatusBar,Image} from 'react-native';
 import AppNavigator from './source/navigator';
 import ModalLoader from './source/components/modalLoader';
 import Events from './source/utils/events';
@@ -13,12 +13,16 @@ import { utils } from '@react-native-firebase/app';
 import messaging, { firebase } from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SplashScreen from 'react-native-splash-screen'
+import Modal from 'react-native-modal';
+import NetInfo from "@react-native-community/netinfo";
 const { height, width } = Dimensions.get('window');
 
 export default function App() {
   const [showModal, setShowModal] = useState(false);
   const [loaderData, setLoaderData] = useState({ label: "", backgroundColor: "black" })
   const [hasPermission, setPermission] = useState(false);
+  const [isConnected, setConnected] = useState('');
+  const [isModalVisible, setModalVisible] = useState(false);
 
   requestUserPermission = async () => {
     const authStatus = await messaging().requestPermission();
@@ -62,6 +66,21 @@ export default function App() {
 
    // return unsubscribe;
   }, [hasPermission])
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      console.log("Connection type", state.type);
+      console.log("Is connected?1", state.isConnected);
+      if (state.isConnected == true) {
+        setModalVisible(false)
+        setConnected(state.isConnected)
+      }
+      else {
+        setConnected(state.isConnected)
+        setModalVisible(true)
+      }
+  
+    });
+      }, [])
 
   Events.on("showModalLoader", "sml", (data) => {
     setShowModal(true);
@@ -76,7 +95,35 @@ export default function App() {
     <Provider store={store} style={{ flex: 1 }}>
       <View style={styles.safeAreaView}>
         <StatusBar barStyle='light-content' hidden={false} translucent={false} />
-        <AppNavigator />
+         
+  { isConnected == false ?
+   // return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: Dimensions.get('window').height,
+          width: Dimensions.get('window').width,
+          backgroundColor: 'transparent',
+        }}>
+        <Modal isVisible={isModalVisible}>
+          <View style={{ backgroundColor: 'white', borderRadius: 5, padding: 10 }}>
+            <Image style={{ alignSelf: 'center' }} source={constants.images.Internerconnection} />
+       
+
+
+          </View>
+        </Modal>
+      </View>
+    //);
+    :
+
+    <AppNavigator />
+  }
+ 
+      
+        
         <ModalLoader
           data={loaderData}
           show={showModal}

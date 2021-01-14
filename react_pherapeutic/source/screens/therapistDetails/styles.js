@@ -22,6 +22,12 @@ export default StyleSheet.create({
     position: 'absolute',
     zIndex: -2,
   },
+  therapistmessage: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: constants.colors.fieldName,
+   textAlign:'center'
+  },
   header: {
     flex: 1.3,
     flexDirection: 'row',
@@ -170,7 +176,7 @@ export default StyleSheet.create({
   },
   therapistInfo: {
     // padding: 20,
-    paddingHorizontal: 20,
+    paddingHorizontal: 12,
     paddingVertical: 10,
     // flex: 4,
     flexDirection: 'row',

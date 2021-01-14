@@ -189,6 +189,7 @@ const TherapistStatus = (props) => {
   const {online_status} = userData;
 
   useEffect(() => {
+    console.log('online userData => ', userData);
     console.log('online status => ', online_status);
   }, [online_status]);
 
@@ -263,8 +264,10 @@ const TherapistStatus = (props) => {
             initialRegion={{
               latitudeDelta: 0.0922,
               longitudeDelta: 0.0421,
-              latitude: 51.4684132,
-              longitude: -0.170704,
+              // latitude: 51.4684132,
+              // longitude: -0.170704,
+              latitude: userData && Number(userData.latitude),
+              longitude: userData && Number(userData.longitude),
             }}
           />
         </View>

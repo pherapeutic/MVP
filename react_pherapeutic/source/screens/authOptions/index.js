@@ -47,15 +47,8 @@ const Login = (props) => {
         if (result.isCancelled) {
           console.log('Login cancelled');
         } else {
-          // alert(JSON.stringify(result));
-          // console.log(
-          //   'Login success with permissions: ' +
-          //     result.grantedPermissions.toString(),
-          // );
-
           AccessToken.getCurrentAccessToken().then((data) => {
             const accessToken = data.accessToken.toString();
-            // alert(JSON.stringify(accessToken));
             getInfoFromToken(accessToken);
           });
         }
@@ -71,8 +64,6 @@ const Login = (props) => {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
       const {user} = userInfo;
-
-      // alert(JSON.stringify(user));
       var username = user.name.split(' ');
       var result = {
         first_name: username[0],
@@ -81,10 +72,9 @@ const Login = (props) => {
         googletoken: user.id,
         image: user.photo,
       };
-
-      // alert(JSON.stringify())
       socialLogin(result, result.googletoken, 1);
     } catch (error) {
+     // alert(JSON.stringify(error));
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
       } else if (error.code === statusCodes.IN_PROGRESS) {
@@ -119,11 +109,9 @@ const Login = (props) => {
         }
       })
       .catch((error) => {
-        // console.warn('error after sociallogin => ', error);
+         console.warn('error after sociallogin => ', error);
         const {data} = error;
         Events.trigger('hideModalLoader');
-        // console.warn('Image => ', image);
-
         if (data.statusCode === 422) {
           if (login_type == 1) {
             navigation.navigate('SignUp', {
@@ -172,8 +160,6 @@ const Login = (props) => {
               'Ok',
             );
           } else {
-            // console.log(result);
-            // alert(JSON.stringify(result));
             socialLogin(result, result.id, 2);
           }
         }
@@ -181,7 +167,6 @@ const Login = (props) => {
     );
     new GraphRequestManager().addRequest(profileRequest).start();
   }
-
   return (
     <View style={styles.container}>
       <Image
@@ -225,7 +210,7 @@ const Login = (props) => {
           </View>
         </View>
         <View style={styles.continueTextWrap}>
-          <Text style={styles.continueText}>or continue with</Text>
+          <Text style={styles.continueText}>Or continue with</Text>
         </View>
 
         <TouchableOpacity
@@ -316,5 +301,4 @@ const Login = (props) => {
     </View>
   );
 };
-
 export default connect()(Login);

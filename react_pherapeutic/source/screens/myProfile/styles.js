@@ -16,7 +16,7 @@ export default StyleSheet.create({
     flexDirection: 'row'
   },
   content: {
-    flex: 8.8,
+    flex: 8.9,
     justifyContent: 'flex-start',
     alignItems: 'center',
   },

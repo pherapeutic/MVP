@@ -42,7 +42,7 @@ const Login = (props) => {
   }, []);
 
   const loginHandler = () => {
-    if (email && !emailError && password) {
+    if (email && !emailError && password && password.length>=6) {
       Events.trigger('showModalLoader');
       const loginObj = {
         email,
@@ -70,16 +70,27 @@ const Login = (props) => {
         })
         .catch((error) => {
           console.log('error logging in => ', error);
-          const {data, message, status, statusCode} = error['data'];
+          const {data, message, status, statusCode,is_verified} = error['data'];
           Events.trigger('hideModalLoader');
+          if(is_verified==1)
+          {
+            navigation.navigate('VerifyEmail', {user_id: data['user_id']});
+          }
+          else{
           setAlert(message);
           setShowAlert(true);
+          }
+         
         });
     } else if (email && emailError && password) {
       setAlert('Email is not valid.');
       setShowAlert(true);
     } else if (!email || !password) {
       setAlert('Please Fill email and password.');
+      setShowAlert(true);
+    }
+    else if (password.length<6) {
+      setAlert('Please Fill password at least 6 digit.');
       setShowAlert(true);
     }
   };
@@ -151,6 +162,7 @@ const Login = (props) => {
                   style={styles.fieldInput}
                   placeholder={'password'}
                   returnKeyType={'done'}
+                  maxLength={8}
                   placeholderTextColor={constants.colors.placeholder}
                   secureTextEntry={true}
                   onChangeText={(text) => setPassword(text)}

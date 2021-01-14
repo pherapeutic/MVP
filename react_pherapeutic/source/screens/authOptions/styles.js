@@ -1,4 +1,5 @@
 import { Dimensions, StyleSheet } from 'react-native';
+import { color } from 'react-native-reanimated';
 import constants from '../../utils/constants';
 
 const { height, width } = Dimensions.get('window');
@@ -40,15 +41,9 @@ export default StyleSheet.create({
   continueTextWrap: {
     justifyContent: 'center',
     alignItems: 'center',
-    padding: height * 0.02
+    padding: height * 0.03,
+    paddingTop:height * 0.1,
   },
-
-
-
-
-
-
-
   backButtonView: {
     flex: 1.2,
     paddingHorizontal: width * 0.05,

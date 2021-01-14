@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   FlatList,
   ImageBackground,
@@ -20,11 +20,11 @@ import RtcEngine, {
 import styles from './styles';
 import constants from '../../utils/constants';
 import APICaller from '../../utils/APICaller';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Events from '../../utils/events';
 
-const {height, width} = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
 const requestCameraAndAudioPermission = async () => {
   try {
     const granted = await PermissionsAndroid.requestMultiple([
@@ -33,9 +33,9 @@ const requestCameraAndAudioPermission = async () => {
     ]);
     if (
       granted['android.permission.RECORD_AUDIO'] ===
-        PermissionsAndroid.RESULTS.GRANTED &&
+      PermissionsAndroid.RESULTS.GRANTED &&
       granted['android.permission.CAMERA'] ===
-        PermissionsAndroid.RESULTS.GRANTED
+      PermissionsAndroid.RESULTS.GRANTED
     ) {
       console.log('You can use the cameras & mic');
     } else {
@@ -46,7 +46,7 @@ const requestCameraAndAudioPermission = async () => {
   }
 };
 
-interface Props {}
+interface Props { }
 
 interface State {
   appId: string;
@@ -61,11 +61,12 @@ class App extends Component<Props, State> {
 
   constructor(props) {
     super(props);
-    const {channelnamedata, callDetails} = this.props.route.params;
+    const { channelnamedata, callDetails,caller_id_remotedata } = this.props.route.params;
     this.state = {
       appId: 'd54602ec57f14ee38079d5b2f0cd7438',
       channelName: channelnamedata,
       callDetails: callDetails,
+      caller_id_remote:caller_id_remotedata,
       userData: null,
       token: '',
       joinSucceed: false,
@@ -88,8 +89,10 @@ class App extends Component<Props, State> {
   }
 
   UNSAFE_componentWillMount() {
+    const { callDetails ,caller_id_remotedata} = this.props.route.params;
+   // alert(JSON.stringify(caller_id_remotedata))
     if (this.props.route.params) {
-      const {CallReciverName} = this.props.route.params;
+      const { CallReciverName } = this.props.route.params;
       if (CallReciverName) {
         this.setState({
           CallReciverName: CallReciverName,
@@ -101,11 +104,11 @@ class App extends Component<Props, State> {
       this.startCall();
     }, 1000);
 
-    const {userToken, navigation, userData} = this.props;
-    this.setState({userData: userData});
+    const { userToken, navigation, userData } = this.props;
+    this.setState({ userData: userData });
   }
   getTherapistsList = () => {
-    const {userToken, navigation, userData} = this.props;
+    const { userToken, navigation, userData } = this.props;
 
     // alert(JSON.stringify(userData));
     const endpoint = 'agoraToken';
@@ -125,7 +128,7 @@ class App extends Component<Props, State> {
         //   response['data'],
         //   '------',
         // );
-        const {status, statusCode, message, data} = response['data'];
+        const { status, statusCode, message, data } = response['data'];
         this.setState({
           token: data.token,
         });
@@ -139,11 +142,11 @@ class App extends Component<Props, State> {
   // Turn the microphone on or off.
 
   switchMicrophone = () => {
-    const {openMicrophone} = this.state;
+    const { openMicrophone } = this.state;
     this._engine
       ?.enableLocalAudio(!openMicrophone)
       .then(() => {
-        this.setState({openMicrophone: !openMicrophone});
+        this.setState({ openMicrophone: !openMicrophone });
       })
       .catch((err) => {
         console.warn('enableLocalAudio', err);
@@ -151,8 +154,8 @@ class App extends Component<Props, State> {
   };
 
   updateCallLogs = (duration, call_status, ended_at) => {
-    const {userToken, navigation, userData} = this.props;
-    const {callDetails} = this.state;
+    const { userToken, navigation, userData } = this.props;
+    const { callDetails } = this.state;
     if (call_status === 2) {
       Events.trigger('showModalLoader');
     }
@@ -177,7 +180,7 @@ class App extends Component<Props, State> {
         Events.trigger('hideModalLoader');
 
         console.log('response after updating call logs => ', response['data']);
-        const {status, statusCode, message, data} = response['data'];
+        const { status, statusCode, message, data } = response['data'];
         if (call_status === 2) {
           this.leaveAndCleanUpResources();
         }
@@ -193,11 +196,11 @@ class App extends Component<Props, State> {
 
   // Switch the audio playback device.
   switchSpeakerphone = () => {
-    const {enableSpeakerphone} = this.state;
+    const { enableSpeakerphone } = this.state;
     this._engine
       ?.setEnableSpeakerphone(!enableSpeakerphone)
       .then(() => {
-        this.setState({enableSpeakerphone: !enableSpeakerphone});
+        this.setState({ enableSpeakerphone: !enableSpeakerphone });
       })
       .catch((err) => {
         console.warn('setEnableSpeakerphone', err);
@@ -206,18 +209,18 @@ class App extends Component<Props, State> {
 
   switchMuteAudio = () => {
     console.log('Mute');
-    const {Mute} = this.state;
+    const { Mute } = this.state;
     this._engine.enableAudio();
-    this.setState({Mute: false});
+    this.setState({ Mute: false });
   };
   switchUnMuteAudio = () => {
     console.log('unMute');
-    const {Mute} = this.state;
+    const { Mute } = this.state;
     this._engine.disableAudio();
-    this.setState({Mute: true});
+    this.setState({ Mute: true });
   };
   init = async () => {
-    const {appId} = this.state;
+    const { appId } = this.state;
     this._engine = await RtcEngine.create(appId);
     this._engine.enableVideo();
     this._engine.enableAudio();
@@ -228,7 +231,7 @@ class App extends Component<Props, State> {
       this.setState({
         user_joined: true,
       });
-      const {peerIds} = this.state;
+      const { peerIds } = this.state;
       if (peerIds.indexOf(uid) === -1) {
         this.setState({
           peerIds: [...peerIds, uid],
@@ -238,7 +241,7 @@ class App extends Component<Props, State> {
 
     this._engine.addListener('UserOffline', (uid, reason) => {
       console.log('UserOffline', uid, reason);
-      const {peerIds} = this.state;
+      const { peerIds } = this.state;
       this.setState({
         peerIds: peerIds.filter((id) => id !== uid),
         user_joined: false,
@@ -259,7 +262,7 @@ class App extends Component<Props, State> {
     this.interval = setInterval(() => {
       var timer = this.state.timer;
       timer = timer + 1;
-      this.setState((prevState) => ({timer: timer}));
+      this.setState((prevState) => ({ timer: timer }));
 
       // if role is client
       if (this.state.userData && this.state.userData.role === '0') {
@@ -287,13 +290,13 @@ class App extends Component<Props, State> {
   };
 
   _renderVideos = () => {
-    const {joinSucceed} = this.state;
+    const { joinSucceed } = this.state;
     return joinSucceed ? (
       <View style={styles.fullView}>
         <RtcLocalView.SurfaceView
           style={styles.max}
           channelId={this.state.channelName}
-          // renderMode={VideoRenderMode.Hidden}
+        // renderMode={VideoRenderMode.Hidden}
         />
         {this._renderRemoteVideos()}
       </View>
@@ -301,12 +304,12 @@ class App extends Component<Props, State> {
   };
 
   _renderRemoteVideos = () => {
-    const {peerIds} = this.state;
+    const { peerIds } = this.state;
 
     return (
       <ScrollView
         style={styles.remoteContainer}
-        contentContainerStyle={{paddingHorizontal: 2.5}}
+        contentContainerStyle={{ paddingHorizontal: 2.5 }}
         horizontal={true}>
         {peerIds.map((value, index, array) => {
           return (
@@ -338,30 +341,34 @@ class App extends Component<Props, State> {
   leaveAndCleanUpResources = async () => {
     clearInterval(this.interval);
     clearInterval(this.intervalend);
-    // }
     await this._engine.leaveChannel();
-    this.setState({peerIds: [], joinSucceed: false});
-   if(this.state.userData.role==0)
-   {
-    this.props.navigation.navigate('TherapistDetails');
-   }
-   else{
-    this.props.navigation.navigate('Home'); 
-   }
-   
-      
-   // this.props.navigation.goBack()
+    this.setState({ peerIds: [], joinSucceed: false });
+    if (this.state.userData.role == 0) {
+      //this.props.navigation.navigate('TherapistDetails');
+      this.props.navigation.navigate('Review', {
+        CallReciverName: this.state.CallReciverName,
+        caller_id: this.state.callDetails.caller_id
+      });
+
+    }
+    else {
+     // alert(JSON.stringify(this.state.caller_id_remote))
+      //    this.props.navigation.navigate('Home'); 
+      this.props.navigation.navigate('LeaveNote',{
+        caller_id: this.state.caller_id_remote
+      });
+
+
+    }
+
+
+    // this.props.navigation.goBack()
   };
   secondsToHms(d) {
     d = Number(d);
     var h = Math.floor(d / 3600);
     var m = Math.floor((d % 3600) / 60);
     var s = Math.floor((d % 3600) % 60);
-
-    // var hDisplay = h > 0 ? h + (h == 1 ? " hour, " : "0:") : "";
-    // var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : "0:") : "";
-    // var sDisplay = s > 0 ? s + (s == 1 ? " second" : ":") : "";
-    // return hDisplay + mDisplay + sDisplay;
     var hDisplay = h > 0 ? h + (h == 1 ? '' : '') : '';
     var mDisplay = m > 0 ? m + (m == 1 ? '' : '') : '';
     var sDisplay = s > 0 ? s + (s == 1 ? '' : '') : '';
@@ -408,7 +415,7 @@ class App extends Component<Props, State> {
                 }}>
                 {this.state.CallReciverName}
               </Text>
-              <Text style={{color: 'white', fontSize: 15}}>Calling......</Text>
+              <Text style={{ color: 'white', fontSize: 15 }}>Calling......</Text>
             </ImageBackground>
           )}
           {this.state.user_joined == true && (
@@ -422,7 +429,7 @@ class App extends Component<Props, State> {
                 alignItems: 'center',
                 alignSelf: 'center',
               }}>
-              <Text style={{color: 'white', padding: 15}}>
+              <Text style={{ color: 'white', padding: 15 }}>
                 {' '}
                 {this.secondsToHms(this.state.timer)}
               </Text>
@@ -443,14 +450,14 @@ class App extends Component<Props, State> {
               onPress={
                 this.state.Mute ? this.switchMuteAudio : this.switchUnMuteAudio
               }
-              style={{backgroundColor: 'white', borderRadius: 100}}>
+              style={{ backgroundColor: 'white', borderRadius: 100 }}>
               <Image
                 source={
                   this.state.Mute
                     ? constants.images.no_sound
                     : constants.images.mic_icon
                 }
-                style={{margin: 15}}
+                style={{ margin: 15 }}
               />
             </TouchableOpacity>
             <TouchableOpacity
@@ -461,7 +468,7 @@ class App extends Component<Props, State> {
               }}>
               <Image
                 source={constants.images.reconnect_icon}
-                style={{margin: 15}}
+                style={{ margin: 15 }}
               />
             </TouchableOpacity>
             <TouchableOpacity
@@ -472,7 +479,7 @@ class App extends Component<Props, State> {
               }}>
               <Image
                 source={constants.images.disconnect_icon}
-                style={{margin: 15}}
+                style={{ margin: 15 }}
               />
             </TouchableOpacity>
           </View>

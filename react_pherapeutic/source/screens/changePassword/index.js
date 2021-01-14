@@ -42,6 +42,10 @@ const ChangePassword = (props) => {
     } else if (password !== confirm) {
       setMessage('Please Enter The Same Password.');
       setShowAlert(true);
+    }
+    else if (password.length<6 || confirm.length<6) {
+      setMessage('Please Fill Password at least 6 digit.');
+      setShowAlert(true);
     } else {
       const body = {
         old_password: old,
@@ -96,6 +100,7 @@ const ChangePassword = (props) => {
                 value={old}
                 autoCapitalize={'none'}
                 secureTextEntry={true}
+                maxLength = {8}
               />
             </View>
           </View>
@@ -109,6 +114,7 @@ const ChangePassword = (props) => {
                 value={password}
                 autoCapitalize={'none'}
                 secureTextEntry={true}
+                maxLength={8}
               />
             </View>
           </View>
@@ -122,6 +128,7 @@ const ChangePassword = (props) => {
                 value={confirm}
                 autoCapitalize={'none'}
                 secureTextEntry={true}
+                maxLength={8}
               />
             </View>
           </View>

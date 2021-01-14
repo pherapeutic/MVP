@@ -19,12 +19,5 @@ export default StyleSheet.create({
     right: 0,
     zIndex: -2,
   },
-  //   card: {
-  //     flex: 6,
-  //     justifyContent: 'flex-start',
-  //     alignItems: 'center',
-  //     backgroundColor: constants.colors.white,
-  //     width: '80%',
-  //     height: height * 0.02,
-  //   },
+
 });

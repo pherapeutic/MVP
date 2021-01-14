@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -12,16 +12,19 @@ import {
 import constants from '../../utils/constants';
 import styles from './styles';
 import LogoutAlert from '../../components/logoutAlert';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import Header from '../../components/Header';
+import { ScrollView } from 'react-native-gesture-handler';
+import APICaller from '../../utils/APICaller';
+import { saveUserProfile } from '../../redux/actions/user';
 
-const {height, width} = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
 
 const MyProfile = (props) => {
   const [showModal, setShowModal] = useState(false);
   const [switchValue, setSwitchValue] = useState(false);
-
-  const {navigation, userData, dispatch} = props;
+  console.log('props', props);
+  const { navigation, userToken, dispatch, userData } = props;
   const {
     email,
     first_name,
@@ -31,7 +34,30 @@ const MyProfile = (props) => {
     last_name,
     role,
   } = userData;
-console.log(userData)
+  useEffect(() => {
+    getUserProfile();
+  }, []);
+  console.log('userToken', userToken);
+  const getUserProfile = () => {
+    const endpoint = 'user/profile';
+    const method = 'GET';
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${userToken}`,
+      Accept: 'application/json',
+    };
+    APICaller(endpoint, method, null, headers)
+      .then((response) => {
+        console.log('response getting user profile => ', response['data']);
+        const { status, statusCode, message, data } = response['data'];
+        if (status === 'success') {
+          dispatch(saveUserProfile(data));
+        }
+      })
+      .catch((error) => {
+        console.log('error getting user profile => ', error);
+      });
+  };
   return (
     <View style={styles.container}>
       <Image
@@ -39,7 +65,6 @@ console.log(userData)
         source={constants.images.background}
         style={styles.containerBackground}
       />
-
       <Header title="My Profile" navigation={navigation} />
 
       <View style={styles.content}>
@@ -48,7 +73,9 @@ console.log(userData)
             <View style={styles.profileImageWrap}>
               <Image
                 style={styles.profileImageWrap}
-                source={image ? {uri: image} : constants.images.defaultUserImage}
+                source={
+                  image ? { uri: image } : constants.images.defaultUserImage
+                }
               />
             </View>
             <View style={styles.profileDetailView}>
@@ -73,34 +100,74 @@ console.log(userData)
                 thumbColor={
                   switchValue
                     ? constants.colors.lightBlue
-                    : constants.colors.red
+                    : constants.colors.white
                 }
                 onValueChange={(value) => setSwitchValue(value)}
                 value={switchValue}
               />
             </View>
           ) : (
-            <View />
-          )}
+              <View />
+            )}
         </View>
+        <ScrollView>
+          <View style={styles.optionsWrap}>
+            {role == 0 && (
+              <TouchableOpacity style={styles.optionItem}
+                onPress={() => navigation.navigate('AppointmentHistory')}
+              >
+                <View style={styles.optionNameView}>
+                  <Image
+                    source={constants.images.history}
+                    resizeMode={'contain'}
+                    style={styles.optionImage}
+                  />
+                  <Text style={styles.itemNameText}>History</Text>
+                </View>
+                <View style={styles.nextArrowWrap}>
+                  <Image source={constants.images.nextArrow} />
+                </View>
+              </TouchableOpacity>
+            )}
+            {role == 1 && (
+              <TouchableOpacity style={styles.optionItem}
+                onPress={() => navigation.navigate('PaymentHistory')}
+              >
+                <View style={styles.optionNameView}>
+                  <Image
+                    source={constants.images.history}
+                    resizeMode={'contain'}
+                    style={styles.optionImage}
+                  />
+                  <Text style={styles.itemNameText}>History</Text>
+                </View>
+                <View style={styles.nextArrowWrap}>
+                  <Image source={constants.images.nextArrow} />
+                </View>
+              </TouchableOpacity>
+            )}
 
-        <View style={styles.optionsWrap}>
-          <View style={styles.optionItem}>
-            <View style={styles.optionNameView}>
-              <Image
-                source={constants.images.history}
-                resizeMode={'contain'}
-                style={styles.optionImage}
-              />
-              <Text style={styles.itemNameText}>History</Text>
-            </View>
-            <View style={styles.nextArrowWrap}>
-              <Image source={constants.images.nextArrow} />
-            </View>
-          </View>
-          {role == 1 ? (
+            {role == 1 ? (
+              <TouchableOpacity
+                onPress={() => navigation.navigate('TherapistStatus')}
+                style={styles.optionItem}>
+                <View style={styles.optionNameView}>
+                  <Image
+                    source={constants.images.changePassword}
+                    resizeMode={'contain'}
+                    style={styles.optionImage}
+                  />
+                  <Text style={styles.itemNameText}>Change Online Status</Text>
+                </View>
+                <View style={styles.nextArrowWrap}>
+                  <Image source={constants.images.nextArrow} />
+                </View>
+              </TouchableOpacity>
+            ) : (
+                <View />
+              )}
             <TouchableOpacity
-              onPress={() => navigation.navigate('TherapistStatus')}
+              onPress={() => navigation.navigate('ChangePassword')}
               style={styles.optionItem}>
               <View style={styles.optionNameView}>
                 <Image
@@ -108,156 +175,149 @@ console.log(userData)
                   resizeMode={'contain'}
                   style={styles.optionImage}
                 />
-                <Text style={styles.itemNameText}>Change Online Status</Text>
+                <Text style={styles.itemNameText}>Change Password</Text>
               </View>
               <View style={styles.nextArrowWrap}>
                 <Image source={constants.images.nextArrow} />
               </View>
             </TouchableOpacity>
-          ) : (
-            <View />
-          )}
-          <TouchableOpacity
-            onPress={() => navigation.navigate('ChangePassword')}
-            style={styles.optionItem}>
-            <View style={styles.optionNameView}>
-              <Image
-                source={constants.images.changePassword}
-                resizeMode={'contain'}
-                style={styles.optionImage}
-              />
-              <Text style={styles.itemNameText}>Change Password</Text>
-            </View>
-            <View style={styles.nextArrowWrap}>
-              <Image source={constants.images.nextArrow} />
-            </View>
-          </TouchableOpacity>
+            {role == 1 && (
+              <TouchableOpacity
+                style={styles.optionItem}
+                onPress={() => navigation.navigate('RatingList')}>
+                <View style={styles.optionNameView}>
+                  <Image
+                    source={constants.images.aboutUs}
+                    resizeMode={'contain'}
+                    style={styles.optionImage}
+                  />
+                  <Text style={styles.itemNameText}>Rating & Reviews</Text>
+                </View>
+                <View style={styles.nextArrowWrap}>
+                  <Image source={constants.images.nextArrow} />
+                </View>
+              </TouchableOpacity>
+            )}
+            {role == 0 && (
+              <TouchableOpacity
+                style={styles.optionItem}
+                onPress={() => navigation.navigate('ManagePayment')}>
+                <View style={styles.optionNameView}>
+                  <Image
+                    source={constants.images.aboutUs}
+                    resizeMode={'contain'}
+                    style={styles.optionImage}
+                  />
+                  <Text style={styles.itemNameText}>
+                    Update payment information
+                  </Text>
+                </View>
+                <View style={styles.nextArrowWrap}>
+                  <Image source={constants.images.nextArrow} />
+                </View>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              style={styles.optionItem}
+              onPress={() => navigation.navigate('AboutUs')}>
+              <View style={styles.optionNameView}>
+                <Image
+                  source={constants.images.aboutUs}
+                  resizeMode={'contain'}
+                  style={styles.optionImage}
+                />
+                <Text style={styles.itemNameText}>About Us</Text>
+              </View>
+              <View style={styles.nextArrowWrap}>
+                <Image source={constants.images.nextArrow} />
+              </View>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.optionItem}
-            // onPress={() => navigation.navigate('ManagePayment')}
-          >
-            <View style={styles.optionNameView}>
-              <Image
-                source={constants.images.aboutUs}
-                resizeMode={'contain'}
-                style={styles.optionImage}
-              />
-              <Text style={styles.itemNameText}>About Us</Text>
-            </View>
-            <View style={styles.nextArrowWrap}>
-              <Image source={constants.images.nextArrow} />
-            </View>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.optionItem}
+              onPress={() => navigation.navigate('ContactUs')}>
+              <View style={styles.optionNameView}>
+                <Image
+                  source={constants.images.contactUs}
+                  resizeMode={'contain'}
+                  style={styles.optionImage}
+                />
+                <Text style={styles.itemNameText}>Contact Us</Text>
+              </View>
+              <View style={styles.nextArrowWrap}>
+                <Image source={constants.images.nextArrow} />
+              </View>
+            </TouchableOpacity>
 
-          <View style={styles.optionItem}>
-            <View style={styles.optionNameView}>
-              <Image
-                source={constants.images.contactUs}
-                resizeMode={'contain'}
-                style={styles.optionImage}
-              />
-              <Text style={styles.itemNameText}>Contact Us</Text>
-            </View>
-            <View style={styles.nextArrowWrap}>
-              <Image source={constants.images.nextArrow} />
-            </View>
+            <TouchableOpacity
+              style={styles.optionItem}
+              onPress={() => navigation.navigate('PrivacyPolicy')}>
+              <View style={styles.optionNameView}>
+                <Image
+                  source={constants.images.privacyPolicy}
+                  resizeMode={'contain'}
+                  style={styles.optionImage}
+                />
+                <Text style={styles.itemNameText}>Privacy Policy</Text>
+              </View>
+              <View style={styles.nextArrowWrap}>
+                <Image source={constants.images.nextArrow} />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.optionItem}
+              onPress={() => navigation.navigate('TermsAndConditions')}>
+              <View style={styles.optionNameView}>
+                <Image
+                  source={constants.images.termsAndConditions}
+                  resizeMode={'contain'}
+                  style={styles.optionImage}
+                />
+                <Text style={styles.itemNameText}>Terms and Conditions</Text>
+              </View>
+              <View style={styles.nextArrowWrap}>
+                <Image source={constants.images.nextArrow} />
+              </View>
+            </TouchableOpacity>
+
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('faq')}
+              style={styles.optionItem}>
+              <View style={styles.optionNameView}>
+                <Image
+                  source={constants.images.faqs}
+                  resizeMode={'contain'}
+
+                  style={styles.optionImage}
+                />
+                <Text style={styles.itemNameText}>FAQs</Text>
+              </View>
+              <View style={styles.nextArrowWrap}>
+                <Image source={constants.images.nextArrow} />
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                console.log('logout!!!');
+                setShowModal((prevState) => !prevState);
+              }}
+              style={styles.optionItem}>
+              <View style={styles.optionNameView}>
+                <Image
+                  source={constants.images.logout}
+                  resizeMode={'contain'}
+                  style={styles.optionImage}
+                />
+                <Text style={styles.itemNameText}>Logout</Text>
+              </View>
+              <View style={styles.nextArrowWrap}>
+                <Image source={constants.images.nextArrow} />
+              </View>
+            </TouchableOpacity>
           </View>
-
-          <View style={styles.optionItem}>
-            <View style={styles.optionNameView}>
-              <Image
-                source={constants.images.privacyPolicy}
-                resizeMode={'contain'}
-                style={styles.optionImage}
-              />
-              <Text style={styles.itemNameText}>Privacy Policy</Text>
-            </View>
-            <View style={styles.nextArrowWrap}>
-              <Image source={constants.images.nextArrow} />
-            </View>
-          </View>
-
-          <View style={styles.optionItem}>
-            <View style={styles.optionNameView}>
-              <Image
-                source={constants.images.termsAndConditions}
-                resizeMode={'contain'}
-                style={styles.optionImage}
-              />
-              <Text style={styles.itemNameText}>Terms and Conditions</Text>
-            </View>
-            <View style={styles.nextArrowWrap}>
-              <Image source={constants.images.nextArrow} />
-            </View>
-          </View>
-
-          <View style={styles.optionItem}>
-            <View style={styles.optionNameView}>
-              <Image
-                source={constants.images.faqs}
-                resizeMode={'contain'}
-                style={styles.optionImage}
-              />
-              <Text style={styles.itemNameText}>FAQs</Text>
-            </View>
-            <View style={styles.nextArrowWrap}>
-              <Image source={constants.images.nextArrow} />
-            </View>
-          </View>
-
-          <TouchableOpacity
-            // onPress={() => navigation.navigate('MapScreen')}
-            style={styles.optionItem}>
-            <View style={styles.optionNameView}>
-              <Image
-                source={constants.images.faqs}
-                resizeMode={'contain'}
-                style={styles.optionImage}
-              />
-              <Text style={styles.itemNameText}>Location </Text>
-            </View>
-            <View style={styles.nextArrowWrap}>
-              <Image source={constants.images.nextArrow} />
-            </View>
-          </TouchableOpacity>
-
-          {/* 
-          <TouchableOpacity
-            // onPress={() => navigation.navigate('VideoCall')}
-            style={styles.optionItem}>
-            <View style={styles.optionNameView}>
-              <Image
-                source={constants.images.faqs}
-                resizeMode={'contain'}
-                style={styles.optionImage}
-              />
-              <Text style={styles.itemNameText}>Video </Text>
-            </View>
-            <View style={styles.nextArrowWrap}>
-              <Image source={constants.images.nextArrow} />
-            </View>
-          </TouchableOpacity> */}
-
-          <TouchableOpacity
-            onPress={() => {
-              console.log('logout!!!');
-              setShowModal((prevState) => !prevState);
-            }}
-            style={styles.optionItem}>
-            <View style={styles.optionNameView}>
-              <Image
-                source={constants.images.logout}
-                resizeMode={'contain'}
-                style={styles.optionImage}
-              />
-              <Text style={styles.itemNameText}>Logout</Text>
-            </View>
-            <View style={styles.nextArrowWrap}>
-              <Image source={constants.images.nextArrow} />
-            </View>
-          </TouchableOpacity>
-        </View>
+        </ScrollView>
       </View>
       <LogoutAlert
         showModal={showModal}
@@ -270,6 +330,7 @@ console.log(userData)
 
 const mapStateToProps = (state) => ({
   userData: state.user.userData,
+  userToken: state.user.userToken,
 });
 
 export default connect(mapStateToProps)(MyProfile);

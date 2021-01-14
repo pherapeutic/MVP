@@ -107,12 +107,6 @@ const MapDetailScreen = (props) => {
                     borderRadius: 5,
                     height: 22,
                   }}>
-                  {/* <Text>4.5</Text>
-                                    <Rating
-                                        imageSize={14}
-                                        onFinishRating={this.ratingCompleted}
-                                        style={{ color: 'red' }}
-                                    /> */}
                 </View>
               </View>
               <Text style={{fontSize: 14}}>
