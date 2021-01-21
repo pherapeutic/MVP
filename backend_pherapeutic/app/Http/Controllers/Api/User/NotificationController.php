@@ -67,8 +67,6 @@ class NotificationController extends Controller
                         ->withData(json_encode($postdata))
                         ->withTimeout($timeout)
                         ->post();
-        print_r($curlOutput);
-        die("here");
 
         \Log::info('Curl out put: '. print_r($curlOutput, true));
         return json_decode($curlOutput, true);
@@ -160,7 +158,7 @@ class NotificationController extends Controller
         //dd($clientObj);
         $fcmToken = $userObj->fcm_token;
 
-         $fcmToken = 'fal3b8-wSXqgJjB5DMA5GP:APA91bHf8aEQvbbalzqkhic94lxf-d71_m4e8JjHDC62ju_8581_nlHgJA7Xj3RsD5KWc0pk6GMsMkNodrV3uNDp6DuzQl3Y6-YJ4mj8EA2Cc0FpAosdspO2sv8JUeG3MH5HzCmkb8qS';
+         //$fcmToken = 'fal3b8-wSXqgJjB5DMA5GP:APA91bHf8aEQvbbalzqkhic94lxf-d71_m4e8JjHDC62ju_8581_nlHgJA7Xj3RsD5KWc0pk6GMsMkNodrV3uNDp6DuzQl3Y6-YJ4mj8EA2Cc0FpAosdspO2sv8JUeG3MH5HzCmkb8qS';
         //$request->get('chanel_name')
         $clientData = $clientObj->getResponseCalletIdArr();
         //dd($clientData);
@@ -190,10 +188,6 @@ class NotificationController extends Controller
 
     }
 
-    public function testNotification(){
-
-      die("here");
-    }
 
   //   public function sendNewOrderNotificationToDriver($orderId = '', Request $request) {
   //       $error="";
