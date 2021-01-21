@@ -34,6 +34,27 @@
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = Pherapeutic;
 		};
+		1D17A0B425A8D30C005A2177 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA275BF62550353E009A72FC /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F6B923B5A106791D9D52196A67E572B3;
+			remoteInfo = "react-native-splash-screen";
+		};
+		1D17A0B625A8D30C005A2177 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA275BF62550353E009A72FC /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DF63376066E2275FF26820B3A512A9B;
+			remoteInfo = "react-native-webview";
+		};
+		1D1EF55425B440BF00DF7494 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA275BF62550353E009A72FC /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 629B4458112E2D01978E2FE02FF6FFF7;
+			remoteInfo = RNCCheckbox;
+		};
 		1D2AA7E6258528B000AE8E91 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA275BF62550353E009A72FC /* Pods.xcodeproj */;
@@ -173,6 +194,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = 97CE6A3FA04F0B3C1E0418A227804309;
 			remoteInfo = RNGoogleSignin;
+		};
+		1D5F9FA125AE1A19002CBD7D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA275BF62550353E009A72FC /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 83A8CC3246A95431ACEA83C7C742228B;
+			remoteInfo = "react-native-netinfo";
 		};
 		1D78793C2578176A00565919 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -684,8 +712,11 @@
 				1D78793D2578176A00565919 /* libreact-native-geolocation.a */,
 				CA92BE372566DC6200DBFCCD /* libreact-native-google-maps.a */,
 				CA92BE392566DC6200DBFCCD /* libreact-native-maps.a */,
+				1D5F9FA225AE1A19002CBD7D /* libreact-native-netinfo.a */,
 				CA5E042925526A240084C960 /* libreact-native-safe-area-context.a */,
+				1D17A0B525A8D30C005A2177 /* libreact-native-splash-screen.a */,
 				CA5BA89D2564394900ED44FE /* libreact-native-video.a */,
+				1D17A0B725A8D30C005A2177 /* libreact-native-webview.a */,
 				CA275C552550353E009A72FC /* libReact-RCTAnimation.a */,
 				CA275C572550353E009A72FC /* libReact-RCTBlob.a */,
 				CA275C592550353E009A72FC /* libReact-RCTImage.a */,
@@ -696,6 +727,7 @@
 				CA275C632550353E009A72FC /* libReact-RCTVibration.a */,
 				CA275C652550353E009A72FC /* libReactCommon.a */,
 				CA5E042B25526A240084C960 /* libRNCAsyncStorage.a */,
+				1D1EF55525B440BF00DF7494 /* libRNCCheckbox.a */,
 				CA5E042D25526A240084C960 /* libRNCMaskedView.a */,
 				1D2AA7FB258528B000AE8E91 /* libRNFBApp.a */,
 				1D2AA7FD258528B000AE8E91 /* libRNFBMessaging.a */,
@@ -854,6 +886,27 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		1D17A0B525A8D30C005A2177 /* libreact-native-splash-screen.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libreact-native-splash-screen.a";
+			remoteRef = 1D17A0B425A8D30C005A2177 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		1D17A0B725A8D30C005A2177 /* libreact-native-webview.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libreact-native-webview.a";
+			remoteRef = 1D17A0B625A8D30C005A2177 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		1D1EF55525B440BF00DF7494 /* libRNCCheckbox.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNCCheckbox.a;
+			remoteRef = 1D1EF55425B440BF00DF7494 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		1D2AA7E7258528B000AE8E91 /* libFirebaseCore.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -992,6 +1045,13 @@
 			fileType = archive.ar;
 			path = libRNGoogleSignin.a;
 			remoteRef = 1D57BBC5257A5B64009ED500 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		1D5F9FA225AE1A19002CBD7D /* libreact-native-netinfo.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libreact-native-netinfo.a";
+			remoteRef = 1D5F9FA125AE1A19002CBD7D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		1D78793D2578176A00565919 /* libreact-native-geolocation.a */ = {
@@ -1694,7 +1754,7 @@
 				CODE_SIGN_ENTITLEMENTS = Pherapeutic/Pherapeutic.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 31;
 				DEVELOPMENT_TEAM = YG6SRDRW2J;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Pherapeutic/Info.plist;
@@ -1727,7 +1787,7 @@
 				CODE_SIGN_ENTITLEMENTS = Pherapeutic/Pherapeutic.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 31;
 				DEVELOPMENT_TEAM = YG6SRDRW2J;
 				INFOPLIST_FILE = Pherapeutic/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;

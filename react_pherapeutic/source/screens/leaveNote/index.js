@@ -15,7 +15,7 @@ import APICaller from '../../utils/APICaller';
 const LeaveNote = (props) => {
     const [noteText, setnoteText] = useState('');
     const { userToken ,navigation} = props;
-    const {caller_id} = props.route.params;
+    const {caller_id,CallReciverName} = props.route.params;
  
     const reviewHandler = () => {
         //navigation.navigate('Home');
@@ -34,13 +34,16 @@ const LeaveNote = (props) => {
                 if (status === 'success') {
                  navigation.navigate('Home');
                   }
+
                
             })
 
 
             .catch(error => {
                 console.log('error logging in => ', error);
+                navigation.navigate('Home');
                 const { data, message, status, statusCode } = error['data'];
+               
              
               })
     }
@@ -53,7 +56,7 @@ const LeaveNote = (props) => {
                 style={styles.containerBackground}
             />
             <View style={styles.viewStyle}>
-    <Text style={styles.leaveNoteTextHeader}>About your session{'\n'}with James</Text>
+    <Text style={styles.leaveNoteTextHeader}>About your session{'\n'}with {CallReciverName}</Text>
             
             </View>
            

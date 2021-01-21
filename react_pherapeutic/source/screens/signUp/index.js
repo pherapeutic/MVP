@@ -22,6 +22,7 @@ import SubmitButton from '../../components/submitButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveUser } from '../../redux/actions/user';
 import { connect } from 'react-redux';
+import CheckBox from '@react-native-community/checkbox';
 
 const { height, width } = Dimensions.get('window');
 
@@ -48,6 +49,7 @@ const SignUp = (props) => {
   const [alertMessage, setAlert] = useState('Please Fill All Fields');
   const [readyToSubmit, setReadyToSibmit] = useState(true);
   const [token, setToken] = useState(null);
+  const [toggleCheckBox, setToggleCheckBox] = useState(false)
 
   const { navigation, route, dispatch } = props;
   const { params } = route;
@@ -184,83 +186,82 @@ const SignUp = (props) => {
   };
 
   const signUpHandler = () => {
-if(!(params && (params.fbtoken || params.googletoken)))
-{
-    if (
-      first_name &&
-      last_name &&
-      email &&
-      password &&
-      confirm_password &&
-      role &&
-      language_id &&
-      password === confirm_password && confirm_password.length >= 6 && password.length >= 6
-    ) {
-      if (role == 'Therapist') {
-        if (!years) {
-          setAlert('Please Enter Total Experience.');
-          setShowAlert(true);
-        } else if (!selectedSpeciality) {
-          setAlert('Please Select Speciality');
-          setShowAlert(true);
+    if (!(params && (params.fbtoken || params.googletoken))) {
+      if (
+        first_name &&
+        last_name &&
+        email &&
+        password &&
+        confirm_password &&
+        role &&
+        language_id &&
+        password === confirm_password && confirm_password.length >= 6 && password.length >= 6
+      ) {
+        if (role == 'Therapist') {
+          if (!years) {
+            setAlert('Please Enter Total Experience.');
+            setShowAlert(true);
+          } else if (!selectedSpeciality) {
+            setAlert('Please Select Speciality');
+            setShowAlert(true);
+          } else {
+            // call api
+            registerUser();
+          }
         } else {
           // call api
           registerUser();
         }
       } else {
-        // call api
-        registerUser();
+        if (!first_name) setAlert('Please Enter First Name.');
+        else if (!last_name) setAlert('Please Enter Last Name.');
+        else if (!email) setAlert('Please Enter Email Address.');
+        else if (emailError) setAlert('Please Enter Valid Email Address.');
+        else if (!password) setAlert('Please Enter Password.');
+        else if (!confirm_password) setAlert('Please Enter Confirm Password.');
+        else if (confirm_password !== password) setAlert('Please Enter Same Password.');
+        else if (!role) setAlert('Please Select Your Role.');
+        else if (!language) setAlert('Please Select Your Language.');
+        else if (password.length < 6) setAlert('Please Fill password at least 6 digit.');
+        else if (confirm_password.length < 6) setAlert('Please Fill password at least 6 digit.');
+        setShowAlert(true);
       }
-    } else {
-      if (!first_name) setAlert('Please Enter First Name.');
-      else if (!last_name) setAlert('Please Enter Last Name.');
-      else if (!email) setAlert('Please Enter Email Address.');
-      else if (emailError) setAlert('Please Enter Valid Email Address.');
-      else if (!password) setAlert('Please Enter Password.');
-      else if (!confirm_password) setAlert('Please Enter Confirm Password.');
-      else if (confirm_password !== password) setAlert('Please Enter Same Password.');
-      else if (!role) setAlert('Please Select Your Role.');
-      else if (!language) setAlert('Please Select Your Language.');
-      else if (password.length < 6) setAlert('Please Fill password at least 6 digit.');
-      else if (confirm_password.length < 6) setAlert('Please Fill password at least 6 digit.');
-      setShowAlert(true);
     }
-  }
-  else{
-    if (
-      first_name &&
-      last_name &&
-      email &&
-      role &&
-      language_id 
-    ) {
-      if (role == 'Therapist') {
-        if (!years) {
-          setAlert('Please Enter Total Experience.');
-          setShowAlert(true);
-        } else if (!selectedSpeciality) {
-          setAlert('Please Select Speciality');
-          setShowAlert(true);
+    else {
+      if (
+        first_name &&
+        last_name &&
+        email &&
+        role &&
+        language_id
+      ) {
+        if (role == 'Therapist') {
+          if (!years) {
+            setAlert('Please Enter Total Experience.');
+            setShowAlert(true);
+          } else if (!selectedSpeciality) {
+            setAlert('Please Select Speciality');
+            setShowAlert(true);
+          } else {
+            // call api
+            registerUser();
+          }
         } else {
           // call api
           registerUser();
         }
       } else {
-        // call api
-        registerUser();
-      }
-    } else {
-      if (!first_name) setAlert('Please Enter First Name.');
-      else if (!last_name) setAlert('Please Enter Last Name.');
-      else if (!email) setAlert('Please Enter Email Address.');
-      else if (emailError) setAlert('Please Enter Valid Email Address.');
-    
-      else if (!role) setAlert('Please Select Your Role.');
-      else if (!language) setAlert('Please Select Your Language.');
-      setShowAlert(true);
-    }
+        if (!first_name) setAlert('Please Enter First Name.');
+        else if (!last_name) setAlert('Please Enter Last Name.');
+        else if (!email) setAlert('Please Enter Email Address.');
+        else if (emailError) setAlert('Please Enter Valid Email Address.');
 
-  }
+        else if (!role) setAlert('Please Select Your Role.');
+        else if (!language) setAlert('Please Select Your Language.');
+        setShowAlert(true);
+      }
+
+    }
   };
 
   const ListView = () => (
@@ -437,7 +438,7 @@ if(!(params && (params.fbtoken || params.googletoken)))
                   value={email}
                   autoCompleteType={'off'}
                   autoCorrect={false}
-                 // editable={!(params && (params.fbtoken || params.googletoken))}
+                  // editable={!(params && (params.fbtoken || params.googletoken))}
                   autoCapitalize={'none'}
                   onBlur={() => {
                     if (email.length) setEmailError(validateEmail(email));
@@ -572,22 +573,73 @@ if(!(params && (params.fbtoken || params.googletoken)))
             />
           </View>
         </View>
-        <View style={styles.footerView}>
-          <Text style={styles.footerText}>
+        {/* <View style={styles.footerView}>
+          <Text style={[styles.footerText]}>
             Already signed up?{' '}
             <Text
               onPress={() => navigation.navigate('Login')}
               style={styles.footerlinkText}>
               Login
             </Text>
+
+
           </Text>
-          <Text style={styles.footerLinkTextBottom}>
+          <View style={{flexDirection:'row'}}>
+          <CheckBox
+            disabled={false}
+            value={toggleCheckBox}
+            onValueChange={(newValue) => setToggleCheckBox(newValue)}
+            tintColors={{true: '#228994'}}
+          />
+          <Text style={[styles.footerText, { fontSize: 12, textAlign: 'center', margin: 5 }]}>
+            We are not an emergency response service. If your life is in danger or you are in need of urgent medical care, please call 999.
+            </Text>
+            </View>
+          <Text style={[styles.footerLinkTextBottom]}>
             By continuing, you agree to our{' '}
             <Text onPress={() => navigation.navigate('TermsAndConditions')} style={{ textDecorationLine: 'underline', borderBottomColor: '#ffffff', borderBottomWidth: 1 }}>
               Terms & Conditions.
             </Text>
           </Text>
-        </View>
+        
+        </View> */}
+         <View style={styles.footerView}>
+          <Text style={[styles.footerText]}>
+            Already signed up?{' '}
+            <Text
+              onPress={() => navigation.navigate('Login')}
+              style={styles.footerlinkText}>
+              Login
+            </Text>
+
+
+          </Text>
+          <View style={{flexDirection:"row",width:'85%'}}>
+          <View style={{ alignSelf:"flex-start"}}>
+            <CheckBox
+            disabled={false}
+            value={toggleCheckBox}
+            onValueChange={(newValue) => setToggleCheckBox(newValue)}
+            tintColors={{true: '#228994'}}
+          />
+          </View>
+          <View style={{textAlign:"center",margin:5,paddingRight:15}}>
+          <Text style={[styles.footerText, { fontSize: 12, textAlign: 'center',  }]}>
+            We are not an emergency response service,If your life is in danger
+            or you are in need of urgent medical care,please call 999.
+            </Text>
+            </View>
+          </View>
+          <Text style={[styles.footerLinkTextBottom]}>
+            By continuing, you agree to our{' '}
+            <Text onPress={() => navigation.navigate('TermsAndConditions')} style={{ textDecorationLine: 'underline', borderBottomColor: '#ffffff', borderBottomWidth: 1 }}>
+              Terms & Conditions.
+            </Text>
+          </Text>
+
+        </View> 
+
+
       </ScrollView>
 
       <AwesomeAlert

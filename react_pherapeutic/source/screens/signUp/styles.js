@@ -46,11 +46,11 @@ export default StyleSheet.create({
     width,
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingTop: height * 0.01
+    //paddingTop: height * 0.01
   },
   footerView: {
     // flex: 1,
-    height: height * 0.1,
+   // height: height * 0.1,
     width,
     justifyContent: 'space-around',
     alignItems: 'center',
@@ -77,7 +77,7 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: height * 0.017,
-    paddingTop: height * 0.02,
+    paddingTop: height * 0.01,
     backgroundColor: constants.colors.formBackground,
     borderRadius: 10,
   },

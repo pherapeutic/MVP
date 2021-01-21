@@ -20,7 +20,6 @@ const Review = (props) => {
     const { userToken ,navigation} = props;
 
      const {CallReciverName,caller_id} = props.route.params;
-
     const ratingCompleted = (rating) => {
         console.log("Rating is: " + rating);
         setratings(rating);
@@ -53,7 +52,7 @@ const Review = (props) => {
             .catch(error => {
                 console.log('error logging in => ', error);
                 const { data, message, status, statusCode } = error['data'];
-             
+                navigation.navigate('TherapistDetails');
               })
     }
     return (
@@ -64,7 +63,7 @@ const Review = (props) => {
                 resizeMode={'stretch'}
                 style={styles.containerBackground}
             />
-                <Header title="Rate your experience with Dr."CallReciverName navigation={ navigation} />
+                <Header title= {'Rate your experience with Dr.'+CallReciverName} navigation={ navigation} />
          
             <AirbnbRating
                 showRating

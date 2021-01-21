@@ -2,7 +2,7 @@ import 'react-native-gesture-handler';
 import { enableScreens } from 'react-native-screens';
 enableScreens();
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, SafeAreaView, Dimensions, Text, View, Alert, StatusBar,Image} from 'react-native';
+import { StyleSheet, SafeAreaView, Dimensions, Text, View, Alert, StatusBar, Image } from 'react-native';
 import AppNavigator from './source/navigator';
 import ModalLoader from './source/components/modalLoader';
 import Events from './source/utils/events';
@@ -11,6 +11,7 @@ import store from "./source/redux/index";
 import constants from './source/utils/constants';
 import { utils } from '@react-native-firebase/app';
 import messaging, { firebase } from '@react-native-firebase/messaging';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SplashScreen from 'react-native-splash-screen'
 import Modal from 'react-native-modal';
@@ -21,7 +22,7 @@ export default function App() {
   const [showModal, setShowModal] = useState(false);
   const [loaderData, setLoaderData] = useState({ label: "", backgroundColor: "black" })
   const [hasPermission, setPermission] = useState(false);
-  const [isConnected, setConnected] = useState('');
+  const [isConnected, setConnected] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
 
   requestUserPermission = async () => {
@@ -48,7 +49,7 @@ export default function App() {
   }
 
   useEffect(() => {
-    SplashScreen.hide();
+    // SplashScreen.hide();
     if (hasPermission) {
       getFcmToken()
     } else {
@@ -58,13 +59,13 @@ export default function App() {
     // //  console.log(JSON.stringify(remoteMessage))
     //  // console.log(remoteMessage.data.title)
     //  // Alert.alert('A new FCM message arrived!');
-   
+
     // });
- 
 
-   
 
-   // return unsubscribe;
+
+
+    // return unsubscribe;
   }, [hasPermission])
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -78,9 +79,9 @@ export default function App() {
         setConnected(state.isConnected)
         setModalVisible(true)
       }
-  
+
     });
-      }, [])
+  }, [])
 
   Events.on("showModalLoader", "sml", (data) => {
     setShowModal(true);
@@ -95,35 +96,35 @@ export default function App() {
     <Provider store={store} style={{ flex: 1 }}>
       <View style={styles.safeAreaView}>
         <StatusBar barStyle='light-content' hidden={false} translucent={false} />
-         
-  { isConnected == false ?
-   // return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: Dimensions.get('window').height,
-          width: Dimensions.get('window').width,
-          backgroundColor: 'transparent',
-        }}>
-        <Modal isVisible={isModalVisible}>
-          <View style={{ backgroundColor: 'white', borderRadius: 5, padding: 10 }}>
-            <Image style={{ alignSelf: 'center' }} source={constants.images.Internerconnection} />
-       
+
+        {isConnected == false ?
+          // return (
+          <View
+            style={{
+               flex: 1,
+               height: Dimensions.get('window').height,
+               width: Dimensions.get('window').width,
+              backgroundColor: 'white',
+            }}>
+             <Modal deviceWidth={50}   isVisible={isModalVisible}>
+              <View style={{ alignContent:'center',justifyContent:'center', backgroundColor: 'white', height: Dimensions.get('window').height,width: Dimensions.get('window').width,}}>
+                <Image style={{ alignSelf: 'center' }} source={constants.images.Internerconnection} />
+                <Text style={{textAlign:'center',fontSize:18,padding:10,color:constants.colors.fieldName}}>
+                  You may be offline. No internet connection detected
+               </Text>
 
 
+              </View>
+            </Modal>
           </View>
-        </Modal>
-      </View>
-    //);
-    :
+          //);
+          :
 
-    <AppNavigator />
-  }
- 
-      
-        
+          <AppNavigator />
+        }
+
+
+
         <ModalLoader
           data={loaderData}
           show={showModal}

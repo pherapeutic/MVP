@@ -8,6 +8,7 @@ import {
   Image,
   TextInput,
 } from 'react-native';
+import Modal from 'react-native-modal';
 import constants from '../../utils/constants';
 import styles from './styles';
 import SubmitButton from '../../components/submitButton';
@@ -46,14 +47,13 @@ const faq = (props) => {
       .then((response) => {
         console.log("response is", response['data']);
         setData(response['data']['data'])
-
       })
       .catch((error) => {
+       
         console.log('error=> ', error);
       });
 
   }
-  console.log(data)
 
   return (
 
@@ -80,13 +80,15 @@ const faq = (props) => {
                       alignItems: 'center',
                       width: width * 0.80,
                       flexDirection: 'row',
+                      flex:1,
                     }}>
                       <Text style={{
                         fontFamily: 'Poppins-SemiBold',
                         color: 'black',
+                        flex:1
                       }}>{dataarr.questions}
                       </Text>
-                      <Image
+                      <Image style={{  flex:0}}
                         source={!showMoreInfo ? constants.images.FAQdownarrow : constants.images.NextArrow}
                       />
                     </View>

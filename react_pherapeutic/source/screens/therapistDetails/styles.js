@@ -11,6 +11,7 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flexWrap: 'wrap',
+
   },
   containerBackground: {
     height: '100%',
@@ -23,10 +24,12 @@ export default StyleSheet.create({
     zIndex: -2,
   },
   therapistmessage: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '500',
     color: constants.colors.fieldName,
-   textAlign:'center'
+    textAlign:'center',
+    
+   
   },
   header: {
     flex: 1.3,
@@ -46,6 +49,7 @@ export default StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#fff',
     marginBottom: 15,
+    
   },
   mapView: {
     // flex: 4,
@@ -82,6 +86,7 @@ export default StyleSheet.create({
     alignItems: 'center',
 
     backgroundColor: constants.colors.white,
+   
   },
   headingText: {
     fontSize: 20,
@@ -141,8 +146,8 @@ export default StyleSheet.create({
   },
 
   info: {
-    // height: height * 0.13,
-    // width: width * 0.9,
+     //height:'5%',
+    width: width * 0.9,
     // paddingHorizontal: width * 0.05,
     // // flexDirection: 'row',
     // justifyContent: 'center',

@@ -74,11 +74,11 @@ const EditProfile = (props) => {
         formData.append('qualification', qualification);
         formData.append('specialism', speciality_id);
 
-        formData.append('address', 'XYZ place');
+        // formData.append('address', 'XYZ place');
 
-        formData.append('latitude', 23.54);
+        // formData.append('latitude', 23.54);
 
-        formData.append('longitude', 87.32);
+        // formData.append('longitude', 87.32);
 
         if (localURL) {
           formData.append('image', {
@@ -123,11 +123,11 @@ const EditProfile = (props) => {
         formData.append('device_type', 1);
 
         formData.append('fcm_token', token);
-        formData.append('address', 'XYZ place');
+        // formData.append('address', '');
 
-        formData.append('latitude', 23.54);
+        // formData.append('latitude', 23.54);
 
-        formData.append('longitude', 87.32);
+        // formData.append('longitude', 87.32);
 
         if (localURL) {
           formData.append('image', {

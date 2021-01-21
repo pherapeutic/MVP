@@ -17,7 +17,7 @@ import Header from '../../components/Header';
 import { ScrollView } from 'react-native-gesture-handler';
 import APICaller from '../../utils/APICaller';
 import { saveUserProfile } from '../../redux/actions/user';
-
+import { AirbnbRating } from 'react-native-ratings';
 const { height, width } = Dimensions.get('window');
 
 const MyProfile = (props) => {
@@ -33,11 +33,13 @@ const MyProfile = (props) => {
     language_id,
     last_name,
     role,
+    rating
   } = userData;
   useEffect(() => {
     getUserProfile();
   }, []);
   console.log('userToken', userToken);
+
   const getUserProfile = () => {
     const endpoint = 'user/profile';
     const method = 'GET';
@@ -78,17 +80,50 @@ const MyProfile = (props) => {
                 }
               />
             </View>
-            <View style={styles.profileDetailView}>
-              <Text
-                style={
-                  styles.userNameText
-                }>{`${first_name} ${last_name}`}</Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('ViewProfile')}
-                style={styles.editButton}>
-                <Text style={styles.buttonText}>VIEW AND EDIT PROFILE</Text>
-              </TouchableOpacity>
-            </View>
+            {role == '1' ? (
+              <View style={styles.profileDetailView}>
+                <Text
+                  style={
+                    styles.userNameText
+                  }>{`${first_name} ${last_name}`}</Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('ViewProfile')}
+                >
+                  <Text style={[styles.buttonText, { color: constants.colors.lightBlue }]}>VIEW AND EDIT PROFILE</Text>
+                </TouchableOpacity>
+                <View style={{ height: 25, padding: 5, flexDirection: "row", borderColor: "rgb(24,173,189)", borderRadius: 10, backgroundColor: constants.colors.greenText }}>
+
+                  <Text style={{ fontSize: 14, color: "white", textAlign: "left", paddingLeft: "2%", alignSelf: "center" }}> Rating: {parseInt(rating) } </Text>
+
+                  <AirbnbRating
+                    showRating={false}
+                    isDisabled={true}
+                    count={5}
+                    size={10}
+                    defaultRating={rating}
+               //   defaultRating={1}
+                    selectedColor="white"
+                    ratingColor='#3498db'
+                    ratingBackgroundColor="rgb(24,173,189)"
+                    starContainerStyle="white"
+
+                  />
+                </View>
+
+              </View>
+            ) : (
+                <View style={styles.profileDetailView}>
+                  <Text
+                    style={
+                      styles.userNameText
+                    }>{`${first_name} ${last_name}`}</Text>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('ViewProfile')}
+                    style={styles.editButton}>
+                    <Text style={styles.buttonText}>VIEW AND EDIT PROFILE</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
           </View>
           {role == '1' ? (
             <View style={styles.probonoWrap}>
@@ -217,7 +252,7 @@ const MyProfile = (props) => {
                 </View>
               </TouchableOpacity>
             )}
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={styles.optionItem}
               onPress={() => navigation.navigate('AboutUs')}>
               <View style={styles.optionNameView}>
@@ -231,7 +266,7 @@ const MyProfile = (props) => {
               <View style={styles.nextArrowWrap}>
                 <Image source={constants.images.nextArrow} />
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <TouchableOpacity
               style={styles.optionItem}
@@ -292,7 +327,7 @@ const MyProfile = (props) => {
 
                   style={styles.optionImage}
                 />
-                <Text style={styles.itemNameText}>FAQs</Text>
+                <Text style={styles.itemNameText}>Help</Text>
               </View>
               <View style={styles.nextArrowWrap}>
                 <Image source={constants.images.nextArrow} />

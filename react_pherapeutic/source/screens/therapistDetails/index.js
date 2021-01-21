@@ -22,6 +22,7 @@ import Events from '../../utils/events';
 import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures';
 import Header from '../../components/Header';
 import GooglePlacesInput from '../../components/GooglePlacesInput';
+import Geolocation from '@react-native-community/geolocation';
 import Modal from 'react-native-modal';
 import SubmitButton from '../../components/submitButton';
 import LinearGradient from 'react-native-linear-gradient';
@@ -39,44 +40,35 @@ const TherapistDetails = (props) => {
 
   useEffect(() => {
     if (!therapist) getTherapistsList();
-    // if (!therapist.image) getTherapistsList();
+          getCurrentCoordinates();
   }, [therapist]);
+  const getCurrentCoordinates = async () => {
+  
+ await Geolocation.getCurrentPosition((info) => getaddress(info));
 
+  };
+    const getaddress = async (info) => {
+      console.log(info)
+ if (info && info.coords) {
+   console.log(info)
+     // latitude = info.coords.latitude;
+      //longitude = info.coords.longitude;
+     
+      let respCurrent = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${info.coords.latitude}
+      ,${info.coords.longitude}&key=AIzaSyCQy7hjaOrLXKWkEAXR-raBRyzR_JioN44`);
+
+console.log(respCurrent)
+    }
+  };
   const callTherapist = (user_id, fullname, therapist) => {
     navigation.navigate('selectPaymentMethod', {
       therapistId: user_id,
       therapist: therapist,
     });
 
-    // let channelname = 'channel_' + Date.now();
-    // const endpoint =
-    //   'sendVideoCallNotificationToTherapist/' +
-    //   user_id +
-    //   '?channel_name=' +
-    //   channelname;
-    // const method = 'GET';
-    // const headers = {
-    //   'Content-Type': 'application/json',
-    //   Authorization: `Bearer ${userToken}`,
-    //   Accept: 'application/json',
-    // };
-    // APICaller(endpoint, method, null, headers)
-    //   .then((response) => {
-    //     //   console.log('userToken'+userToken)
-    //     //   console.log("response calling therapist => ", response)
-    //     navigation.navigate('VideoCall', {
-    //       CallReciverName: fullname,
-    //       channelnamedata: channelname,
-    //     });
-    //   })
-    //   .catch((error) => {
-    //     console.log('error calling therapist => ', error);
-    //   });
   };
 
-  // console.log("therapist data ===> ", therapist)
   const getTherapistsList = () => {
-    //  const endpoint = 'user/search/therapist';
     const endpoint = 'user/search/therapistlist';
     const method = 'POST';
     const headers = {
@@ -96,14 +88,10 @@ const TherapistDetails = (props) => {
           '------',
         );
         const { status, statusCode, message, data } = response['data'];
-        // alert(JSON.stringify(data.length));
 
         if (data && data.length > 0) {
           setTherapistsList(data);
-
           setTherapist({
-            image:
-              'https://firebasestorage.googleapis.com/v0/b/ihad2lie.appspot.com/o/profileImages%2F1603133558?alt=media&token=261fe67f-bf96-461f-8efc-b15c44abe9a5',
             first_name: data[0].first_name,
             last_name: data[0].last_name,
             experience: data[0].experience,
@@ -114,77 +102,19 @@ const TherapistDetails = (props) => {
             user_id: data[0].user_id,
             latitude: data[0].latitude,
             longitude: data[0].longitude,
-            rating: data[0].rating
-
-
+            rating: data[0].rating,
+            image: data[0].image,
+            consultations_count:data[0].consultations_count
           });
         } else {
           setModalVisible(true)
-
-          // alert('No Therapist Found');
-
-          //   <AwesomeAlert
-          //   show={showAlert}
-          //   showProgress={false}
-          //   message={message}
-          //   closeOnTouchOutside={true}
-          //   showConfirmButton={true}
-          //   confirmText="Confirm"
-          //   confirmButtonColor={constants.colors.lightGreen}
-          //   onCancelPressed={() => {
-          //     setShowAlert(false);
-          //     if (success) navigation.goBack();
-          //   }}
-          //   onConfirmPressed={() => {
-          //     setShowAlert(false);
-          //     if (success) navigation.goBack();
-          //   }}
-          //   onDismiss={() => {
-          //     setShowAlert(false);
-          //     if (success) navigation.goBack();
-          //   }}
-          // />
-
         }
-        // setTherapistsList([
-        //   {
-        //     image:
-        //       'https://firebasestorage.googleapis.com/v0/b/ihad2lie.appspot.com/o/profileImages%2F1603133558?alt=media&token=261fe67f-bf96-461f-8efc-b15c44abe9a5',
-        //     first_name: 'Avan',
-        //     last_name: 'saam',
-        //     experience: 3,
-        //     qualification: 'MBBS',
-        //     language: 'English',
-        //     specialism: 'andf',
-        //   },
-        //   {
-        //     image:
-        //       'https://firebasestorage.googleapis.com/v0/b/ihad2lie.appspot.com/o/profileImages%2F288C4549F0B6.jpg?alt=media&token=76a97901-f328-4a04-aa76-58f4d9e243cb',
-        //     first_name: 'Akin',
-        //     last_name: 'see',
-        //     experience: 12,
-        //     qualification: 'graduation',
-        //     language: 'French',
-        //     specialism: 'Depression',
-        //   },
-        //   {
-        //     image:
-        //       'https://firebasestorage.googleapis.com/v0/b/ihad2lie.appspot.com/o/profileImages%2F1603763121?alt=media&token=762e32c9-64ca-44fa-8bb3-1c2604ed4222',
-        //     first_name: 'Akin',
-        //     last_name: 'see',
-        //     experience: 12,
-        //     qualification: 'graduation',
-        //     language: 'English',
-        //     specialism: 'Depression, Anger',
-        //   },
-        // ]);
       })
       .catch((error) => {
         //alert(error);
         console.log('response getting therapist listtt => ', error['data']);
       });
   };
-
   const getTherapistsListDefalut = () => {
     setModalVisible(false)
     const endpoint = 'user/search/therapistlist';
@@ -210,11 +140,7 @@ const TherapistDetails = (props) => {
         );
         const { status, statusCode, message, data } = response['data'];
         if (data && data.length > 0) {
-          // setTherapistsList(data);
-
           setTherapist({
-            image:
-              'https://firebasestorage.googleapis.com/v0/b/ihad2lie.appspot.com/o/profileImages%2F1603133558?alt=media&token=261fe67f-bf96-461f-8efc-b15c44abe9a5',
             first_name: data[0].first_name,
             last_name: data[0].last_name,
             experience: data[0].experience,
@@ -225,36 +151,30 @@ const TherapistDetails = (props) => {
             user_id: data[0].user_id,
             latitude: data[0].latitude,
             longitude: data[0].longitude,
-            rating: data[0].rating
+            rating: data[0].rating,
+            image: data[0].image,
+            consultations_count:data[0].consultations_count
 
           });
         } else {
-          // setModalVisible(true)
         }
 
       })
       .catch((error) => {
-        //   alert(error);
         console.log('response getting therapist listtt => ', error['data']);
       });
   };
 
   onSwipeUp = (gestureState) => {
-    // this.setState({ myText: 'You swiped up!' });
-    // alert('Called');
     if (!isExpanded) {
       setExpanded(true);
     }
-    // navigation.navigate('MapDetailScreen');
   };
 
   onSwipeDown = (gestureState) => {
-    // this.setState({ myText: 'You swiped up!' });
-    // alert('Called');
     if (isExpanded) {
       setExpanded(false);
     }
-    // navigation.navigate('MapDetailScreen');
   };
 
   return (
@@ -282,14 +202,15 @@ const TherapistDetails = (props) => {
       {/* Address Input */}
       <View style={styles.LocationInput}>
         <View style={styles.locationInputBox}>
-          <Image source={constants.images.ic_location} style={{ margin: 10 }} />
-          <TextInput
+           <Image source={constants.images.ic_location} style={{ margin: 10 }} />
+           <TextInput
             //style={styles.addressInput}
             style={{ padding: 1 }}
             onChangeText={(text) => setLocation(text)}
             value={location}
-          />
-          {/* <GooglePlacesInput
+          /> 
+           {/* <GooglePlacesInput
+           
             onPress={(data) => {
               setLocation(data.description);
             }}
@@ -299,14 +220,15 @@ const TherapistDetails = (props) => {
             value={location}
             placeholder="Current location"
             text="Location"
-          /> */}
+          />  */}
         </View>
       </View>
       <Modal isVisible={isModalVisible}>
-        <View style={{ backgroundColor: 'white', borderRadius: 5, padding: 10 }}>
+        <View style={{ backgroundColor: 'white', borderRadius: 10, padding: 15 }}>
           <Image style={{ alignSelf: 'center' }} source={constants.images.shutterstock} />
-          <View style={{ padding: 5 }}>
-            <Text style={styles.therapistmessage}>“One moment, we’ll connect you {'\n'} soon. If you don’t want to wait, we  {'\n'}can connect you to any available  {'\n'} therapist”</Text>
+          <View style={{ padding: 10 }}>
+            <Text style={styles.therapistmessage}>So sorry. We are brand new and experiencing issues connecting you.
+We want to help so please bear with us. If you don't want to wait, we can connect you to any available therapist</Text>
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 10, padding: 10 }}>
             <TouchableOpacity
@@ -363,13 +285,10 @@ const TherapistDetails = (props) => {
                 style={styles.map}
                 customMapStyle={mapStyle}
                 region={{
-                  //     latitude: therapist.latitude?therapist.latitude:0,
+                  // latitude: therapist.latitude?therapist.latitude:0,
                   // longitude: therapist.longitude?therapist.longitude:0,
                   latitude: therapist && Number(therapist.latitude),
                   longitude: therapist && Number(therapist.longitude),
-                  //  latitude: 22.719568,
-                  //  longitude: 75.857727,
-
                   latitudeDelta: 0,
                   longitudeDelta: 0.0121,
                 }}>
@@ -377,19 +296,15 @@ const TherapistDetails = (props) => {
                   coordinate={{
                     // latitude: therapist.latitude?therapist.latitude:0,
                     // longitude: therapist.longitude?therapist.longitude:0,
-                    //  latitude: 22.719568,
-                    //  longitude: 75.857727,
+                  
                     latitude: therapist && Number(therapist.latitude),
                     longitude: therapist && Number(therapist.longitude),
-                    // latitude: 37.78825,
-                    // longitude: -122.4324,
                   }}
                 />
               </MapView>
             }
           </View>
           <GestureRecognizer
-            style={{}}
             onSwipeUp={(state) => this.onSwipeUp(state)}
             onSwipeDown={(state) => this.onSwipeDown(state)}>
             <View style={styles.swipeAction}>
@@ -413,8 +328,8 @@ const TherapistDetails = (props) => {
                 }}>
                 <Image
                   source={
-                    therapist && therapist['image'] !== null
-                      ? { uri: therapist['image'] }
+                    therapist && therapist.image !== null
+                      ? { uri: therapist.image }
                       : constants.images.defaultUserImage
                   }
                   style={{ width: 80, height: 100, borderRadius: 10 }}
@@ -461,7 +376,7 @@ const TherapistDetails = (props) => {
                 <Text style={{ fontSize: 14 }}>
                   {therapist.experience} years experience
                 </Text>
-                <Text>12 consultations done</Text>
+                <Text>{therapist.consultations_count} consultations done</Text>
               </View>
             </View>
           </GestureRecognizer>
@@ -485,7 +400,7 @@ const TherapistDetails = (props) => {
 
           <View style={styles.callButton}>
             <CustomButton
-              title={'Call Now'}
+              title={'CALL NOW'}
               submitFunction={() => {
                 // alert(JSON.stringify(therapist));
                 callTherapist(
@@ -496,7 +411,6 @@ const TherapistDetails = (props) => {
               }}
             />
           </View>
-
           <View style={styles.misc}>
             <TouchableOpacity
               onPress={() => {
@@ -506,22 +420,21 @@ const TherapistDetails = (props) => {
                 if (therapistNumber < therapistsList.length - 1) {
                   Events.trigger('showModalLoader');
                   setTimeout(() => {
-                    //  setTherapist(therapistsList[therapistNumber + 1]);
                     setTherapist({
-                      image:
-                        'https://firebasestorage.googleapis.com/v0/b/ihad2lie.appspot.com/o/profileImages%2F1603133558?alt=media&token=261fe67f-bf96-461f-8efc-b15c44abe9a5',
                       first_name:
                         therapistsList[therapistNumber + 1].first_name,
                       last_name: therapistsList[therapistNumber + 1].last_name,
-                      experience:therapistsList[therapistNumber + 1].experience,
-                      qualification:therapistsList[therapistNumber + 1].qualification,
-                      Languages:  therapistsList[therapistNumber + 1].Languages,
+                      experience: therapistsList[therapistNumber + 1].experience,
+                      qualification: therapistsList[therapistNumber + 1].qualification,
+                      Languages: therapistsList[therapistNumber + 1].Languages,
                       Specialism: therapistsList[therapistNumber + 1].Specialism,
                       amount: therapistsList[therapistNumber + 1].amount,
                       user_id: therapistsList[therapistNumber + 1].user_id,
                       latitude: therapistsList[therapistNumber + 1].latitude,
                       longitude: therapistsList[therapistNumber + 1].longitude,
-                      rating: therapistsList[therapistNumber + 1].rating
+                      rating: therapistsList[therapistNumber + 1].rating,
+                      image: therapistsList[therapistNumber + 1].image,
+                      consultations_count:therapistsList[therapistNumber + 1].consultations_count
                     });
 
                     setTherapistNumber((prevNo) => ++prevNo);
@@ -541,7 +454,6 @@ const TherapistDetails = (props) => {
         </View>
       ) : (
           <View style={styles.mapScreen}>
-            {/* <Text style={styles.textStylesOne}>Search Again</Text> */}
           </View>
         )}
     </View>

@@ -30,7 +30,6 @@ const Home = (props) => {
       console.log('onmessage')
       console.log('notificaation' + JSON.stringify(remoteMessage))
       console.log('sound' + JSON.stringify(remoteMessage))
-      //  Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
       Alert.alert(
         '',
         '' + remoteMessage.notification.title + '',
@@ -44,7 +43,8 @@ const Home = (props) => {
             text: "Join",
             onPress: () => navigation.navigate('VideoCall', {
               channelnamedata: remoteMessage.data.channel_name,
-              caller_id_remotedata:remoteMessage.data.caller_id
+              caller_id_remotedata:remoteMessage.data.caller_id,
+              CallReciverName:remoteMessage.data.first_name,
             })
           }
         ],
@@ -64,7 +64,8 @@ const Home = (props) => {
       //setInitialRoute('VideoCall')
       navigation.navigate('VideoCall', {
         channelnamedata: remoteMessage.data.channel_name,
-        caller_id_remotedata:remoteMessage.data.caller_id
+        caller_id_remotedata:remoteMessage.data.caller_id,
+        CallReciverName:remoteMessage.data.first_name,
       });
 
     });
@@ -81,7 +82,9 @@ const Home = (props) => {
           // setInitialRoute('VideoCall') // e.g. "Settings"
           navigation.navigate('VideoCall', {
             channelnamedata: remoteMessage.data.channel_name,
-            caller_id_remotedata:remoteMessage.data.caller_id
+            caller_id_remotedata:remoteMessage.data.caller_id,
+            CallReciverName:remoteMessage.data.first_name,
+            
           });
 
         }

@@ -38,7 +38,14 @@ const Login = (props) => {
   const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
-    GoogleSignin.configure();
+  //  GoogleSignin.configure();
+
+    GoogleSignin.configure({
+      scopes: ['email'], // what API you want to access on behalf of the user, default is email and profile
+      webClientId: '313896155549-9pjng4gik1g1foigcgmlpdg58qpguvrh.apps.googleusercontent.com', // client ID of type WEB for your server (needed to verify user ID and offline access)
+      offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
+      forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
+  });
   }, []);
 
   const loginWithFacebook = () => {
@@ -60,6 +67,7 @@ const Login = (props) => {
   };
 
   const signInWithGoogle = async () => {
+    console.log(GoogleSignin)
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
@@ -74,7 +82,7 @@ const Login = (props) => {
       };
       socialLogin(result, result.googletoken, 1);
     } catch (error) {
-     // alert(JSON.stringify(error));
+      console.log(JSON.stringify(error));
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
       } else if (error.code === statusCodes.IN_PROGRESS) {

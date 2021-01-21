@@ -63,7 +63,8 @@ class App extends Component<Props, State> {
     super(props);
     const { channelnamedata, callDetails,caller_id_remotedata } = this.props.route.params;
     this.state = {
-      appId: 'd54602ec57f14ee38079d5b2f0cd7438',
+     // appId: 'd54602ec57f14ee38079d5b2f0cd7438',
+      appId: '0d97119f3b6744d58af674a7abdd76d1',
       channelName: channelnamedata,
       callDetails: callDetails,
       caller_id_remote:caller_id_remotedata,
@@ -89,8 +90,7 @@ class App extends Component<Props, State> {
   }
 
   UNSAFE_componentWillMount() {
-    const { callDetails ,caller_id_remotedata} = this.props.route.params;
-   // alert(JSON.stringify(caller_id_remotedata))
+    const { callDetails ,caller_id_remotedata,CallReciverName} = this.props.route.params;
     if (this.props.route.params) {
       const { CallReciverName } = this.props.route.params;
       if (CallReciverName) {
@@ -110,7 +110,6 @@ class App extends Component<Props, State> {
   getTherapistsList = () => {
     const { userToken, navigation, userData } = this.props;
 
-    // alert(JSON.stringify(userData));
     const endpoint = 'agoraToken';
     const method = 'POST';
     const headers = {
@@ -225,7 +224,6 @@ class App extends Component<Props, State> {
     this._engine.enableVideo();
     this._engine.enableAudio();
     //await this._engine.disableAudio()
-
     this._engine.addListener('UserJoined', (uid, elapsed) => {
       console.log('UserJoined', uid, elapsed);
       this.setState({
@@ -344,7 +342,6 @@ class App extends Component<Props, State> {
     await this._engine.leaveChannel();
     this.setState({ peerIds: [], joinSucceed: false });
     if (this.state.userData.role == 0) {
-      //this.props.navigation.navigate('TherapistDetails');
       this.props.navigation.navigate('Review', {
         CallReciverName: this.state.CallReciverName,
         caller_id: this.state.callDetails.caller_id
@@ -352,17 +349,13 @@ class App extends Component<Props, State> {
 
     }
     else {
-     // alert(JSON.stringify(this.state.caller_id_remote))
-      //    this.props.navigation.navigate('Home'); 
       this.props.navigation.navigate('LeaveNote',{
-        caller_id: this.state.caller_id_remote
+        caller_id: this.state.caller_id_remote,
+        CallReciverName: this.state.CallReciverName,
       });
 
 
     }
-
-
-    // this.props.navigation.goBack()
   };
   secondsToHms(d) {
     d = Number(d);

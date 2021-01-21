@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const apiStaticPath = 'https://pherapeutic.itechnolabs.tech/api/v1/';
+//const apiStaticPath = 'https://pherapeutic.itechnolabs.tech/api/v1/';
+const apiStaticPath = 'https://admin.pherapeutic.com/api/v1/';
 
 const APICaller = (endpoint, method, body, headers) =>
   axios({

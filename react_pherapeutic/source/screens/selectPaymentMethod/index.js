@@ -177,10 +177,9 @@ const selectPaymentMethod = (props) => {
     APICaller(endpoint, method, null, headers)
       .then((response) => {
         //   console.log('userToken'+userToken)
-        console.log('response calling therapist => ', response);
+        console.log('response calling push => ', response);
         navigation.navigate('VideoCall', {
-          CallReciverName:
-            therapistDetail.first_name + therapistDetail.last_name,
+          CallReciverName:therapistDetail.first_name,
           channelnamedata: channelname,
           callDetails: data,
         });
