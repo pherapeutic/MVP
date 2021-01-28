@@ -17,7 +17,7 @@ class TermsandConditions extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'description' => $this->description,
+            'description' => html_entity_decode(strip_tags($this->description)),
           
         ];
     }

@@ -30,7 +30,8 @@ Route::get('/', function(){
 	return redirect()->route('admin.home');
 })->name('home');
 
-Route::get('privacy','PagesController@privacy');
+
+Route::get('privacy','PagesController@privacy')->name('privacy');
 
 Route::middleware('auth')->prefix('admin')->namespace('Admin')->name('admin.')->group(function(){
 	//Admin Route
@@ -55,6 +56,7 @@ Route::middleware('auth')->prefix('admin')->namespace('Admin')->name('admin.')->
 	Route::resource('contactus', 'ContactUsController');
 	Route::resource('termsandconditions', 'TermsConditionsController');
 	Route::resource('privacypolicy', 'PrivacyPolicyController');
+
     Route::resource('faq', 'FaqController');
 	//End Admin Route
 });

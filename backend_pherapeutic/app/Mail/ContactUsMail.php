@@ -30,6 +30,6 @@ class ContactUsMail extends Mailable
      */
     public function build()
     {
-        return $this->from('smtp@itechnolabs.tech')->subject($this->data['subject'])->view('emails.contactus')->with('data',$this->data);
+        return $this->from('smtp@itechnolabs.tech')->subject('contact us')->view('emails.contactus')->with('data',$this->data);
     }
 }

@@ -41,6 +41,6 @@ class HomeController extends Controller
         $users = json_encode($monthlys['users']);
         $therapists = json_encode($monthlys['therapists']);
         $categories = json_encode($monthlys['month']);
-        return view('admin.home', compact('totalClient','totalTherapist','therapists','users','categories','totalAppointments','contactUs'));
+        return view('admin.home', compact('totalClient','totalTherapist','therapists','users','categories','totalAppointments','contactUs','monthlyPayments'));
     }
 }

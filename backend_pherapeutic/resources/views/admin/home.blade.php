@@ -224,6 +224,19 @@
 
   });
 
+  var paymentJson = <?= $monthlyPayments?>;
+
+  paymentJson = JSON.parse(JSON.stringify(paymentJson));
+
+  var payments = [];
+
+  $.each(paymentJson, function(index, value) {
+    payments.push(value);
+
+  });
+
+  console.log(payments);
+
 
 Highcharts.setOptions([]);
  new Highcharts.chart('w0',
@@ -277,10 +290,10 @@ Highcharts.setOptions([]);
     "categories":categories},
     "yAxis":{
       "title":{
-        "text":"Count"}},
+        "text":"GBP"}},
         "series":[{
           "name":"Monthly Payment",
-          "data":users
+          "data":payments
         }
          ]});
 });

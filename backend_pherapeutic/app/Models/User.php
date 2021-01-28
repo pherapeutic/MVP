@@ -11,6 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Storage;
 use App\Models\CallLogs;
+use App\Models\PaymentDetails;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
@@ -70,6 +71,20 @@ class User extends Authenticatable
     public function getFullNameAttribute($value)
     {
         return "{$this->first_name} {$this->last_name}";
+    }
+
+    public function getTherapistSpecialisation(){
+
+        $specialisms = $this->userTherapistTypes;
+        $therapistType = [];
+        if($specialisms->count()){
+        foreach ($specialisms as $key => $specialism) {
+
+            $therapistType[$key] = $specialism->therapistType->title;
+        }
+        return implode(',', $therapistType);
+       }
+       return "N/A";
     }
 
     public function getLanguagesString()
@@ -320,13 +335,13 @@ class User extends Authenticatable
                         ->where('email_verified_at', '!=', 'null')->where('created_at','like','%' . $month . '%')->count();
             $therapists = self::where('role', '=', User::THERAPIST_ROLE)
                         ->where('email_verified_at', '!=', 'null')->where('created_at','like','%' . $month . '%')->count();
-             $therapists = self::where('role', '=', User::THERAPIST_ROLE)
-                        ->where('email_verified_at', '!=', 'null')->where('created_at','like','%' . $month . '%')->count();
+             $payments = PaymentDetails::where('is_captured',2)
+                        ->where('created_at','like','%' . $month . '%')->sum('amount');
 
             $count['month'][$i] = $month;
             $count['users'][$i] = $userCount;
             $count['therapists'][$i] = $therapists;
-            $count['payments'][$i] = $therapists;
+            $count['payments'][$i] = (int) $payments;
 
         }
         return $count;

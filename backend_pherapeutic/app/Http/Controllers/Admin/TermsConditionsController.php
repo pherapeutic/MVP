@@ -39,7 +39,7 @@ class TermsConditionsController extends Controller
                     return ($termsandconditions->title) ? ($termsandconditions->title) : 'N/A';
                 })
                 ->addColumn('description', function ($termsandconditions) {
-                    return ($termsandconditions->description) ? ($termsandconditions->description) : 'N/A';
+                    return ($termsandconditions->description) ? (html_entity_decode(strip_tags($termsandconditions->description))) : 'N/A';
                 })
                 ->addColumn('action', function ($termsandconditions) {
                     $btn = '';

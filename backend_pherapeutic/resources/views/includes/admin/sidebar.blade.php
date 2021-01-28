@@ -354,7 +354,7 @@
                     </div>
                 </li>
 
-                         <li class="menu-item menu-item-submenu {{ request()->is('admin/privacypolicy') || request()->is('admin/privacypolicy/*') ? 'menu-item-open' : '' }}" aria-haspopup="true" data-menu-toggle="hover">
+                <li class="menu-item menu-item-submenu {{ request()->is('admin/faq') || request()->is('admin/faq/*') ? 'menu-item-open' : '' }}" aria-haspopup="true" data-menu-toggle="hover">
                     <a href="javascript:;" class="menu-link menu-toggle">
                         <span class="svg-icon menu-icon">
                             <!--begin::Svg Icon | path:assets/media/svg/icons/Layout/Layout-4-blocks.svg-->
@@ -373,7 +373,7 @@
                     <div class="menu-submenu">
                         <i class="menu-arrow"></i>
                         <ul class="menu-subnav">
-                            <li class="menu-item {{ request()->is('admin/privacypolicy') ? 'menu-item-active' : '' }}" aria-haspopup="true">
+                            <li class="menu-item {{ request()->is('admin/faq') ? 'menu-item-active' : '' }}" aria-haspopup="true">
                                 <a href="{{ route('admin.faq.index') }}" class="menu-link">
                                     <i class="menu-bullet menu-bullet-line">
                                         <span></span>

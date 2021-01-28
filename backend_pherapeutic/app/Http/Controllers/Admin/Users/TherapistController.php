@@ -47,8 +47,8 @@ class TherapistController extends Controller
                 ->addColumn('languages', function ($userObj) {
                     return ($userObj->getLanguagesString()) ? ($userObj->getLanguagesString()) : 'N/A';
                 })
-                ->addColumn('qualification', function ($userObj) {
-                    return (optional($userObj->therapistProfile)->qualification) ? ($userObj->therapistProfile->qualification) : 'N/A';
+                ->addColumn('specialism', function ($userObj) {
+                    return $userObj->getTherapistSpecialisation();
                 })
                 ->addColumn('experience', function ($userObj) {
                     return (optional($userObj->therapistProfile)->experience) ? ($userObj->therapistProfile->experience.' Year(s)') : 'N/A';

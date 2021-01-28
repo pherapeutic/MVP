@@ -98,12 +98,11 @@
         <!--begin::Signin-->
         <div class="login-form login-signin">
 
-    <h3 class="font-weight-bolder text-dark font-size-h4 font-size-h1-lg text-left">Title</h3>
-    {{$model->title??''}}
+    <h3 class="font-weight-bolder text-dark font-size-h4 font-size-h1-lg text-left">{{$model->title??''}}</h3>
+    
 
     <br>
 
-    <h3 class="font-weight-bolder text-dark font-size-h4 font-size-h1-lg text-left">Description</h3>
 {{$model->description??''}}
 
          

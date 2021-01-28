@@ -35,7 +35,7 @@
                   <div class="col-md-6">
                      <div class="form-group">
                         <label>Description</label>
-                        <input type="text" name="description" class="form-control form-control-solid" placeholder="Enter description" value="{{ (old('description')) ? (old('description')) : ($termsandconditionsObj->description) }}" />
+                         <textarea id="description" name="description" rows="7" class="form-control" placeholder="Page Content">{{$termsandconditionsObj->description}}</textarea>
                         @if ($errors->has('description'))
                               <span class="form-text text-danger">
                                  {{ $errors->first('description') }}
@@ -68,4 +68,12 @@
          placeholder: "Select languages",
       });
    </script>
+
+<script src="https://cdn.ckeditor.com/4.15.0/standard/ckeditor.js"></script>
+<!-- <script src="{{ asset('vendor/unisharp/laravel-ckeditor/ckeditor.js') }}"></script> -->
+
+    <script>
+  
+    CKEDITOR.replace( 'description' );
+</script>
 @endpush

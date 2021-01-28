@@ -41,4 +41,73 @@ class FaqController extends Controller
         return view('admin.faq.index');
     }
 
+    public function create()
+    {
+        return view('admin.faq.create');
+    }
+
+    public function store(Request $request, Faq $faq)
+    {
+        //dd(10);
+        $inputArr['questions'] = $request->get('questions');
+        $inputArr['answers'] = $request->get('answers');
+        $faq = $faq->saveNewFaq($inputArr);
+        if(!$faq){
+            return redirect()->back()->with('error', 'Unable to add faq. Please try again later.');
+        }
+
+        return redirect()->route('admin.faq.index')->with('success_message', 'New FAQ created successfully.');
+    }
+
+
+     public function edit($id)
+    {
+        $faq = new Faq;
+
+        $faq = $faq->getFaqById($id);
+        if(!$faq){
+            return redirect()->back()->with('error_message', 'FAQ does not exist');
+        }
+
+        return view('admin.faq.edit', compact('faq'));
+    }
+
+     public function update($id,Request $request)
+    {
+        $faq = new FAQ;
+        $faq = $faq->getFaqById($id);
+        if(!$faq){
+            return redirect()->back()->with('error_message', 'This FAQ does not exist');
+        }
+
+        $inputArr['questions'] = $request->get('questions');
+        $inputArr['answers'] = $request->get('answers');
+        $hasUpdated = $faq->updateFaq($id, $inputArr);
+        
+        if(!$hasUpdated){
+            return redirect()->back()->with('error_message', 'Unable to update FAQ. Please try again later.');
+        }
+
+        return redirect()->route('admin.faq.index')->with('success_message', 'updated successfully.');
+        
+    }
+
+     public function destroy($id)
+    {
+        $faq = new Faq;
+        $faq = $faq->getFaqById($id);
+
+        if(!$faq){
+            return returnNotFoundResponse('This FAQ does not exist');
+        }
+
+        $hasDeleted = $faq->delete();
+        if($hasDeleted){
+            return returnSuccessResponse('FAQ deleted successfully');
+        }
+
+        return returnErrorResponse('Something went wrong. Please try again later');
+    }
+
+
 }

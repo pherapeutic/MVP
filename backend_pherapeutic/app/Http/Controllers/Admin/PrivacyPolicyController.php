@@ -8,7 +8,7 @@ use App\Http\Requests\TermsConditionsRequest;
 use App\Http\Requests\UpdateTermsConditionsRequest;
 use App\Models\PrivacyPolicy;
 
-class privacyPolicyController extends Controller
+class PrivacyPolicyController extends Controller
 {
     public function __construct()
     {
