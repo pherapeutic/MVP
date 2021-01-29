@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers\Api\User;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Models\UserAnswers;
-use App\Models\TherapistType;
-use App\Models\Appointments;
 use Auth;
 use Validator;
+use App\Models\User;
+use App\Models\UserAnswers;
+use App\Models\Appointments;
+use Illuminate\Http\Request;
+use App\Models\TherapistType;
+use App\Models\TherapistProfile;
+use App\Models\UserTherapistType;
+use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
 
 class TherapistController extends Controller
 {
@@ -170,4 +174,43 @@ class TherapistController extends Controller
             return $this->successResponse($returnArr, ' Assigned therapist detail.');            
         }        
     }
+    public function store(Request $request){
+		$validator = Validator::make($request->all(), [
+                'first_name' => 'required',
+                'last_name' => 'required',
+                'email' => 'required',
+                'specialisms' => 'required',
+                'qualification' => 'required',
+                'experience' => 'required',
+                    ]);
+        	if ($validator->fails()) {
+                return response()->json([
+                'status' => JsonResponse::HTTP_UNPROCESSABLE_ENTITY,
+                'message' => $validator->errors()->first()
+                ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+       		 }
+            $user= User::create([
+                'first_name' => $request->first_name,
+                'last_name'  => $request->last_name,
+                'email'		=> $request->email,
+                'role'  => '1'
+                ]);
+            $therapist_profiles= TherapistProfile::create([
+                'user_id' => $user->id,
+                'experience' => $request->experience,
+                'qualification' => $request-> qualification,
+            ]);
+
+            $user_therapist_types= UserTherapistType ::create([
+                'user_id' => $user->id,
+                'therapist_type_id' => $request->specialisms,
+            ]);
+		
+		return response()->json([
+                'status' => JsonResponse::HTTP_OK,
+                'message' => 'Therapist created Successfully'
+            ], JsonResponse::HTTP_OK);
+		
+}
+
 }

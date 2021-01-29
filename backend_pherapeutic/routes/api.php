@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
  
 
-     
+    Route::post('/therapist/store' ,'Api\User\TherapistController@store'); 
 
 Route::prefix('v1')->group(function () {
     
