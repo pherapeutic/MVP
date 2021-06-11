@@ -1,0 +1,148 @@
+
+App Thinning Size Report for All Variants of Pherapeutic
+
+Variant: Pherapeutic-070D0FB3-BC77-45BC-9086-5862BEAF6B00.ipa
+Supported variant descriptors: [device: iPhone11,8, os-version: 12.0] and [device: iPhone11,8, os-version: 12.2]
+App + On Demand Resources size: 4.8 MB compressed, 7.5 MB uncompressed
+App size: 4.8 MB compressed, 7.5 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-0A8AE705-15E0-41B7-A700-BCD85315CC9E.ipa
+Supported variant descriptors: [device: iPhone8,4, os-version: 11.0], [device: iPhone8,1, os-version: 11.0], [device: iPhone6,2, os-version: 11.0], [device: iPod7,1, os-version: 11.0], [device: iPhone6,1, os-version: 11.0], and [device: iPhone7,2, os-version: 11.0]
+App + On Demand Resources size: 4.8 MB compressed, 7.4 MB uncompressed
+App size: 4.8 MB compressed, 7.4 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-1386F0D5-2825-41FD-9984-53C1F3CCAEDB.ipa
+Supported variant descriptors: [device: iPhone7,1, os-version: 11.0] and [device: iPhone8,2, os-version: 11.0]
+App + On Demand Resources size: 4.8 MB compressed, 7.5 MB uncompressed
+App size: 4.8 MB compressed, 7.5 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-356A4405-9705-4DC8-96B4-FF28638FDB32.ipa
+Supported variant descriptors: [device: iPhone8,4, os-version: 13.0], [device: iPhone8,1, os-version: 13.0], [device: iPod9,1, os-version: 13.0], [device: iPhone8,4, os-version: 14.0], [device: iPod9,1, os-version: 14.0], and [device: iPhone8,1, os-version: 14.0]
+App + On Demand Resources size: 4.7 MB compressed, 7.4 MB uncompressed
+App size: 4.7 MB compressed, 7.4 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-3DDFCEB9-DEF1-475F-B4B7-3EA06CC27D46.ipa
+Supported variant descriptors: [device: iPad7,3, os-version: 14.0], [device: iPad8,9, os-version: 13.0], [device: iPad11,1, os-version: 13.0], [device: iPad8,7, os-version: 14.0], [device: iPad11,3, os-version: 14.0], [device: iPad8,2, os-version: 13.0], [device: iPad7,1, os-version: 14.0], [device: iPad8,4, os-version: 14.0], [device: iPad8,1, os-version: 14.0], [device: iPad8,12, os-version: 14.0], [device: iPad8,6, os-version: 14.0], [device: iPad7,4, os-version: 13.0], [device: iPad8,5, os-version: 14.0], [device: iPad6,4, os-version: 14.0], [device: iPad13,2, os-version: 14.0], [device: iPad8,10, os-version: 13.0], [device: iPad11,3, os-version: 13.0], [device: iPad8,10, os-version: 14.0], [device: iPad11,2, os-version: 13.0], [device: iPad7,2, os-version: 14.0], [device: iPad6,3, os-version: 14.0], [device: iPad8,3, os-version: 14.0], [device: iPad7,2, os-version: 13.0], [device: iPad7,1, os-version: 13.0], [device: iPad8,8, os-version: 14.0], [device: iPad8,9, os-version: 14.0], [device: iPad7,3, os-version: 13.0], [device: iPad8,4, os-version: 13.0], [device: iPad8,5, os-version: 13.0], [device: iPad8,7, os-version: 13.0], [device: iPad8,11, os-version: 13.0], [device: iPad8,12, os-version: 13.0], [device: iPad8,8, os-version: 13.0], [device: iPad8,11, os-version: 14.0], [device: iPad8,3, os-version: 13.0], [device: iPad6,4, os-version: 13.0], [device: iPad11,4, os-version: 13.0], [device: iPad8,1, os-version: 13.0], [device: iPad13,1, os-version: 14.0], [device: iPad8,2, os-version: 14.0], [device: MacFamily20,1, os-version: 14.0], [device: iPad11,2, os-version: 14.0], [device: iPad6,3, os-version: 13.0], [device: iPad11,4, os-version: 14.0], [device: iPad8,6, os-version: 13.0], [device: iPad11,1, os-version: 14.0], and [device: iPad7,4, os-version: 14.0]
+App + On Demand Resources size: 4.7 MB compressed, 7.4 MB uncompressed
+App size: 4.7 MB compressed, 7.4 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-582ADD7D-9EF8-4925-B34D-56CB98F5CE9E.ipa
+Supported variant descriptors: [device: iPhone11,6, os-version: 14.0], [device: iPhone12,5, os-version: 13.0], [device: iPhone10,5, os-version: 13.0], [device: iPhone11,2, os-version: 14.0], [device: iPhone12,3, os-version: 13.0], [device: iPhone12,3, os-version: 14.0], [device: iPhone11,4, os-version: 13.0], [device: iPhone10,6, os-version: 13.0], [device: iPhone10,6, os-version: 14.0], [device: iPhone10,2, os-version: 14.0], [device: iPhone9,2, os-version: 13.0], [device: iPhone10,2, os-version: 13.0], [device: iPhone13,3, os-version: 14.0], [device: iPhone12,5, os-version: 14.0], [device: iPhone10,3, os-version: 14.0], [device: iPhone13,2, os-version: 14.0], [device: iPhone13,4, os-version: 14.0], [device: iPhone9,4, os-version: 13.0], [device: iPhone10,3, os-version: 13.0], [device: iPhone11,2, os-version: 13.0], [device: iPhone11,6, os-version: 13.0], [device: iPhone10,5, os-version: 14.0], [device: iPhone9,2, os-version: 14.0], [device: iPhone13,1, os-version: 14.0], [device: iPhone9,4, os-version: 14.0], and [device: iPhone11,4, os-version: 14.0]
+App + On Demand Resources size: 4.8 MB compressed, 7.5 MB uncompressed
+App size: 4.8 MB compressed, 7.5 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-5C282E60-9C50-444A-9A01-0C7EE192102A.ipa
+Supported variant descriptors: [device: iPhone8,2, os-version: 12.0], [device: iPhone8,2, os-version: 12.2], [device: iPhone7,1, os-version: 12.2], and [device: iPhone7,1, os-version: 12.0]
+App + On Demand Resources size: 4.8 MB compressed, 7.5 MB uncompressed
+App size: 4.8 MB compressed, 7.5 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-5EC094A3-BB8B-44B3-B4FB-BC6EBEE7911F.ipa
+Supported variant descriptors: [device: iPhone10,2, os-version: 11.0], [device: iPhone9,4, os-version: 11.0], [device: iPhone10,3, os-version: 11.0], [device: iPhone9,2, os-version: 11.0], [device: iPhone10,5, os-version: 11.0], and [device: iPhone10,6, os-version: 11.0]
+App + On Demand Resources size: 4.8 MB compressed, 7.5 MB uncompressed
+App size: 4.8 MB compressed, 7.5 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-65EE52CC-6D27-45CD-9192-17435F05AAD1.ipa
+Supported variant descriptors: [device: iPhone10,1, os-version: 14.0], [device: iPhone9,1, os-version: 14.0], [device: iPhone9,3, os-version: 14.0], [device: iPhone9,1, os-version: 13.0], [device: iPhone12,8, os-version: 13.0], [device: iPhone10,4, os-version: 14.0], [device: iPhone12,8, os-version: 14.0], [device: iPhone10,1, os-version: 13.0], [device: iPhone9,3, os-version: 13.0], and [device: iPhone10,4, os-version: 13.0]
+App + On Demand Resources size: 4.7 MB compressed, 7.4 MB uncompressed
+App size: 4.7 MB compressed, 7.4 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-6619130F-34C2-4DAA-B681-851CB10F8DC6.ipa
+Supported variant descriptors: [device: iPhone9,1, os-version: 12.0], [device: iPhone9,1, os-version: 12.2], [device: iPhone9,3, os-version: 12.0], [device: iPhone10,4, os-version: 12.0], [device: iPhone10,1, os-version: 12.0], [device: iPhone9,3, os-version: 12.2], [device: iPhone10,1, os-version: 12.2], and [device: iPhone10,4, os-version: 12.2]
+App + On Demand Resources size: 4.8 MB compressed, 7.5 MB uncompressed
+App size: 4.8 MB compressed, 7.5 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-7C9D022C-DAE9-4548-B7FA-8916F310FF01.ipa
+Supported variant descriptors: [device: iPhone8,2, os-version: 13.0] and [device: iPhone8,2, os-version: 14.0]
+App + On Demand Resources size: 4.8 MB compressed, 7.5 MB uncompressed
+App size: 4.8 MB compressed, 7.5 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-83246C33-92C9-4F6B-930B-DFA0F35D4901.ipa
+Supported variant descriptors: [device: iPad11,2, os-version: 12.2], [device: iPad11,1, os-version: 12.2], [device: iPad6,4, os-version: 12.0], [device: iPad8,5, os-version: 12.0], [device: iPad6,3, os-version: 12.2], [device: iPad8,1, os-version: 12.0], [device: iPad7,2, os-version: 12.0], [device: iPad6,4, os-version: 12.2], [device: iPad8,2, os-version: 12.0], [device: iPad8,4, os-version: 12.0], [device: iPad7,4, os-version: 12.2], [device: iPad8,7, os-version: 12.2], [device: iPad7,1, os-version: 12.0], [device: iPad8,8, os-version: 12.2], [device: iPad8,3, os-version: 12.2], [device: iPad8,1, os-version: 12.2], [device: iPad7,4, os-version: 12.0], [device: iPad11,3, os-version: 12.2], [device: iPad8,6, os-version: 12.0], [device: iPad7,3, os-version: 12.0], [device: iPad8,8, os-version: 12.0], [device: iPad8,7, os-version: 12.0], [device: iPad7,2, os-version: 12.2], [device: iPad8,4, os-version: 12.2], [device: iPad7,1, os-version: 12.2], [device: iPad7,3, os-version: 12.2], [device: iPad6,3, os-version: 12.0], [device: iPad8,3, os-version: 12.0], [device: iPad11,4, os-version: 12.2], [device: iPad8,2, os-version: 12.2], [device: iPad8,6, os-version: 12.2], and [device: iPad8,5, os-version: 12.2]
+App + On Demand Resources size: 4.8 MB compressed, 7.5 MB uncompressed
+App size: 4.8 MB compressed, 7.5 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-8C2D621F-038A-4CE2-AD26-A7A4854E3789.ipa
+Supported variant descriptors: [device: iPad7,1, os-version: 11.0], [device: iPad7,2, os-version: 11.0], [device: iPad6,4, os-version: 11.0], [device: iPad6,3, os-version: 11.0], [device: iPad7,3, os-version: 11.0], and [device: iPad7,4, os-version: 11.0]
+App + On Demand Resources size: 4.8 MB compressed, 7.4 MB uncompressed
+App size: 4.8 MB compressed, 7.4 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-A7B3E86A-9E51-4656-801A-E00E36AC02C9.ipa
+Supported variant descriptors: [device: iPhone8,1, os-version: 12.0], [device: iPhone8,4, os-version: 12.0], [device: iPhone8,4, os-version: 12.2], [device: iPhone6,1, os-version: 12.0], [device: iPod7,1, os-version: 12.0], [device: iPod9,1, os-version: 12.2], [device: iPhone6,2, os-version: 12.0], [device: iPhone8,1, os-version: 12.2], [device: iPhone6,1, os-version: 12.2], [device: iPhone7,2, os-version: 12.2], [device: iPhone6,2, os-version: 12.2], [device: iPod7,1, os-version: 12.2], and [device: iPhone7,2, os-version: 12.0]
+App + On Demand Resources size: 4.8 MB compressed, 7.5 MB uncompressed
+App size: 4.8 MB compressed, 7.5 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-B6403595-E3A0-44EB-897D-1EE31D658875.ipa
+Supported variant descriptors: [device: iPhone12,1, os-version: 13.0], [device: iPhone11,8, os-version: 13.0], [device: iPhone12,1, os-version: 14.0], and [device: iPhone11,8, os-version: 14.0]
+App + On Demand Resources size: 4.8 MB compressed, 7.4 MB uncompressed
+App size: 4.8 MB compressed, 7.4 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-CFF965E7-F665-48EF-A01E-3C027320A18B.ipa
+Supported variant descriptors: [device: iPad6,7, os-version: 12.0], [device: iPad7,5, os-version: 12.0], [device: iPad7,6, os-version: 12.2], [device: iPad4,1, os-version: 12.0], [device: iPad5,2, os-version: 12.0], [device: iPad4,7, os-version: 12.2], [device: iPad5,1, os-version: 12.2], [device: iPad5,4, os-version: 12.0], [device: iPad6,7, os-version: 12.2], [device: iPad4,4, os-version: 12.2], [device: iPad4,5, os-version: 12.2], [device: iPad4,2, os-version: 12.2], [device: iPad4,4, os-version: 12.0], [device: iPad4,8, os-version: 12.2], [device: iPad4,3, os-version: 12.0], [device: iPad6,12, os-version: 12.2], [device: iPad4,5, os-version: 12.0], [device: iPad5,1, os-version: 12.0], [device: iPad7,5, os-version: 12.2], [device: iPad6,8, os-version: 12.0], [device: iPad5,2, os-version: 12.2], [device: iPad5,3, os-version: 12.0], [device: iPad4,2, os-version: 12.0], [device: iPad4,6, os-version: 12.2], [device: iPad4,3, os-version: 12.2], [device: iPad5,3, os-version: 12.2], [device: iPad6,11, os-version: 12.2], [device: iPad4,9, os-version: 12.0], [device: iPad4,9, os-version: 12.2], [device: iPad5,4, os-version: 12.2], [device: iPad4,7, os-version: 12.0], [device: iPad4,1, os-version: 12.2], [device: iPad7,6, os-version: 12.0], [device: iPad4,6, os-version: 12.0], [device: iPad6,12, os-version: 12.0], [device: iPad4,8, os-version: 12.0], [device: iPad6,11, os-version: 12.0], and [device: iPad6,8, os-version: 12.2]
+App + On Demand Resources size: 4.8 MB compressed, 7.5 MB uncompressed
+App size: 4.8 MB compressed, 7.5 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-E37ED4E8-EE49-400F-8EB9-D4E8DC878976.ipa
+Supported variant descriptors: [device: iPad7,6, os-version: 14.0], [device: iPad7,12, os-version: 14.0], [device: iPad11,7, os-version: 14.0], [device: iPad11,6, os-version: 14.0], [device: iPad5,1, os-version: 14.0], [device: iPad5,2, os-version: 13.0], [device: iPad5,3, os-version: 14.0], [device: iPad6,11, os-version: 13.0], [device: iPad5,3, os-version: 13.0], [device: iPad5,4, os-version: 14.0], [device: iPad6,8, os-version: 13.0], [device: iPad6,11, os-version: 14.0], [device: iPad7,11, os-version: 14.0], [device: iPad6,8, os-version: 14.0], [device: iPad6,12, os-version: 14.0], [device: iPad5,1, os-version: 13.0], [device: iPad6,12, os-version: 13.0], [device: iPad7,6, os-version: 13.0], [device: iPad7,12, os-version: 13.0], [device: iPad5,4, os-version: 13.0], [device: iPad7,5, os-version: 13.0], [device: iPad6,7, os-version: 14.0], [device: iPad7,11, os-version: 13.0], [device: iPad5,2, os-version: 14.0], [device: iPad7,5, os-version: 14.0], and [device: iPad6,7, os-version: 13.0]
+App + On Demand Resources size: 4.7 MB compressed, 7.4 MB uncompressed
+App size: 4.7 MB compressed, 7.4 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-F5CC0384-DEC4-4D3D-A65D-5D0A5921EFDE.ipa
+Supported variant descriptors: [device: iPhone9,3, os-version: 11.0], [device: iPhone9,1, os-version: 11.0], [device: iPhone10,4, os-version: 11.0], and [device: iPhone10,1, os-version: 11.0]
+App + On Demand Resources size: 4.8 MB compressed, 7.4 MB uncompressed
+App size: 4.8 MB compressed, 7.4 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-FB3344E0-2B50-44F6-9D4B-D3CCCCD6D7AB.ipa
+Supported variant descriptors: [device: iPhone10,5, os-version: 12.2], [device: iPhone9,2, os-version: 12.0], [device: iPhone11,2, os-version: 12.0], [device: iPhone10,3, os-version: 12.0], [device: iPhone10,6, os-version: 12.0], [device: iPhone11,6, os-version: 12.0], [device: iPhone9,4, os-version: 12.0], [device: iPhone10,2, os-version: 12.0], [device: iPhone10,5, os-version: 12.0], [device: iPhone11,4, os-version: 12.2], [device: iPhone9,2, os-version: 12.2], [device: iPhone10,2, os-version: 12.2], [device: iPhone11,2, os-version: 12.2], [device: iPhone9,4, os-version: 12.2], [device: iPhone11,6, os-version: 12.2], [device: iPhone11,4, os-version: 12.0], [device: iPhone10,3, os-version: 12.2], and [device: iPhone10,6, os-version: 12.2]
+App + On Demand Resources size: 4.8 MB compressed, 7.5 MB uncompressed
+App size: 4.8 MB compressed, 7.5 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic-FC9ED3D8-324B-4C43-93E0-DA1B2E98C1A8.ipa
+Supported variant descriptors: [device: iPad4,4, os-version: 11.0], [device: iPad4,1, os-version: 11.0], [device: iPad7,6, os-version: 11.0], [device: iPad4,8, os-version: 11.0], [device: iPad4,5, os-version: 11.0], [device: iPad7,5, os-version: 11.0], [device: iPad4,6, os-version: 11.0], [device: iPad4,9, os-version: 11.0], [device: iPad6,7, os-version: 11.0], [device: iPad5,2, os-version: 11.0], [device: iPad6,11, os-version: 11.0], [device: iPad6,12, os-version: 11.0], [device: iPad4,2, os-version: 11.0], [device: iPad6,8, os-version: 11.0], [device: iPad4,7, os-version: 11.0], [device: iPad5,1, os-version: 11.0], [device: iPad5,3, os-version: 11.0], [device: iPad5,4, os-version: 11.0], and [device: iPad4,3, os-version: 11.0]
+App + On Demand Resources size: 4.8 MB compressed, 7.4 MB uncompressed
+App size: 4.8 MB compressed, 7.4 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
+
+
+Variant: Pherapeutic.ipa
+Supported variant descriptors: Universal
+App + On Demand Resources size: 5.4 MB compressed, 8.1 MB uncompressed
+App size: 5.4 MB compressed, 8.1 MB uncompressed
+On Demand Resources size: Zero KB compressed, Zero KB uncompressed
