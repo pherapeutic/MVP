@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Ixudra\Curl\Facades\Curl;
 
 class CallLogs extends Model
 {
@@ -63,7 +64,59 @@ class CallLogs extends Model
           
     public function ratings()
     {
-        return $this->hasOne('App\Models\Rating');
+        return $this->hasOne('App\Models\Rating','call_logs_id','caller_id');
+    }
+
+        public static function sendNotificationToTherapist($notificationData = array()) {  
+        //dd($notificationData);
+        if(count($notificationData) <= 0){
+            return;
+        }
+
+        $curlUrl = "https://fcm.googleapis.com/fcm/send"; 
+        $push_notification_key = \Config::get('services.notification.therapist_push_notification_key');
+
+        if($notificationData['device_type'] == '1'){ // for IOS
+            $postdata = [
+                "to" => $notificationData['fcm_token'],
+                "notification" => [
+                    "title" => $notificationData['title'],
+                    "text" => $notificationData['message'],
+                    "sound" => "default",
+                ],
+                "data" => $notificationData['data']
+            ];
+
+
+        \Log::info('notification data: '. print_r($postdata, true));
+        } else if($notificationData['device_type'] == '0'){ // for android
+            $postdata = [
+                "to" => $notificationData['fcm_token'],
+                "notification" => [
+                    //'data' => $notificationData['data'],
+                    "title" => $notificationData['title'],
+                    "text" => $notificationData['message'],
+                    "sound" => "default"
+                ],
+                'data' => $notificationData['data']
+            ];
+
+        } else {
+            return;
+        }
+
+
+        $header = array("authorization: key=" . $push_notification_key . "", "content-type: application/json"); 
+
+        $timeout = 120;
+        $curlOutput = Curl::to($curlUrl)
+                        ->withHeaders($header)
+                        ->withData(json_encode($postdata))
+                        ->withTimeout($timeout)
+                        ->post();
+
+        \Log::info('Curl out put: '. print_r($curlOutput, true));
+        return json_decode($curlOutput, true);
     }
         
 }

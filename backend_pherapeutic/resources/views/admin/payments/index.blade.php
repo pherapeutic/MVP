@@ -71,6 +71,21 @@
         $(document).ready(function() {
             getDataTable();
         });
+		
+		// paidAmount/{payment_id}/{charge_id}
+		 $(document).on('click', '.refundAmount', function(e){
+            let url  = base_url + "/admin/refundPayment/" + $(this).attr('data-id')+"/"+$(this).attr('data-transfer');
+            let tableId = 'payments_datatable';
+			
+            RefundTransferDataTableRecord(url, tableId,'refund');
+        });
+
+		$(document).on('click', '.paidAmount', function(e){
+            let url  = base_url + "/admin/paidAmount/" + $(this).attr('data-id')+"/"+$(this).attr('data-transfer');
+            let tableId = 'payments_datatable';
+	
+            RefundTransferDataTableRecord(url, tableId,'transfer');
+        });
 
     </script>
 @endpush

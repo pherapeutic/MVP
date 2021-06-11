@@ -37,6 +37,7 @@
                     <th>Sr. No.</th>
                     <th>Question</th>
                     <th>Answer</th>
+                    <th>User Type</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -72,6 +73,7 @@
                     {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
                     { data: 'question', name: 'question' },
                     { data: 'answer', name: 'answer' },
+                    { data: 'type_id', name: 'type_id' },
                     { data: 'action', name: 'action', orderable: false, searchable: false},
                 ]
             });

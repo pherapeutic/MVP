@@ -17,6 +17,7 @@ Auth::routes();
 
 
 //connect vendor account
+Route::get('/stripeRedirect', 'FrontendController@stripeRedirect');
 Route::get('/connectwithstrip', 'FrontendController@connectwithstrip');
 Route::get('/sendcurltostrip', 'FrontendController@sendcurltostrip');
 Route::get('/disConnectTherapistAccount/{stripeConnectId}', 'FrontendController@disConnectTherapistAccount');
@@ -48,6 +49,7 @@ Route::middleware('auth')->prefix('admin')->namespace('Admin')->name('admin.')->
 	Route::resource('languages', 'LanguagesController');
 
 	Route::resource('questionnaire', 'QuestionnaireController');	
+	Route::delete('destroyAnswerById/{id}', 'QuestionnaireController@destroyAnswerById');	
 	Route::post('question-ordering/{order}', 'QuestionnaireController@ordering');
 
 	Route::resource('settings', 'SettingController');
@@ -58,6 +60,13 @@ Route::middleware('auth')->prefix('admin')->namespace('Admin')->name('admin.')->
 	Route::resource('privacypolicy', 'PrivacyPolicyController');
 
     Route::resource('faq', 'FaqController');
+    Route::resource('user', 'UserController');
+    Route::get('change-password','UserController@changePasswordView')->name('change-password');
+    Route::post('change-password','UserController@changePassword');
+    
+	Route::post('/refundPayment/{payment_id}/{charge_id}','PaymentsController@refundPayment')->name('refundPayment');
+	Route::post('/paidAmount/{payment_id}/{charge_id}','PaymentsController@paidAmount')->name('paidAmount');
+
 	//End Admin Route
 });
 

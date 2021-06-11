@@ -30,7 +30,10 @@ Route::prefix('v1')->group(function () {
             Route::post('/forgotPassword', 'LoginController@forgotPassword')->name('forgotPassword');
             Route::post('/resetPassword', 'LoginController@resetPassword')->name('resetPassword');
             Route::post('/socialLogin', 'LoginController@socialLogin')->name('socialLogin');
+            Route::post('/appleLogin', 'LoginController@appleLogin')->name('appleLogin');
             Route::any('/getTermsandConditions', 'TermsandConditionsController@getTermsandConditions')->name('getTermsandConditions');
+			
+			
             
         });
 
@@ -54,10 +57,18 @@ Route::prefix('v1')->group(function () {
             //Get Questionare Route
             Route::get('user/questions', 'QuestionareController@getQuestions')->name('getQuestions');
             Route::post('user/answers', 'QuestionareController@postAnswers')->name('postAnswers');
+            Route::post('user/clientList', 'TherapistController@clientList')->name('clientList');
+
             //Search Therapist Route
             Route::post('user/search/therapist', 'TherapistController@searchTherapist')->name('searchTherapist');
             Route::post('user/search/therapistlist', 'TherapistController@searchTherapistList')->name('searchTherapistList');
+            Route::post('user/search/therapistlistTest', 'TherapistController@therapistlistTest')->name('therapistlistTest');
+
             Route::post('/assigned/therapist', 'TherapistController@showAssignedTherapist')->name('showAssignedTherapist');
+			
+            Route::post('/bonoWorkStatus', 'TherapistController@bonoWorkStatus')->name('therapist.bonoWorkStatus');
+			
+		
 
             // Route::post('/isProBonoWork', 'HomeController@isProBonoWork')->name('isProBonoWork');
             // Route::post('/user/change/password', 'HomeController@changePassword')->name('change.password');
@@ -95,6 +106,9 @@ Route::prefix('v1')->group(function () {
             Route::post('/amountHold', 'PaymentController@amountHoldBeforeCall')->name('amountHoldBeforeCall');
             Route::post('/makePayment', 'PaymentController@makePayment')->name('makePayment');
             Route::get('/getPaymentHistory', 'PaymentController@getPaymentHistory')->name('getPaymentHistory');
+            Route::get('/stripeData', 'PaymentController@stripeData')->name('stripeData');
+            Route::get('/connectWithStripe', 'PaymentController@connectWithStripe')->name('connectWithStripe');
+
             //Agora authentication token
             Route::post('/agoraToken', 'HomeController@agoraToken')->name('agoraToken');
             Route::post('/agoraTokenRtm', 'HomeController@agoraTokenRtm')->name('agoraTokenRtm');
@@ -113,8 +127,11 @@ Route::prefix('v1')->group(function () {
             Route::post('/contact-us', 'ContacustController@saveContact');
             
         });
+		
+		
+		 
     });
-   
+   	 Route::get('/getQualification', 'Api\User\QualificationController@index')->name('getQualification');
     Route::get('/getLanguages', 'LanguageController@getLanguages')->name('getLanguages');
     Route::get('/getTherapistTypes', 'TherapistTypeController@getTherapistTypes')->name('getTherapistTypes');
 });

@@ -65,5 +65,15 @@ class UserAnswers extends Model
     public function getUserAnswerByUserId($id){
         return self::where('user_id', $id)->get()->all();
     }
+
+    public function getQuestion()
+    {
+        return $this->belongsTo('App\Models\Questions', 'question_id', 'id');
+    }
+
+    public function getAnswer()
+    {
+        return $this->belongsTo('App\Models\Answers', 'answer_id', 'id');
+    }
    
 }

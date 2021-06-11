@@ -18,8 +18,9 @@
         "laravel/framework": "^8.0",
         "laravel/sanctum": "^2.7",
         "laravel/tinker": "^2.0",
-        "stripe/stripe-php": "^7.27",
         "laravel/ui": "^3.0",
+        "socialiteproviders/apple": "^4.1",
+        "stripe/stripe-php": "^7.27",
         "yajra/laravel-datatables-oracle": "^9.11"
     },
     "require-dev": {

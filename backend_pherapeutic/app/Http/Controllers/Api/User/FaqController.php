@@ -15,11 +15,21 @@ class FaqController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $faqs = Faq::all();
+        $role = $request->input('role');      
+
+        $faqs = Faq::where(['type_id'=>$role])->get();
         //dd($faqs);
-        return $this->sendResponse(FaqResource::collection($faqs), 'Faq retrieved successfully.');
+		$getResponseData=array();
+		if($faqs->count() >0){
+			foreach ($faqs as $faq) {
+				$getResponseData[] = $faq->getResponseArr();
+            
+           }
+		}
+		return returnSuccessResponse('Faq retrieved successfully.',$getResponseData);
+        // return $this->sendResponse(FaqResource::collection($faqs), 'Faq retrieved successfully.');
     }
     /**
      * Store a newly created resource in storage.

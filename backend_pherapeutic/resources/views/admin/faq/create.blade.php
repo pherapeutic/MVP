@@ -39,6 +39,18 @@
                      </div>
                   </div>
                </div>
+
+               <div class="col-md-6">
+                     <div class="form-group">
+                     <label>User Type</label>
+
+                     <select name ="type_id" class="form-control" required>
+                        <option value="">Select User Type</option>
+                        <option value="0">Client</option>
+                        <option value="1">Therapist</option>
+                     </select>
+                     </div>
+               </div>
          
                
             </div>

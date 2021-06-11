@@ -26,4 +26,13 @@ class PrivacyPolicy extends Model
     public function updatePolicy($id, $inputArr){
         return self::where('id', $id)->update($inputArr);
     }
+	public function getResponseArr(){
+	  return	$returnArr = [
+				'id' => $this->id,
+				'title' => $this->title,
+				'description' => mb_convert_encoding($this->description, 'UTF-8', 'UTF-8'),
+				
+			];
+		
+	}
 }

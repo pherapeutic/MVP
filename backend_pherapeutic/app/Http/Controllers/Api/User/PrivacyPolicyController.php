@@ -18,9 +18,18 @@ class PrivacyPolicyController extends BaseController
     public function getPrivacyPolicy()
     {
         //dd(10);
+		$getResponseData=array();
         $privacypolicy = PrivacyPolicy::all();
+		if($privacypolicy->count() >0){
+			foreach ($privacypolicy as $policy) {
+            $getResponseData[] = $policy->getResponseArr();
+            
+        }
+		}
+		// print_r($getResponseData);die;
         //dd($privacypolicy);
-        return $this->sendResponse(PrivacyPolicyResource::collection($privacypolicy), 'Privacy Policy retrieved successfully.');
+        // return $this->sendResponse(PrivacyPolicyResource::collection($getResponseData), 'Privacy Policy retrieved successfully.');
+		return returnSuccessResponse('Privacy Policy retrieved successfully.',$getResponseData);
     }
     
 }

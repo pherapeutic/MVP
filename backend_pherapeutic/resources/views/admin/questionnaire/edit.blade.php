@@ -22,7 +22,7 @@
             @csrf
             @method('put')
                <div class="row justify-content-center">
-                  <div class="col-md-6">
+                  <div class="col-md-6" id="">
                      <div class="form-group">
                         <label>Question</label>
                         <input type="text" name="title" id="title" class="form-control form-control-solid" value="{{($questionObj->title)? $questionObj->title : old('title')}}" placeholder="Enter your question" required/>
@@ -32,6 +32,17 @@
                            </span>
                         @endif
                      </div>
+					
+					<div class="form-group">
+						<label>Ordering</label>
+						<input type="text" name="ordering" id="myTextBox" class="form-control disabled-inputs"  value="{{$questionObj->ordering}}" placeholder="Enter Ordering">
+						 @if ($errors->has("ordering"))
+                           <span class="form-text text-danger">
+                              {{ $errors->first("ordering") }}
+                           </span>
+                        @endif
+					</div>	
+                                
 <!--                   </div> -->
 
                     <div class="new-fields-html d-none">
@@ -66,33 +77,36 @@
                             </div>
                         </div>
                     </div>
-                    <!-- On the time of edit -->
+                    <!-- On the time of edit disabled-input  -->
+					<div id="importResponse">
                     @if($questionAnswers)
                     @foreach($questionAnswers as $data)                    
                     <div class="new_fields_edit">
                         <div>
                             <div class="form-group row">
                                 <div class="col-md-6">
-                                    <input type="text" name="more[answer][]" class="form-control  disabled-input" value="{{$data->title}}" placeholder="Enter answer">
+                                    <input type="text" name="more[answer][]" class="form-control  disabled-inputd" value="{{$data->title}}" placeholder="Enter answer">
                                 </div>
                                 <div class="col-md-3">
-                                    <input id="point" type="number" class="form-control  disabled-input" name="more[point][]" value="{{ $data->point }}" placeholder="Points">
+                                    <input id="point" type="number" class="form-control  disabled-inputd" name="more[point][]" value="{{ $data->point }}" placeholder="Points">
                                 </div>
                                 <div class="col-md-3">
                                     <a href="javascript:void(0);" class="add_new_row d-none btn btn-primary">Add More</a>
-                                    <a href="javascript:void(0);" class="remove_new_row btn btn-danger">Remove</a>
+                                    <a href="javascript:void(0);" data-id="{{$data->id}}" class="remove_edit_row btn btn-danger">Remove</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     @endforeach
-                    @endif                    
+                    @endif 
+                    </div>					
                   </div>
-               </div>
+              
+                  
+			 </div>
               
                <!-- end profile -->
-            </div>
-
+             </div>			
             <div class="card-footer">
                 <div class="col-sm-12 text-center">
                   <button type="submit" class="btn btn-primary mr-2">Submit</button>
@@ -112,6 +126,9 @@
 
        addField();
        removeField();
+	   removeAnswer();
+	   
+	  
    });
 
       function addField(){
@@ -155,6 +172,41 @@
               var removeVal = $(this).closest('.row').find(".item").val();
               $(this).closest('.row').remove();
           });
-      }      
+		  
+		 
+      }
+	  
+     function removeAnswer(){
+	    $(document).on('click', '.remove_edit_row', function(e){
+            var itemID=$(this).attr('data-id');
+            console.log(itemID);
+            $.ajax({
+                type:"delete",
+                url:"{{url('admin/destroyAnswerById')}}/"+itemID,
+				"headers": {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                //data: "user_id="+userId,
+                    //"_token = <?php //echo csrf_token() ?>",
+                success: function( data ) {
+                    if(data.statusCode >= 200){
+                        toastr.success(data.message);
+						$("#importResponse").load(location.href + " #importResponse");
+                    }
+                    if(data.statusCode >= 422){
+                        toastr.error(data.message);
+                    }
+                    // $("#VendorsTable").DataTable().ajax.reload();                      
+                },
+                error: function (data) {
+                    toastr.error('Error:', data);
+                }
+            });
+        });
+	 }	
+	
+
+
+	$('#myTextBox').bind('keyup paste', function(){
+        this.value = this.value.replace(/[^0-9]/g, '');
+  });
    </script>
 @endpush

@@ -34,15 +34,24 @@ class HomeController extends Controller
             $returnArr = $userObj->getResponseArr();
             //calculate therapist rating
             $callLogs = $callLogs->getAllTherapistCallLog($userObj->id);
+           
             $addRating = 0;
-            $totalRating = 1;
+            $totalRating = 0;
             foreach ($callLogs as $callLog) {
                 if($callLog->ratings){
                     $addRating += $callLog->ratings->rating;
-                    $totalRating = $callLog->ratings->count();
+                    $totalRating++;
                 }
             }
-            $ratingAvg = $addRating/$totalRating;
+
+            $ratingAvg = '';
+
+            if(!empty($addRating))
+                $ratingAvg = $addRating/$totalRating;
+
+            $ratingAvg = round($ratingAvg,2);
+            
+
             $returnArr['rating'] = $ratingAvg;
 
             return returnSuccessResponse('Profile detail', $returnArr);

@@ -1,19 +1,19 @@
-{{-- Extends layout --}}
-@extends('layouts.admin.app')
+@extends('layouts.admin')
 
-{{-- Content --}}
+@section('title') Specialisms @endsection
+
 @section('content')
 
     <div class="card card-custom">
         <div class="card-header flex-wrap border-0 pt-6 pb-0">
             <div class="card-title">
-                <h3 class="card-label">Therapist Type
+                <h3 class="card-label">Specialisms
                     <!-- <div class="text-muted pt-2 font-size-sm">Datatable initialized from HTML table</div> -->
                 </h3>
             </div>
             <div class="card-toolbar">
                 <!--begin::Button-->
-                <a href="{{route('therapisttypes.create')}}" class="btn btn-primary font-weight-bolder">
+                <a href="{{route('admin.therapisttypes.create')}}" class="btn btn-primary font-weight-bolder">
                 <span class="svg-icon svg-icon-md">
                     <!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
                     <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
@@ -24,7 +24,7 @@
                         </g>
                     </svg>
                     <!--end::Svg Icon-->
-                </span>New Therapist Type</a>
+                </span>New Specialism</a>
                 <!--end::Button-->
             </div>
         </div>
@@ -33,8 +33,10 @@
             <table class="table table-bordered table-hover" id="therapist_types">
                 <thead>
                 <tr>
-                    <th>Therapist Type ID</th>
+                    <th>Specialism ID</th>
                     <th>Title</th>
+                    <th>Min Point</th>
+                    <th>Max Point</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -47,33 +49,22 @@
     </div>
 
 @endsection
+@push('page_script')
 
-{{-- Styles Section --}}
-@section('styles')
-    <link href="{{ asset('assets/plugins/datatables.bundle.css') }}" rel="stylesheet" type="text/css"/>
-@endsection
-
-{{-- Scripts Section --}}
-@section('scripts')
-    {{-- vendors --}}
-    <script src="{{ asset('js/sweetalert.min.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('assets/plugins/datatables.bundle.js') }}" type="text/javascript"></script>
-    {{-- page scripts --}}
-    <script src="{{ asset('assets/plugins/basic/basic.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('js/app.js') }}" type="text/javascript"></script>
     <script>
-        var base_url ="{{url('/')}}";
         function getDataTable(){
             $('#therapist_types').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url:  base_url + "/admin/therapisttypes",
+                    url:  site_url + "/admin/therapisttypes",
                     type: 'GET',
                 },
                 columns: [
                     {data: 'id', name: 'id', orderable: false, searchable: false},
                     { data: 'title', name: 'title' },
+                    { data: 'min_point', name: 'min_point' },
+                    { data: 'point', name: 'point' },
                     { data: 'action', name: 'action', orderable: false, searchable: false},
                 ],
                 order: [[1, 'desc']]
@@ -81,7 +72,7 @@
         }
 
         $(document).on('click', '.delete-datatable-record', function(e){
-            let url  = base_url + "/admin/therapisttypes/" + $(this).attr('data-id');
+            let url  = site_url + "/admin/therapisttypes/" + $(this).attr('data-id');
             let tableId = 'therapist_types';
             deleteDataTableRecord(url, tableId);
         });
@@ -92,4 +83,4 @@
         });
 
     </script>
-@endsection
+@endpush

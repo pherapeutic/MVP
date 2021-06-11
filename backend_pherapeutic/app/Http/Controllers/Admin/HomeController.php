@@ -37,6 +37,12 @@ class HomeController extends Controller
         $totalAppointments = Appointments::count();
         $contactUs = Contactus::count();
         $monthlys = User::monthly();
+		// $totalClient = 0;
+        // $totalTherapist = 0;
+
+        // $totalAppointments = 0;
+        // $contactUs = 0;
+        // $monthlys = 0;
         $monthlyPayments = json_encode($monthlys['payments']);
         $users = json_encode($monthlys['users']);
         $therapists = json_encode($monthlys['therapists']);

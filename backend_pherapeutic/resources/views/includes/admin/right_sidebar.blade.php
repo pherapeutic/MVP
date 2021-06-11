@@ -18,7 +18,12 @@
         <!--begin::Header-->
         <div class="d-flex align-items-center mt-5">
             <div class="symbol symbol-100 mr-5">
+                @if(empty($userObj->image))
                 <div class="symbol-label" style="background-image:url('{{asset('assets/media/users/300_21.jpg')}}')"></div>
+                @else
+                <img src="{{asset('storage/profile-images/'.$userObj->image)}}">
+                @endif
+
                 <i class="symbol-badge bg-success"></i>
             </div>
             <div class="d-flex flex-column">
@@ -43,6 +48,12 @@
                             <span class="navi-text text-muted text-hover-primary">{{ $userObj->email }}</span>
                         </span>
                     </a>
+
+                    <a href="/admin/user/{{$userObj->id}}/edit" class="btn btn-sm btn-light-primary font-weight-bolder py-2 px-5">Edit Profile</a></br>
+                    </br>
+                     <a href="/admin/change-password" class="btn btn-sm btn-light-primary font-weight-bolder py-2 px-5">Change Password</a></br>
+                    </br>
+
                     <form action="{{ route('logout') }}" method="post">
                         @csrf
                         <button type="submit" class="btn btn-sm btn-light-primary font-weight-bolder py-2 px-5">Sign Out</button>

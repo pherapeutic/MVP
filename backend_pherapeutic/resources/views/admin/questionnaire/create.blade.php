@@ -31,7 +31,15 @@
                         @endif
                      </div>
 <!--                   </div> -->
-
+                       <div class="form-group">
+						<label>Ordering</label>
+						<input type="text" name="ordering" id="myTextBox" class="form-control disabled-inputs"  value="{{old('ordering')}}" placeholder="Enter Ordering">
+						 @if ($errors->has("ordering"))
+                           <span class="form-text text-danger">
+                              {{ $errors->first("ordering") }}
+                           </span>
+                        @endif
+					</div>	
                     <div class="new-fields-html d-none">
                         <div>
                             <div class="form-group row">

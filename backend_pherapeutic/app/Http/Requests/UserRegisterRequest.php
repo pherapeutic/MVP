@@ -36,16 +36,16 @@ class UserRegisterRequest extends FormRequest
             'role' => 'required|boolean',
             'languages' => 'required',
             'device_type' => 'required|boolean',
-            'fcm_token' => 'required'            
+            //'fcm_token' => 'required'            
         ];
 
         if($request->role == \App\Models\User::THERAPIST_ROLE){
             $rulesArr['experience'] = 'required';
-            $rulesArr['qualification'] = 'required';
+            //$rulesArr['qualification'] = 'required';
             $rulesArr['specialism'] = 'required';
             $rulesArr['address'] = 'required';
-            $rulesArr['latitude'] = 'required';
-            $rulesArr['longitude'] = 'required';
+            //$rulesArr['latitude'] = 'required';
+            //$rulesArr['longitude'] = 'required';
         }
         return $rulesArr;
     }
@@ -62,7 +62,7 @@ class UserRegisterRequest extends FormRequest
             'last_name.required'  => 'Please enter last name',
 
             'email.required'  => 'Please enter your email',
-            'email.unique'  => 'This email already exist',
+            'email.unique'  => 'This email address is already registered.',
             'email.email'  => 'Please enter a valid email',
 
             'password.required' => 'Please enter the password',

@@ -110,7 +110,7 @@ class TherapistType extends Model
         return $userTherapistTypeColl;
     }
 
-    public function searchTherapistList($userPoints, $latitude, $longitude){
+    public function searchTherapistList($userPoints, $latitude, $longitude,$default){
         //To Do check from appoinment use in this query
         // $user_id=2;
         //$therapist_id =DB::table('')->pluck('id')->toArray();
@@ -163,17 +163,23 @@ class TherapistType extends Model
                                     //         $join->on('appointments.therapist_id', '=', 'users.id')
                                     //             ->whereIn('appointments.status', ['2', '3', '4']);
                                     //         })
-                                    $userTherapistTypeColl= $userTherapistTypeColl_query->where('therapist_types.min_point','<=', $userPoints)
-                                    ->where('therapist_types.point','>=', $userPoints)
-                                    ->where('users.online_status', '1')
-                                    ->selectSub('(111.111 *
-                                        DEGREES(ACOS(LEAST(1.0, COS(RADIANS(therapist_profiles.latitude))
-                                            * COS(RADIANS('.$latitude.'))
-                                            * COS(RADIANS(therapist_profiles.longitude - '.$longitude.'))
-                                            + SIN(RADIANS(therapist_profiles.latitude))
-                                            * SIN(RADIANS('.$latitude.'))))))','distance_in_km')
-                                    ->orderBy('distance_in_km','ASC')
-                                    ->get();
+                                   
+                                    $distance = 10;
+
+                                    if($default !=2){
+                                     $userTherapistTypeColl= $userTherapistTypeColl_query->where('therapist_types.min_point','<=', $userPoints)
+                                    ->where('therapist_types.point','>=', $userPoints);
+
+                                    }
+
+                                    $userTherapistTypeColl= $userTherapistTypeColl_query->where('users.online_status', '1');
+                                     if(!empty($latitude) && !empty($longitude)){
+                                        $userTherapistTypeColl = $userTherapistTypeColl->selectSub('( 6371 * acos( cos( radians(' . $latitude . ') ) * cos( radians( therapist_profiles.latitude ) ) * cos( radians( therapist_profiles.longitude ) - radians(' . $longitude . ') ) + sin( radians(' . $latitude .') ) * sin( radians(therapist_profiles.latitude) ) ) )','distance_in_km')->having('distance_in_km', '<', $distance)
+                                    ->orderBy('distance_in_km','ASC');
+                                        
+                                    }
+                                    
+                                    $userTherapistTypeColl = $userTherapistTypeColl->get();
                                     
                                     //dd($userTherapistTypeColl_query);
 

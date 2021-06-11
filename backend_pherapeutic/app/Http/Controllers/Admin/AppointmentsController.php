@@ -8,6 +8,7 @@ use App\Models\Appointments;
 use App\Models\User;
 use App\Models\Rating;
 use Carbon\Carbon;
+use App\Models\UserAnswers;
 class AppointmentsController extends Controller
 {
     /**
@@ -127,7 +128,8 @@ class AppointmentsController extends Controller
         if(!$appointmentObj){
             return redirect()->route('admin.appointments.index')->with('error_message', 'Appointment not found.');            
         }
-        return view('admin.appointments.show',compact('appointmentObj'));
+        $questions = UserAnswers::where(['user_id'=>$appointmentObj->user_id])->get();
+        return view('admin.appointments.show',compact('appointmentObj','questions'));
     }
 
     /**

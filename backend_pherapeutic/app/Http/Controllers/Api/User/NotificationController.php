@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\User;
 use Illuminate\Http\Request;
 use Ixudra\Curl\Facades\Curl;
 use App\Http\Controllers\Controller;
-use App\User;
+use App\Models\User;
 use App\Driver;
 use App\OpenOrder;
 use App\OrderDriver;
@@ -184,6 +184,8 @@ class NotificationController extends Controller
             "statusCode" => 200,
             "message" => 'Video call notification has been send to Therapist successfully'
         );
+		
+		// print_r($result);die;
         return response()->json($result);        
 
     }

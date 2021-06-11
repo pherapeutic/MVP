@@ -26,10 +26,11 @@ class QuestionareController extends Controller
      */
 
     public function getQuestions(Questions $questions){
+		
         $questionObj = $questions->getAllQuestions();
         $returnArr = array();
         foreach ($questionObj as $question) {
-            $getResponseData = $question->getResponseArr();
+            $getResponseData = mb_convert_encoding($question->getResponseArr(), 'UTF-8', 'UTF-8');
             array_push($returnArr, $getResponseData);
         }
         if(!empty($returnArr)){

@@ -17,6 +17,9 @@ use App\Notifications\SendEmailVerificationOTP;
 use Validator;
 use Auth;
 use Carbon\Carbon;
+use Laravel\Socialite\Facades\Socialite;
+
+use App\Models\UserQualification;
 
 class LoginController extends Controller
 {
@@ -35,7 +38,7 @@ class LoginController extends Controller
             'email' => 'required|email',
             'password' => 'required',
             'device_type' => 'required|boolean',
-            'fcm_token' => 'required'
+            // 'fcm_token' => 'required'
         ];
 
         $messages = [
@@ -44,7 +47,7 @@ class LoginController extends Controller
             'password.required' => 'Please enter your password',
             'device_type.required'  => 'Please select device type',
             'device_type.boolean' => 'Invalid device type',
-            'fcm_token.required'  => 'Please enter fcm token'
+            // 'fcm_token.required'  => 'Please enter fcm token'
         ];
 
         $inputArr = $request->all();
@@ -79,10 +82,11 @@ class LoginController extends Controller
             return $this->returnResponse($response);         
         }
         //end otp verified check
-        $userObj->fill([
-            'fcm_token' => $request->input('fcm_token')
-        ]);        
+        // $userObj->fill([
+            // 'fcm_token' => $request->input('fcm_token')
+        // ]);        
         $userObj->save();
+
 
         $authToken = $userObj->createToken('authToken')->plainTextToken;
         $returnArr = $userObj->getResponseArr();
@@ -165,7 +169,7 @@ class LoginController extends Controller
         return returnSuccessResponse('Password reset successfully');
     }
 
-    public function socialLogin(Request $request, User $user, TherapistProfile $therapistProfile, UserTherapistType $userTherapistType, UserLanguage $userlanguage){
+    public function socialLogin(Request $request, User $user, UserQualification $userqualification,TherapistProfile $therapistProfile, UserTherapistType $userTherapistType, UserLanguage $userlanguage){
 
         //Social login when user visit second time
         $userToken = $request->get('social_token');
@@ -190,24 +194,26 @@ class LoginController extends Controller
         $rules = [
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'required|email|unique:users,email,NULL,id,deleted_at,NULL',
+            //'email' => 'required|email|unique:users,email,NULL,id,deleted_at,NULL',
             'login_type' => 'required',
             'social_token' => 'required|unique:users,social_token,NULL,id,deleted_at,NULL',
             'role' => 'required|boolean',
             'languages' => 'required',
-            'device_type' => 'required|boolean',
-            'fcm_token' => 'required',
-            'image' => 'required',
+            'device_type' => 'required|boolean'
+            //'fcm_token' => 'required'
+            //'image' => 'required',
         ];
+        //$message = ['email.unique'=>'This email address is already registered.'];
+
         $role = $request['role'];
         //for Therapist
         if( $role =='1'){
             $rules['experience'] = 'required';
             $rules['qualification'] = 'required';
             $rules['specialism'] = 'required';
-            $rules['address'] = 'required';
-            $rules['latitude'] = 'required';
-            $rules['longitude'] = 'required';
+            //$rules['address'] = 'required';
+            //$rules['latitude'] = 'required';
+            //$rules['longitude'] = 'required';
         }                
         $inputArr = $request->all();
         $validator = Validator::make($inputArr, $rules);
@@ -224,8 +230,10 @@ class LoginController extends Controller
             'email' => $request->get('email'),
             'role' => $request->get('role'),
             'image' => $request->get('image'),
+            'fcm_token' => $request->input('fcm_token'),
             'email_verified_at' => Carbon::now()
         ];
+
 
         $userObj = $user->saveNewUser($userArr);
 
@@ -245,10 +253,22 @@ class LoginController extends Controller
         }
 
         if($userObj->role == User::THERAPIST_ROLE){
+			
+			$userqualificationArr=array();
+			 $qualificationsArr = $request->get('qualification');
+			   if(is_array($qualificationsArr)){
+				foreach ($qualificationsArr as $key => $qualificationId) {
+					$userqualificationArr = [
+						'user_id' => $userObj->id,
+						'qualification_id' => $qualificationId
+					];
+					$userqualification->saveNewUserQualification($userqualificationArr);
+				}
+            }
             $therapistPofileArr = [
                 'user_id' => $userObj->id,
                 'experience' => $request->get('experience'),
-                'qualification' => $request->get('qualification'),
+                // 'qualification' => $request->get('qualification'),
                 'address' => $request->get('address'),
                 'latitude' => $request->get('latitude'),
                 'longitude' => $request->get('longitude')
@@ -268,15 +288,43 @@ class LoginController extends Controller
         }
         
         
-        try{
-            $userObj->notify(new SendEmailVerificationOTP($user));
-        } catch(\Exception $ex){
-            \Log::error($ex);
-        }
+        // try{
+        //     $userObj->notify(new SendEmailVerificationOTP($user));
+        // } catch(\Exception $ex){
+        //     \Log::error($ex);
+        // }
         $authToken = $userObj->createToken('authToken')->plainTextToken;
         $returnArr = $userObj->getResponseArr();
         $returnArr['auth_token'] = $authToken;
 
         return returnSuccessResponse('Your account created successfully.', $returnArr);
     }
+
+    public function appleLogin(Request $request)
+    {
+        $rules = [
+        'apple_token' => 'required'
+        ];
+        $token = $request->apple_token;
+
+
+        $user = User::where(['social_token'=>$token])->first();
+        $model = new User;
+        $inputArr = $request->all();
+        $validator = Validator::make($inputArr, $rules);
+        if ($validator->fails()) {
+            $validateerror = $validator->errors()->all();
+            return $this->validationErrorResponse($validateerror[0]);
+        }
+
+        $provider = 'apple';
+        $token = $request->apple_token;
+
+
+        $socialUser = Socialite::driver($provider)->userFromToken($token);
+
+        return returnSuccessResponse('Data sent successfully.', $model->appleJson($socialUser));
+                
+    }
+
 }

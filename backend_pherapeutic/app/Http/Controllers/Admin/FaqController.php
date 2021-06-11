@@ -28,6 +28,9 @@ class FaqController extends Controller
                 ->addColumn('answer', function ($faqs) {
                     return ($faqs->answers) ? ($faqs->answers) : 'N/A';
                 })
+                 ->addColumn('type_id', function ($faqs) {
+                    return $faqs->getUserType();
+                })
                 ->addColumn('action', function ($faqs) {
                     $btn = '';
                     $btn = '<a href="faq/'.$faqs->id.'/edit" title="Edit"><i class="fas fa-edit mr-1"></i></a>';
@@ -51,6 +54,7 @@ class FaqController extends Controller
         //dd(10);
         $inputArr['questions'] = $request->get('questions');
         $inputArr['answers'] = $request->get('answers');
+        $inputArr['type_id'] = $request->get('type_id');
         $faq = $faq->saveNewFaq($inputArr);
         if(!$faq){
             return redirect()->back()->with('error', 'Unable to add faq. Please try again later.');
@@ -82,6 +86,7 @@ class FaqController extends Controller
 
         $inputArr['questions'] = $request->get('questions');
         $inputArr['answers'] = $request->get('answers');
+        $inputArr['type_id'] = $request->get('type_id');
         $hasUpdated = $faq->updateFaq($id, $inputArr);
         
         if(!$hasUpdated){

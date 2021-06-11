@@ -19,6 +19,7 @@ class Faq extends JsonResource
             'id' => $this->id,
             'questions' => $this->questions,
             'answers' => $this->answers,
+            'type_id'=>$this->type_id,
             'created_at' =>  date('Y-m-d', strtotime($this->created_at)),
             'updated_at' =>  date('Y-m-d', strtotime($this->updated_at))
         ];

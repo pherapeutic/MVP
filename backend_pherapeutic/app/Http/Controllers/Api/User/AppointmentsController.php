@@ -81,17 +81,25 @@ class AppointmentsController extends Controller
             return $this->notAuthorizedResponse('User is not authorized');
         }
         $appointments = $appointments->getAllClientAppointments($userObj->id);
-        foreach ($appointments as $appointment) {
+		
+		
+        // foreach ($appointments as $appointment) {
             $paid = DB::table('call_logs')
-            ->orderBy('id', 'DESC')
-            ->join('payment_details', 'call_logs.id', '=', 'payment_details.call_logs_id')
-            ->join('users', 'users.id', '=', 'call_logs.therapist_id')
-            ->select('call_logs.id', 'call_logs.user_id','call_logs.therapist_id',
+              ->select('call_logs.id', 'call_logs.user_id','call_logs.therapist_id',
              'payment_details.amount', 'payment_details.transfer_amount', 
-             'payment_details.refund_amount','users.first_name','users.last_name','users.image as pic')
-            ->first();
-
-            $rating = Rating::where('id', '=', $appointment->id)->first();
+             'payment_details.refund_amount','users.first_name','users.last_name','users.image as pic','feedback_notes.feedback_note as comment','ratings.rating')
+			 ->join('payment_details', 'call_logs.id', '=', 'payment_details.call_logs_id')
+            ->join('users', 'users.id', '=', 'call_logs.therapist_id')
+            ->join('ratings','call_logs.caller_id','=', 'ratings.call_logs_id')
+            ->join('feedback_notes','call_logs.caller_id','=', 'feedback_notes.call_logs_id')
+			  ->orderBy('feedback_notes.id', 'DESC')
+            ->get();
+		
+			/*$getCallLogs=DB::table('call_logs')->where('user_id',$userObj->id)->where('therapist_id',$appointment->therapist_id)->first();
+           // $aa[]=$appointment->id;
+		   // print_r($getCallLogs);die;
+            $rating = Rating::where('call_logs_id', $getCallLogs->caller_id)->first();
+			 // print_r($getCallLogs->caller_id);die;
             if($rating){
                 $appointment['rating'] = $rating->rating;
                 $appointment['comment'] = $rating->comment;                
@@ -105,11 +113,11 @@ class AppointmentsController extends Controller
             else{
                 $appointment['rating'] ="0";
                 $appointment['comment'] ="";
-            }
-        }
-
-        if(!empty($appointments)){
-            return returnSuccessResponse('Appointments list',$appointments);
+            }*/
+        // }
+         // print_r($aa);die;
+        if(!empty($paid)){
+            return returnSuccessResponse('Appointments list',$paid);
         }else{
             return returnNotFoundResponse('Not found');   
         }

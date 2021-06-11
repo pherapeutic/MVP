@@ -49,7 +49,7 @@ class ContacustController extends BaseController
             \Log::error($ex);
         }
 
-        return $this->sendResponse(new contactusResource($input2), 'Thank you for contact us!');
+        return $this->sendResponse(new contactusResource($input2), 'Thank you!');
 
     }
 }

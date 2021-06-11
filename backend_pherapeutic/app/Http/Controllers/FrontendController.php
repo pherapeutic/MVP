@@ -114,4 +114,8 @@ class FrontendController extends Controller
         //return redirect('/connectwithstrip');    
     }
 
+    public function stripeRedirect()
+    {
+        return view('striperedirecturl');       
+    }
 }

@@ -43,6 +43,18 @@
                         @endif
                      </div>
                   </div>
+
+                   <div class="col-md-6">
+                     <div class="form-group">
+                     <label>User Type</label>
+
+                     <select name ="type_id" class="form-control" required>
+                        <option value="">Select User Type</option>
+                        <option value="0" {{$faq->type_id == 0?"selected":""}}>Client</option>
+                        <option value="1" {{$faq->type_id == 1?"selected":""}}>Therapist</option>
+                     </select>
+                     </div>
+               </div>
                </div>
           
 

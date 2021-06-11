@@ -35,6 +35,10 @@ class TherapistTypeController extends Controller
                 })
                 ->addColumn('title', function ($TTypes) {
                     return ($TTypes->title) ? ($TTypes->title) : 'N/A';
+                })->addColumn('min_point', function ($TTypes) {
+                    return $TTypes->min_point;
+                })->addColumn('point', function ($TTypes) {
+                    return ($TTypes->point) ? ($TTypes->point) : 'N/A';
                 })
                 ->addColumn('action', function ($TTypes) {
                     $btn = '';
@@ -69,22 +73,27 @@ class TherapistTypeController extends Controller
     {
         //echo"<pre>";print_r($request->all());die;
         $rules = [
-            'title' => 'required'
+            'title' => 'required',
+            'min_point'=>'required|numeric|min:0',
+            'max_point' => 'required|numeric|gt:min_point|min:0'
         ];
 
 
         $input = $request->all();
+
         $validator = Validator::make($input, $rules);
         if ($validator->fails()) {
+
             return redirect()->back()->withErrors($validator)->withInput();
         }else{
-            $inputArr = $request->except(['_token']);
+            $inputArr = $request->except(['_token','max_point']);
+            $inputArr['point'] = $request->input('max_point');
             $typesObj = $TTypes->saveNewTherapistType($inputArr);
             if(!$typesObj){
-                return redirect()->back()->with('error', 'Unable to add therapist type. Please try again later.');
+                return redirect()->back()->with('error_message', 'Unable to add therapist type. Please try again later.');
             }
 
-            return redirect()->route('therapisttypes.index')->with('success', 'Therapist type account added successfully.');
+            return redirect()->route('admin.therapisttypes.index')->with('success_message', 'Specialism added successfully.');
         }
     }
 
@@ -126,8 +135,10 @@ class TherapistTypeController extends Controller
     public function update(Request $request, $id)
     {
         //echo"<pre>";print_r($request->all());die;
-         $rules = [
-            'title' => 'required'
+          $rules = [
+            'title' => 'required',
+            'min_point'=>'required|numeric|min:0',
+            'max_point' => 'required|numeric|gt:min_point|min:0'
         ];
 
         $input = $request->all();
@@ -141,11 +152,12 @@ class TherapistTypeController extends Controller
                 return redirect()->back()->with('error', 'This therapist type does not exist');
             }
 
-            $inputArr = $request->except(['_token', 'therapisttype_id', '_method']);
+            $inputArr = $request->except(['_token', 'therapisttype_id', '_method','max_point']);
+            $inputArr['point'] = $request->input('max_point');
             $hasUpdated = $TTypes->updateTherapistType($id, $inputArr);
 
             if($hasUpdated){
-                return redirect()->route('therapisttypes.index')->with('success', 'Therapist type updated successfully.');
+                return redirect()->route('admin.therapisttypes.index')->with('success', 'Specialism updated successfully.');
             }
             return redirect()->back()->with('error', 'Unable to update Therapist type. Please try again later.');
         }
@@ -167,7 +179,7 @@ class TherapistTypeController extends Controller
 
         $hasDeleted = $typesObj->delete();
         if($hasDeleted){
-            return returnSuccessResponse('Therapist type deleted successfully');
+            return returnSuccessResponse('Specialism deleted successfully');
         }
 
         return returnErrorResponse('Something went wrong. Please try again later');

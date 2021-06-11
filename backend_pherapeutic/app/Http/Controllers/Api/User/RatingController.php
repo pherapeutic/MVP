@@ -34,14 +34,33 @@ class RatingController extends Controller
         if (!$userObj) {
             return $this->notAuthorizedResponse('User is not authorized');
         }
+
+         $addRating = 0;
+        $totalRating = 0;
+
       
         $callLogs = $callLogs->getAllTherapistCallLog($userObj->id);
-       
+
+
         $responeArr = array();
         foreach ($callLogs as $callLog) {
+
+        if($callLog->ratings){
+
+
+             $addRating += $callLog->ratings->rating;
+
+            $totalRating++;
         
             array_push($responeArr, $callLog->ratings);
         }
+    }
+
+       $ratingAvg = "";
+
+       if(!empty($addRating))
+          $ratingAvg = $addRating/$totalRating;
+
         if(!empty($responeArr)){
             return returnSuccessResponse('Rating list',$responeArr);
         }else{

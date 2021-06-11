@@ -79,7 +79,7 @@ class PaymentController extends Controller
 
     try{
       if(!$user->stripe_id){
-        $customer = \Stripe\Customer::create(['email' => $user->email]);
+        $customer = \Stripe\Customer::create(['email' => $user->email,'description'=>'']);
         $user->stripe_id = $customer['id'];
       } else {
         \Stripe\Customer::update(
@@ -113,7 +113,7 @@ class PaymentController extends Controller
       if($userCardObj){
         $result = array(
           "statusCode" => 200,  // $this-> successStatus
-          "message" => "success"
+          "message" => "Your card has been added sucessfully."
         );
   
         return response()->json($result);
@@ -401,7 +401,7 @@ class PaymentController extends Controller
         $appointmentObj->status = '2';
         $appointmentObj->save();
 
-      
+     
         $result = [
           "statusCode" => 200, 
           "message" => 'Payment amount hold in you card.',
@@ -605,10 +605,50 @@ class PaymentController extends Controller
     }
 
     $input = $request->all();
+	
+	 //Get appoint therapist for this appointmet
+    $callTherapist = User::find($input['therapist_id']);
+
+    if(!$callTherapist){
+        $result = array(
+          "statusCode" => 404,  // $this-> successStatus
+          "message" => 'Therapist not found.'
+        );
+      return response()->json($result );      
+    }
+    //Check therapist is connect with stripe or not
+    // if(!$callTherapist->stripe_connect_id){
+        // $result = array(
+          // "statusCode" => 401,  // $this-> successStatus
+          // "message" => 'Call could not be connect.'
+        // );
+      // return response()->json($result );
+    // }
+
+    //Check therapist is Online or not
+    if(!$callTherapist->online_status){
+        $result = array(
+          "statusCode" => 401,  // $this-> successStatus
+          "message" => 'Call could not be connected, Therapist is off-line.'
+        );
+      return response()->json($result );
+    }
 
     //check on going call
     $lastCallObj = $callLogs->getNotEndedCall($user->id);
-    if($lastCallObj){
+	
+	$countFreeCallLogs=CallLogs::where('user_id',$user->id)->where('call_status','2')->where('ended_at','!=',null)->get()->count();
+	// print_r($countFreeCallLogs);die;
+	if($countFreeCallLogs<=3){
+		$result=$this->freeCallToUserTherapist($callerId,$user->id,$input['therapist_id']);
+		return response()->json($result); 
+	}
+	
+	 if(!empty($callTherapist->is_pro_bono_work)){
+		$result=$this->freeCallToUserTherapist($callerId,$userId,$input['therapist_id']); 
+	    return response()->json($result); 
+	 }
+    /*if($lastCallObj){
       //make payment
       $paymentDetailsObj = PaymentDetails::where('call_logs_id', $lastCallObj->id)
                             ->where('is_captured', '0')->first();
@@ -639,14 +679,26 @@ class PaymentController extends Controller
           $amount = $lastCallObj->duration;
           $amountPercentage = (($amount*$applicationCharge)/100);
           $therapistAmount = $amount-$amountPercentage;
+		  
+		  if(empty($callTherapist->stripe_connect_id)){
+			$accountID=\Config::get('services.stripe.admin_account_id');
+		}else{
+			$accountInfo=$this->getAccountVerifyStripeOrNot($userObj->stripe_connect_id);
+			if(empty($accountInfo)){
+				 $accountID=\Config::get('services.stripe.admin_account_id');
+			}else{
+				 $accountID=$callTherapist->stripe_connect_id;
+			}
+		}
+		
 
           // Create a Transfer to a connected therapist account
           $transfer = \Stripe\Transfer::create([
             'amount' => $therapistAmount*100,
             'currency' => \Config::get('services.stripe.currency'),
             'source_transaction' => $paymentDetailsObj->charge_id,
-            'destination' => $appointTherapist->stripe_connect_id,
-            'transfer_group' => 'Transfer done for caller id #'.$lastCallObj->id.', transfer to account:'.$appointTherapist->stripe_connect_id.'',
+            'destination' => $accountID,
+            'transfer_group' => 'Transfer done for caller id #'.$lastCallObj->id.', transfer to account:'.$appointTherapist->stripe_connect_id.' and therapist id: '.$request->therapist_id,
           ]);
           //store data in payment details model
           if($transfer){
@@ -715,35 +767,9 @@ class PaymentController extends Controller
             return response()->json($result );
         }
       }
-    }
+    }*/
 
-    //Get appoint therapist for this appointmet
-    $callTherapist = User::find($input['therapist_id']);
-
-    if(!$callTherapist){
-        $result = array(
-          "statusCode" => 404,  // $this-> successStatus
-          "message" => 'Therapist not found.'
-        );
-      return response()->json($result );      
-    }
-    //Check therapist is connect with stripe or not
-    if(!$callTherapist->stripe_connect_id){
-        $result = array(
-          "statusCode" => 401,  // $this-> successStatus
-          "message" => 'Call could not be connect.'
-        );
-      return response()->json($result );
-    }
-
-    //Check therapist is Online or not
-    if(!$callTherapist->online_status){
-        $result = array(
-          "statusCode" => 401,  // $this-> successStatus
-          "message" => 'Call could not be connected, Therapist is off-line.'
-        );
-      return response()->json($result );
-    }
+   
     //create call
     $callCreateArr = [
         'caller_id' => $callerId,
@@ -764,7 +790,7 @@ class PaymentController extends Controller
       $charge = \Stripe\Charge::create([
         'amount' => \Config::get('services.stripe.amount')*100,
         'currency' => \Config::get('services.stripe.currency'),
-        'description' => 'Payment to pherapeutic for caller id '.$callerId.'',
+        'description' => 'Payment to pherapeutic for caller id '.$callerId.' and therapist id '.$input['therapist_id'],
         'customer' => $user->stripe_id,
         'source' => $input['card_id'],
         'capture' => false,
@@ -791,15 +817,18 @@ class PaymentController extends Controller
         ];
 
         PaymentDetails::create($callPaymentArr);
+		$appoint=$this->postAppointment($user->id,$input['therapist_id']);
       
         $result = [
           "statusCode" => 200, 
           "message" => 'Payment amount hold in you card.',
           "data" => [
             'charge_id' => $charge['id'],
-            'caller_id' => $hasCreatedCall->caller_id
+            'caller_id' => $hasCreatedCall->caller_id,
+            'appointment_id  ' => $appoint
           ]
         ];
+		 // print_r($charge);die; 
         return response()->json($result);        
       //}
 
@@ -813,5 +842,192 @@ class PaymentController extends Controller
 
 
   }
+  
+  public function freeCallToUserTherapist($callerId,$userId,$therapistId){
+	   //create call
+    $callCreateArr = [
+        'caller_id' => $callerId,
+        'user_id' => $userId,
+        'therapist_id' => $therapistId
+    ];
+    $hasCreatedCall = CallLogs::create($callCreateArr);
+    if(!$hasCreatedCall){
+        $result = array(
+          "statusCode" => 401,  // $this-> successStatus
+          "message" => 'Call could not be connected, Internal server error.'
+        );
+      return response()->json($result );      
+    }
 
+    try{
+
+       //if($charge['paid']){
+        $callPaymentArr = [
+            'call_logs_id' => $hasCreatedCall->id,
+            'charge_id' =>null,
+            'txn_id' => null,
+            'amount' => 0.00,
+            'is_captured' => '1',
+            'card_id' => null
+        ];
+
+        PaymentDetails::create($callPaymentArr);
+		$appoint=$this->postAppointment($userId,$therapistId);
+      
+        $result = [
+          "statusCode" => 200, 
+          "message" => 'This call for free.',
+          "data" => [
+            'charge_id' =>null,
+            'caller_id' => $hasCreatedCall->caller_id,
+            'appointment_id  ' => $appoint
+          ]
+        ];
+		 // print_r($charge);die; 
+        return $result;       
+      //}
+
+    } catch(\Exception $ex){
+        $result = array(
+            "statusCode" => 401,
+            "message" => $ex->getMessage()
+        );
+        return response()->json($result );
+    }
+
+  }
+  
+  public function postAppointment($user_id,$therapist_id){
+
+            $appointments=new Appointments();
+			  
+            $inputArr['user_id'] = $user_id;
+            $inputArr['therapist_id'] = $therapist_id;
+            $respone = $appointments->saveNewAppointment($inputArr);
+			
+		 return $respone['id'];
+            
+    }
+
+  public function connectWithStripe(Request $request){
+
+    $code = $request->input('code');
+
+    $clientSecret = \Config::get('services.stripe.secret');
+    /* need to check*/
+    // $clientSecret = "sk_test_51Hc2GiHjeqWbGW6kopJKI80U2kZPr8WjuUkoGZfcu4b7IunarDQwXeCSwTG5cgBlSpZZIMMPj9dXNmNlm9ejYu9300EcvuYwrI";
+    $isError = false;
+
+    if(empty($code))
+      return returnNotFoundResponse("please send code.");   
+
+    \Stripe\Stripe::setApiKey($clientSecret);
+
+    try {
+            $response = \Stripe\OAuth::token([
+            'grant_type' => 'authorization_code',
+            'code' => $code,
+            ]);
+        } 
+    catch(\Stripe\Exception\CardException $e) {
+      // Since it's a decline, \Stripe\Exception\CardException will be caught
+      $isError = true;
+      $error = $e->getMessage();
+    } catch (\Stripe\Exception\RateLimitException $e) {
+      $isError = true;
+      $error = $e->getMessage();
+    } catch (\Stripe\Exception\InvalidRequestException $e) {
+        $isError = true;
+        $error = $e->getMessage();
+    } catch (\Stripe\Exception\AuthenticationException $e) {
+      // Authentication with Stripe's API failed
+      // (maybe you changed API keys recently)
+       $isError = true;
+       $error = $e->getMessage();
+    } catch (\Stripe\Exception\ApiConnectionException $e) {
+      // Network communication with Stripe failed
+        $isError = true;
+        $error = $e->getMessage();
+    } catch (\Stripe\Exception\ApiErrorException $e) {
+        $isError = true;
+        $error = $e->getMessage();
+    } catch (Exception $e) {
+      $isError = true;
+      $error = $e->getMessage();
+      // Something else happened, completely unrelated to Stripe
+    }
+    
+    if($isError)
+    {
+        $result = array(
+        "statusCode" => 401,
+        "message" => $error
+      );
+      return response()->json($result );
+    }
+    $user = Auth::user(); 
+
+    if(!empty($response->stripe_user_id)){
+
+      $user->stripe_connect_id = $response->stripe_user_id;     
+      if($user->save()){
+
+        return returnSuccessResponse('Account is connected!');
+
+      }
+    }
+
+    return returnNotFoundResponse("Something Went Wrong.");         
+
+  }
+
+  public function stripeData(){
+
+    $stripeKey = \Config::get('services.stripe.key');
+
+    // $secretIdTesting = \Config::get('services.stripe.secret_test');
+    // $clientIdTesting = \Config::get('services.stripe.client_id_test');
+    $secretId = \Config::get('services.stripe.secret');
+    $clientId = \Config::get('services.stripe.client_id');
+    // $redirect_url = config('app.APP_URL');
+    $redirect_url = url("stripeRedirect");
+
+    $data['stripe_connect_url'] = "https://connect.stripe.com/oauth/authorize?response_type=code&client_id=$clientId&amp;&scope=read_write&redirect_uri=$redirect_url";
+
+    $data['stripe_key'] = $stripeKey;
+    $data['secret_id'] = $secretId;
+    $data['client_id'] = $clientId;
+
+    return returnSuccessResponse('Data sent sucessfully.',$data);
+
+  }
+  
+  /**
+     * Created By Anil Dogra
+     * Created At 12-05-2021
+     * @var $request object of request class
+     * @var $user object of user class
+     * @return object with registered user id
+     * This function use to get account verify stripe or not
+     */
+	 
+	public function getAccountVerifyStripeOrNot($accountID){
+		 $secretId = \Config::get('services.stripe.secret');
+		 $stripe = new \Stripe\StripeClient($secretId);
+		  $account=$stripe->accounts->all([]);
+		  // print_r($account);die;
+			foreach($account as $key=>$value){
+				$arrayAcount[]=$value->id;
+			}
+			
+			if(in_array($accountID, $arrayAcount)){
+				return true;
+			}else{
+				return false;
+			}
+	}
+  
+ 
 }
+
+//17gmck134

@@ -13,6 +13,7 @@ use Validator;
 use Carbon\Carbon;
 use Auth;
 use Stripe;
+use App\Models\User;
 
 class CallLogsController extends Controller
 {
@@ -53,14 +54,16 @@ class CallLogsController extends Controller
             return returnNotFoundResponse('Call log not found');            
         }
 
+        $clientObject = User::find($callLogObj->user_id);
+        $therapistObject = User::find($callLogObj->therapist_id);
         //Calllog status update
         $callLogObj->duration = $inputArr['duration'];
 
-        $paymentDetailsObj = PaymentDetails::where('call_logs_id', $callLogObj->id)
-                                ->where('is_captured', '0')->first();
+        // $paymentDetailsObj = PaymentDetails::where('call_logs_id', $callLogObj->id)
+                                // ->where('is_captured', '0')->first();
 
         if($request->input('call_status')){
-            if($request->input('call_status') == '3'){
+           /* if($request->input('call_status') == '3'){
                 //Refund all amount when call decline
                 try{
                   $refund = \Stripe\Refund::create(['charge' => $paymentDetailsObj->charge_id]);
@@ -87,7 +90,7 @@ class CallLogsController extends Controller
                     );
                     return response()->json($result );
                 }
-            }
+            } */
 
             //Check the call status
             $call_status = array("1", "2", "3");
@@ -102,7 +105,7 @@ class CallLogsController extends Controller
             
             $callLogObj->call_status = $inputArr['call_status'];
         }
-        if($request->input('ended_at') == '1'){
+       /* if($request->input('ended_at') == '1'){
             //make payment when call end
             $appointTherapist = $callLogObj->therapist;
             try{
@@ -129,13 +132,24 @@ class CallLogsController extends Controller
               $amountPercentage = (($amount*$applicationCharge)/100);
               $therapistAmount = $amount-$amountPercentage;
 
+			   if(empty($therapistObject->stripe_connect_id)){
+					$accountID=\Config::get('services.stripe.admin_account_id');
+				}else{
+					$accountInfo=$this->getAccountVerifyStripeOrNot($therapistObject->stripe_connect_id);
+					if(empty($accountInfo)){
+						 $accountID=\Config::get('services.stripe.admin_account_id');
+					}else{
+						 $accountID=$therapistObject->stripe_connect_id;
+					}
+		       }
+		
               // Create a Transfer to a connected therapist account
               $transfer = \Stripe\Transfer::create([
                 'amount' => $therapistAmount*100,
                 'currency' => \Config::get('services.stripe.currency'),
                 'source_transaction' => $paymentDetailsObj->charge_id,
-                'destination' => $appointTherapist->stripe_connect_id,
-                'transfer_group' => 'Transfer done for caller id #'.$callLogObj->id.', transfer to account:'.$appointTherapist->stripe_connect_id.'',
+                'destination' => $accountID,
+                'transfer_group' => 'Transfer done for caller id #'.$callLogObj->id.', transfer to account:'.$accountID.' and therapist id :'.$therapistObject->id,
               ]);
               //store data in payment details model
               if($transfer){
@@ -166,8 +180,25 @@ class CallLogsController extends Controller
                 );
                 return response()->json($result );
             }
-        }
+        }*/
+		$callLogObj->ended_at = Carbon::now();           
+	    $callLogObj->call_status = '2';           
+	    $callLogObj->payment_status = '2';    
         $callLogObj->updated_at = Carbon::now();
+        $clientData = $clientObject->getResponseCalletIdArr();
+         $notificationData = [
+            'fcm_token' => $therapistObject->fcm_token,
+            'device_type' => $therapistObject->device_type,
+            'title' => ' Your call will end shortly.',
+            'message' => '',
+            'data' => $clientData
+        ];
+
+
+       //  if(($inputArr['duration'] >= 120) && $callLogObj->notification_sent_to_therapist!=1){
+       //  $callLogObj->sendNotificationToTherapist($notificationData);
+       //  $callLogObj->notification_sent_to_therapist = 1;
+       // }
         $hasUpdate = $callLogObj->save();
 
         if($hasUpdate){
@@ -212,15 +243,14 @@ class CallLogsController extends Controller
         }
 
         $callLogs = $callLogs->getAllClientCallLog($userObj->id);
-
         foreach ($callLogs as $callLog) {
-            $rating = Rating::where('call_logs_id', '=', $callLog->id)->first();
+            $rating = Rating::where('call_logs_id', $callLog->id)->first();
             if($rating){
-                $callLog['rating'] = $rating->rating;
-                $callLog['comment'] = $rating->comment;                
+                $callLogs['rating'] = $rating->rating;
+                $callLogs['comment'] = $rating->comment;                
             }else{
-                $callLog['rating'] ="0";
-                $callLog['comment'] ="";
+                $callLogss['rating'] ="0";
+                $callLogss['comment'] ="";
             }
         }
 
@@ -231,4 +261,28 @@ class CallLogsController extends Controller
         }
     }
     
+	/**
+     * Created By Anil Dogra
+     * Created At 31-03-2021
+     * @var $request object of request class
+     * @var $user object of user class
+     * @return object with registered user id
+     * This function use to get account verify stripe or not
+     */
+	 
+	public function getAccountVerifyStripeOrNot($accountID){
+		 $secretId = \Config::get('services.stripe.secret');
+		 $stripe = new \Stripe\StripeClient($secretId);
+		  $account=$stripe->accounts->all([]);
+		  // print_r($account);die;
+			foreach($account as $key=>$value){
+				$arrayAcount[]=$value->id;
+			}
+			
+			if(in_array($accountID, $arrayAcount)){
+				return true;
+			}else{
+				return false;
+			}
+	}
 }
