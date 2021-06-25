@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
-
+Route::post('fb_data_deletion','SocialDataController@dataDeletionCallback');
+Route::get('deletion_status/{id}','SocialDataController@deletionStatus');
 //connect vendor account
 Route::get('/stripeRedirect', 'FrontendController@stripeRedirect');
 Route::get('/connectwithstrip', 'FrontendController@connectwithstrip');
