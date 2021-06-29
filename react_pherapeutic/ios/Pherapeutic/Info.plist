@@ -25,7 +25,7 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>fb711749749453347</string>
+				<string>fb2919621365031834</string>
 			</array>
 		</dict>
 		<dict>
@@ -42,7 +42,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FacebookAppID</key>
-	<string>711749749453347</string>
+	<string>2919621365031834</string>
 	<key>FacebookDisplayName</key>
 	<string>pherapeutic</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
