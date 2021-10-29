@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Pherapeutic.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>DDE004520DD3ADCE0C7A7A10418DBCA23BE46BC1</string>
+				<key>dateExpires</key>
+				<string>31/10/21</string>
+				<key>type</key>
+				<string>Apple Distribution</string>
+			</dict>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>YG6SRDRW2J.com.itech.pherapeutic</string>
+				<key>com.apple.developer.team-identifier</key>
+				<string>YG6SRDRW2J</string>
+				<key>get-task-allow</key>
+				<false/>
+				<key>keychain-access-groups</key>
+				<array>
+					<string>YG6SRDRW2J.com.itech.pherapeutic</string>
+				</array>
+			</dict>
+			<key>name</key>
+			<string>Pherapeutic.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>0714e9c8-36ac-434a-8659-2eed7a75d6ec</string>
+				<key>name</key>
+				<string>iOS Team Ad Hoc Provisioning Profile: com.itech.pherapeutic</string>
+			</dict>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>YG6SRDRW2J</string>
+				<key>name</key>
+				<string>Dizzi Globile Pty Ltd</string>
+			</dict>
+		</dict>
+	</array>
+</dict>
+</plist>

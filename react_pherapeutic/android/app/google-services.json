@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "313896155549",
+    "project_id": "pherapeutic-8254a",
+    "storage_bucket": "pherapeutic-8254a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:313896155549:android:f0dffe05ff2c470633d774",
+        "android_client_info": {
+          "package_name": "com.pherapeutic"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "313896155549-ibhrn0opl1ecm6l64canm304f1ffm0fq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pherapeutic",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "313896155549-9pjng4gik1g1foigcgmlpdg58qpguvrh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfeMi7sHs19dsc6LCjoVOALU--CCgC1Po"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "313896155549-9pjng4gik1g1foigcgmlpdg58qpguvrh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
