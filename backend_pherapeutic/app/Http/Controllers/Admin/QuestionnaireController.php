@@ -84,6 +84,7 @@ class QuestionnaireController extends Controller
     {
         $rules = [
             'title' => 'required',
+			'ordering'=>'required|unique:questions,ordering'
         ];
 
         $input = $request->all();
@@ -93,13 +94,14 @@ class QuestionnaireController extends Controller
         }
         $answer = array_filter($input['more']['answer']);
         $point = array_filter($input['more']['point']);
-        $combineData = array_combine($point,$answer);
+        $combineData = array_combine($answer,$point);
 
         if(!$answer || !$point){
             return redirect()->back()->with('error_message', 'Unable to create new question. Please enter answer and points.');
         }
 
         $questionArr['title'] = $input['title'];
+        $questionArr['ordering'] = $input['ordering'];
         $questionArr['status'] = '1';
         //dd($questionArr);
         $hasSave = Questions::create($questionArr);
@@ -108,7 +110,7 @@ class QuestionnaireController extends Controller
             return redirect()->back()->with('error', 'Unable to create new question. Please try again later.');
         }
 
-        foreach ($combineData as $point => $answer) {
+        foreach ($combineData as $answer => $point) {
             $data = [
                 'question_id' => $hasSave->id,
                 'title' => $answer,
@@ -163,25 +165,37 @@ class QuestionnaireController extends Controller
         ];
 
         $input = $request->all();
+		$questionObj = $questions->getQuestionById($id);
+		
+		 if($input['ordering']==$questionObj->ordering){
+		    $rules['ordering']='required';
+	    }else{
+			 $rules['ordering']='required|unique:questions,ordering';
+		}
+	   
         $validator = Validator::make($input, $rules);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
+       
+	  
+ 
 
-        $questionObj = $questions->getQuestionById($id);
+        
         if(!$questionObj){
             return redirect()->back()->with('error', 'This question does not exist');
         }
 
         $inputArr = $request->except(['_token', '_method']);
         $questionArr = [
-            'title' => $inputArr['title']
+            'title' => $inputArr['title'],
+            'ordering' => $inputArr['ordering'],
         ];
         $answer = array_filter($inputArr['more']['answer']);
         $point = array_filter($inputArr['more']['point']);
-        $combineData = array_combine($point,$answer);
+        $combineData = array_combine($answer,$point);
         
-        if(!$answer || !$point){
+        if(empty($answer) || empty($point)){
             return redirect()->back()->with('error_message', 'Unable to update question. Please enter answer and points.');
         }
 
@@ -191,11 +205,11 @@ class QuestionnaireController extends Controller
         }
 
         $hasDelete = Answers::where('question_id', $id)->delete();
-        if(!$hasDelete){
-            return redirect()->back()->with('error_message', 'Unable to update answer. Please try again later.');            
-        }
+        // if(!$hasDelete){
+            // return redirect()->back()->with('error_message', 'Unable to update answer. Please try again later.');            
+        // }
 
-        foreach ($combineData as $point => $answer) {
+        foreach ($combineData as $answer => $point) {
             $data = [
                 'question_id' => $id,
                 'title' => $answer,
@@ -254,4 +268,19 @@ class QuestionnaireController extends Controller
         $hasUpdated = $questions->updateQuestion($input['questionId'], $questionArr); 
         return returnSuccessResponse('Question order change successfully');
     }
+	 /**
+     * destroyAnswerById the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroyAnswerById($id){
+		$res=Answers::where('id',$id)->delete();
+        if($res){
+            return returnSuccessResponse('Answer deleted successfully');
+        }else{
+			return returnNotFoundResponse('This Answers does not exist');
+		}
+	}
+
 }

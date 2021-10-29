@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Appointments;
+use App\Models\Contactus;
+use App\Models\PaymentDetails;
+
 
 class HomeController extends Controller
 {
@@ -29,6 +33,20 @@ class HomeController extends Controller
                         ->where('email_verified_at', '!=', 'null')->count();
         $totalTherapist = User::where('role', '=', User::THERAPIST_ROLE)
                             ->where('email_verified_at', '!=', 'null')->count();
-        return view('admin.home', compact('totalClient','totalTherapist'));
+
+        $totalAppointments = Appointments::count();
+        $contactUs = Contactus::count();
+        $monthlys = User::monthly();
+		// $totalClient = 0;
+        // $totalTherapist = 0;
+
+        // $totalAppointments = 0;
+        // $contactUs = 0;
+        // $monthlys = 0;
+        $monthlyPayments = json_encode($monthlys['payments']);
+        $users = json_encode($monthlys['users']);
+        $therapists = json_encode($monthlys['therapists']);
+        $categories = json_encode($monthlys['month']);
+        return view('admin.home', compact('totalClient','totalTherapist','therapists','users','categories','totalAppointments','contactUs','monthlyPayments'));
     }
 }

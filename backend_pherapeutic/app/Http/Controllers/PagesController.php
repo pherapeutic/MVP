@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\PrivacyPolicy;
 
 class PagesController extends Controller
 {
@@ -103,5 +104,12 @@ class PagesController extends Controller
     public function quickSearch()
     {
         return view('layout.partials.extras._quick_search_result');
+    }
+
+    public function privacy(){
+
+        $model = PrivacyPolicy::first();
+
+        return view('pages.privacy',['model'=>$model]);
     }
 }

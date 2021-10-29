@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\User;
 use Illuminate\Http\Request;
 use Ixudra\Curl\Facades\Curl;
 use App\Http\Controllers\Controller;
-use App\User;
+use App\Models\User;
 use App\Driver;
 use App\OpenOrder;
 use App\OrderDriver;
@@ -22,7 +22,7 @@ class NotificationController extends Controller
     }
 
     public static function sendNotificationToTherapist($notificationData = array()) {  
-
+        //dd($notificationData);
         if(count($notificationData) <= 0){
             return;
         }
@@ -41,22 +41,26 @@ class NotificationController extends Controller
                 "data" => $notificationData['data']
             ];
 
+
         \Log::info('notification data: '. print_r($postdata, true));
         } else if($notificationData['device_type'] == '0'){ // for android
             $postdata = [
                 "to" => $notificationData['fcm_token'],
-                "sound" => "default",
-                "data" => [
-                    'data' => $notificationData['data'],
+                "notification" => [
+                    //'data' => $notificationData['data'],
                     "title" => $notificationData['title'],
-                    "text" => $notificationData['message']
-                ]
+                    "text" => $notificationData['message'],
+                    "sound" => "default"
+                ],
+                'data' => $notificationData['data']
             ];
+
         } else {
             return;
         }
 
-        $header = array("authorization: key=" . $push_notification_key . "", "content-type: application/json");  
+        $header = array("authorization: key=" . $push_notification_key . "", "content-type: application/json"); 
+
         $timeout = 120;
         $curlOutput = Curl::to($curlUrl)
                         ->withHeaders($header)
@@ -149,20 +153,27 @@ class NotificationController extends Controller
             return response()->json($result);
         }
 
-        $clientObj = Auth::user();        
+        $clientObj = Auth::user();  
 
+        //dd($clientObj);
         $fcmToken = $userObj->fcm_token;
-        // $fcmToken = 'fZEO0-GlTQifO6qH4xjx__:APA91bFqQlFf01H6JHwQYMLzTUi4ItmYCshWpRcT6rrlhDKQfERBfhcEPcD1bsAmG-xNvRxPhEUxkeZc7ptrEZ10hZTOkcHAvC_P_nV_9rnyHNBmK4xPCwf6aTfw7wJFR_Cnl2TR5N_h';
-        
+
+         //$fcmToken = 'fal3b8-wSXqgJjB5DMA5GP:APA91bHf8aEQvbbalzqkhic94lxf-d71_m4e8JjHDC62ju_8581_nlHgJA7Xj3RsD5KWc0pk6GMsMkNodrV3uNDp6DuzQl3Y6-YJ4mj8EA2Cc0FpAosdspO2sv8JUeG3MH5HzCmkb8qS';
+        //$request->get('chanel_name')
+        $clientData = $clientObj->getResponseCalletIdArr();
+        //dd($clientData);
+        $clientData['channel_name'] = $request->get('channel_name');
+
         $notificationData = [
             'fcm_token' => $fcmToken,
             'device_type' => $userObj->device_type,
-            'title' => 'Get Video Call From Pherapeutic. Client Id: '.$clientObj->id,
-            'message' => 'For help',
-            'data' => $clientObj->getResponseArr()
+            'title' => $clientObj->first_name.' '.$clientObj->last_name.' calling...',
+            'message' => '',
+            'data' => $clientData
         ];
 
         $response = $this->sendNotificationToTherapist($notificationData);
+        
 
         if($response['success'] == 0 && $response['failure'] == 1){
             \Log::info('Unable to send notification. Error: '. print_r($response['results'], true));
@@ -173,9 +184,12 @@ class NotificationController extends Controller
             "statusCode" => 200,
             "message" => 'Video call notification has been send to Therapist successfully'
         );
+		
+		// print_r($result);die;
         return response()->json($result);        
 
     }
+
 
   //   public function sendNewOrderNotificationToDriver($orderId = '', Request $request) {
   //       $error="";

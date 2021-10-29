@@ -147,6 +147,8 @@
         <div class="text-dark-50 font-size-lg font-weight-bolder mr-10 ">
             <span class="mr-1">2020©</span>
             <a href="{{ route('admin.home') }}" class="text-dark-75 text-hover-primary">Pherapeutic</a>
+            <a href="{{route('privacy')}}" class="text-dark-75 text-hover-primary">Privacy & Policy</a>
+
         </div>
     </div>
     <!--end::Content footer-->

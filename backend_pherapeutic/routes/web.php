@@ -17,6 +17,7 @@ Auth::routes();
 
 
 //connect vendor account
+Route::get('/stripeRedirect', 'FrontendController@stripeRedirect');
 Route::get('/connectwithstrip', 'FrontendController@connectwithstrip');
 Route::get('/sendcurltostrip', 'FrontendController@sendcurltostrip');
 Route::get('/disConnectTherapistAccount/{stripeConnectId}', 'FrontendController@disConnectTherapistAccount');
@@ -29,6 +30,9 @@ Route::get('/disConnectTherapistAccount/{stripeConnectId}', 'FrontendController@
 Route::get('/', function(){
 	return redirect()->route('admin.home');
 })->name('home');
+
+
+Route::get('privacy','PagesController@privacy')->name('privacy');
 
 Route::middleware('auth')->prefix('admin')->namespace('Admin')->name('admin.')->group(function(){
 	//Admin Route
@@ -45,7 +49,24 @@ Route::middleware('auth')->prefix('admin')->namespace('Admin')->name('admin.')->
 	Route::resource('languages', 'LanguagesController');
 
 	Route::resource('questionnaire', 'QuestionnaireController');	
-	Route::post('question-ordering/{order}', 'QuestionnaireController@ordering');	
+	Route::delete('destroyAnswerById/{id}', 'QuestionnaireController@destroyAnswerById');	
+	Route::post('question-ordering/{order}', 'QuestionnaireController@ordering');
+
+	Route::resource('settings', 'SettingController');
+
+	Route::resource('payments', 'PaymentsController');
+	Route::resource('contactus', 'ContactUsController');
+	Route::resource('termsandconditions', 'TermsConditionsController');
+	Route::resource('privacypolicy', 'PrivacyPolicyController');
+
+    Route::resource('faq', 'FaqController');
+    Route::resource('user', 'UserController');
+    Route::get('change-password','UserController@changePasswordView')->name('change-password');
+    Route::post('change-password','UserController@changePassword');
+    
+	Route::post('/refundPayment/{payment_id}/{charge_id}','PaymentsController@refundPayment')->name('refundPayment');
+	Route::post('/paidAmount/{payment_id}/{charge_id}','PaymentsController@paidAmount')->name('paidAmount');
+
 	//End Admin Route
 });
 
@@ -66,3 +87,11 @@ Route::middleware('auth')->prefix('admin')->namespace('Admin')->name('admin.')->
 	// // Quick search dummy route to display html elements in search dropdown (header search)
 	// Route::get('/quick-search', 'PagesController@quickSearch')->name('quick-search');	
 
+Route::get('/clear-cache', function() {
+	\Artisan::call('cache:clear');
+	\Artisan::call('config:clear');
+	\Artisan::call('config:cache');
+	\Artisan::call('view:clear');
+	\Artisan::call('route:clear');
+	return "Cache cleared";
+});

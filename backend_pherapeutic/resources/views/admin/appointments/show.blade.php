@@ -103,6 +103,41 @@
                             </table>
                         </div>
                     </div>
+                      <div class="col-6">
+                        <div class="p-2">
+                            <label><b>Questions and Answers</b> </label>
+                        </div>
+                        <div>
+                            <table class="table">
+                                <tbody>
+                                @if(count($questions))
+                                    @foreach($questions as $key=>$question)
+                                    <tr>
+                                        <th>Question: </th>
+                                        <td class="p-2">
+                                            {{$question->getQuestion ? $question->getQuestion->title : 'N/A'}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Answer: </th>
+                                        <td class="p-2">
+                                            {{$question->getAnswer ? $question->getAnswer->title : 'N/A'}}
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                @else
+                                 <tr>
+                                        <td class="p-2">
+                                            No data found
+                                        </td>
+                                </tr>
+                                @endif
+
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                     <div class="col-12 text-center mt-5">
                         <a class="btn btn-dark" href="{{URL::previous()}}" style="color:white;">Back</a>
                     </div>

@@ -37,9 +37,25 @@ return [
         'currency' => env('STRIPE_CURRENCY'),
         'amount' => env('AMOUNT'),
         'client_id' => env('STRIPE_CLIENT_ID'),
+        'secret_test' => env('STRIPE_SECRET_TEST'),
+        'client_id_test' => env('STRIPE_CLIENT_ID_TEST'),
+        'admin_account_id' => env('STRIPE_ACCOUNT_ID')
+
     ],
 
     'notification' => [
-        'therapist_push_notification_key' => env('THERAPIST_PUSH_NOTIFICATION_KEY', 'AAAAqYvxCrk:APA91bEANxdtQ6kF8207-aoskGNTJbKV7Y5z3rXO3fHFoWHUAXklmUozMb3vgnKYsC1jt0Q_2klXt0L90REfTojIo0Cn9J68h51M2g2-D5rCfXClLET5-MWfvKBpqfU2u3r6sTwmCH9g'),
+        'therapist_push_notification_key' => env('THERAPIST_PUSH_NOTIFICATION_KEY', 'AAAASRWrOZ0:APA91bGBUc7Ydf0Xp3tYG47ROCZw-6KtuMao593xfIBRatphi4D-V1_GRAN56s9M_LfykPGcV0dox80RSdwoMmBjANpoLOPJ5x3YrUt6mo_OVbx6MDkTc7C0OPiTG0ExSCwVi_knq61u'),
     ],
+
+    'agora' => [
+        'app_id' => env('AGORA_APP_ID','0d97119f3b6744d58af674a7abdd76d1'),
+        'app_certificate' => env('AGORA_APP_CERTIFICATE','a6ab0d27cb114f65b3c5cb7942b26cf4'),
+    ],
+
+    "apple" => [
+        "client_id" => "<your_client_id>",
+        "client_secret" => "<your_client_secret>",
+            'redirect' => 'TWITTER_REDIRECT_URI'
+    ],
+
 ];

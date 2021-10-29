@@ -38,8 +38,9 @@
                     <th>Name</th>
                     <th>Email</th>
                     <th>Languages</th>
-                    <th>Qualification</th>
+                    <th>Specialism</th>
                     <th>Experience</th>
+                    <th>Bono Work</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -76,8 +77,9 @@
                     { data: 'name', name: 'name' },
                     { data: 'email', name: 'email' },
                     { data: 'languages', name: 'languages' },
-                    { data: 'qualification', name: 'qualification' },
+                    { data: 'specialism', name: 'specialism' },
                     { data: 'experience', name: 'experience' },
+                    { data: 'bono_work', name: 'bono_work' },
                     { data: 'action', name: 'action', orderable: false, searchable: false},
                 ]
             });

@@ -37,9 +37,9 @@ class UserUpdateRequest extends FormRequest
             $rulesArr['experience'] = 'required';
             $rulesArr['qualification'] = 'required';
             $rulesArr['specialism'] = 'required';
-            $rulesArr['address'] = 'required';
-            $rulesArr['latitude'] = 'required';
-            $rulesArr['longitude'] = 'required';
+            //$rulesArr['address'] = 'required';
+            //$rulesArr['latitude'] = 'required';
+            //$rulesArr['longitude'] = 'required';
         }
         return $rulesArr;
     }
@@ -58,10 +58,10 @@ class UserUpdateRequest extends FormRequest
 
             'experience.required' => 'Please enter your experience',
             'qualification.required' => 'Please enter your qualification',
-            'specialism.required' => 'Please enter your specialism',
-            'address.required' => 'Please enter your address',
-            'latitude.required' => 'Please enter your latitude',
-            'longitude.required' => 'Please enter your longitude'
+            'specialism.required' => 'Please enter your specialism'
+            //'address.required' => 'Please enter your address',
+            //'latitude.required' => 'Please enter your latitude',
+            //'longitude.required' => 'Please enter your longitude'
         ];
     }
 

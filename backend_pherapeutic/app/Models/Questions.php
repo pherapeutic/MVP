@@ -10,6 +10,7 @@ use App\Models\Answers;
 class Questions extends Model
 {
     use HasFactory, Softdeletes;
+	
     /**
      * The attributes that are mass assignable.
      *
@@ -19,6 +20,7 @@ class Questions extends Model
         //'answer_id',
         'title',
         'status',
+		'ordering'
     ];
 
     /**

@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\TherapistProfile;
 use App\Models\Language;
 use App\Models\UserLanguage;
+use App\Models\UserQualification;
 use App\Models\UserTherapistType;
 use App\Http\Requests\UserRegisterRequest;
 use App\Notifications\SendEmailVerificationOTP;
@@ -26,7 +27,7 @@ class RegisterController extends Controller
      * @return object with registered user id
      * This function use to register a new user
      */
-    public function register(UserRegisterRequest $request, User $user, UserLanguage $userlanguage, TherapistProfile $therapistProfile, UserTherapistType $userTherapistType)
+    public function register(UserRegisterRequest $request, User $user, UserQualification $userqualification, UserLanguage $userlanguage, TherapistProfile $therapistProfile, UserTherapistType $userTherapistType)
     {
         $languagesArr = $request->get('languages');
         $userArr = [
@@ -34,10 +35,17 @@ class RegisterController extends Controller
             'last_name' => $request->get('last_name'),
             'email' => $request->get('email'),
             'password' => $request->get('password'),
-            'role' => $request->get('role')
+            'role' => $request->get('role'),
+            'latitude'=>$request->get('latitude'),
+            'longitude' => $request->get('longitude')
+     
         ];
+		 if($request->has('fcm_token')){
+                
+				$userArr['fcm_token'] = $request->input('fcm_token');
+            }
+        //dd($userArr);
         $userObj = $user->saveNewUser($userArr);
-
         if(!$userObj){
             return returnErrorResponse('Unable to register user. Please try again later');
         }
@@ -53,10 +61,21 @@ class RegisterController extends Controller
         }
 
         if($userObj->role == User::THERAPIST_ROLE){
+			$userqualificationArr=array();
+			 $qualificationsArr = $request->get('qualification');
+			   if(is_array($qualificationsArr)){
+				foreach ($qualificationsArr as $key => $qualificationId) {
+					$userqualificationArr = [
+						'user_id' => $userObj->id,
+						'qualification_id' => $qualificationId
+					];
+					$userqualification->saveNewUserQualification($userqualificationArr);
+				}
+            }
             $therapistPofileArr = [
                 'user_id' => $userObj->id,
                 'experience' => $request->get('experience'),
-                'qualification' => $request->get('qualification'),
+                // 'qualification' => ,
                 'address' => $request->get('address'),
                 'latitude' => $request->get('latitude'),
                 'longitude' => $request->get('longitude')
@@ -80,7 +99,7 @@ class RegisterController extends Controller
         } catch(\Exception $ex){
             \Log::error($ex);
         }
-        return returnSuccessResponse('Your account created successfully.', ['user_id' => $userObj->id]);
+        return returnSuccessResponse('Your account created successfully.', ['user_id' => $userObj->id,'otp'=>$userObj->verification_otp]);
     }
 
     /**
@@ -91,11 +110,12 @@ class RegisterController extends Controller
      * @return object with verified user detail and auth token
      * This function use to verify uer's phone number
      */
-    public function verifyOtp(Request $request, User $user)
+    public function verifyOtp(Request $request, User $user, $CallerId = '')
     {
         $rules = [
             'user_id' => 'required',
-            'otp' => 'required'
+            'otp' => 'required',
+
         ];
 
         $inputArr = $request->all();

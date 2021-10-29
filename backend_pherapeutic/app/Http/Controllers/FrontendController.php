@@ -20,7 +20,7 @@ class FrontendController extends Controller
             $noUser = 1;
             return view('connectwithstrip',compact('error', 'noUser'));
         }
-        if($user->role != '1'){
+        if($user->role != User::THERAPIST_ROLE){
             $error = 'Unauthorized user!';
             $noUser = 1;
             return view('connectwithstrip',compact('error', 'noUser'));        	
@@ -114,4 +114,8 @@ class FrontendController extends Controller
         //return redirect('/connectwithstrip');    
     }
 
+    public function stripeRedirect()
+    {
+        return view('striperedirecturl');       
+    }
 }

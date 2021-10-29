@@ -13,14 +13,16 @@ use App\Models\Languages;
 use App\Models\UserLanguage;
 use App\Models\UserTherapistType;
 use App\Models\Address;
+use App\Models\UserQualification;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Requests\ChangePasswordRequest;
 use Validator;
+use Stripe;
 
 class AccountController extends Controller
 {
-    public function update(UserUpdateRequest $request, UserLanguage $userLanguage, TherapistProfile $therapistProfile, UserTherapistType $userTherapistType){
-        
+    public function update(UserUpdateRequest $request, UserLanguage $userLanguage,UserQualification $userqualification, TherapistProfile $therapistProfile, UserTherapistType $userTherapistType){
+      
         $userObj = $this->request->user();
         if (!$userObj) {
             return $this->notAuthorizedResponse('User is not authorized');
@@ -30,9 +32,12 @@ class AccountController extends Controller
         $userArr = [
             'first_name' => $inputArr['first_name'],
             'last_name' => $inputArr['last_name'],
-            'image' => (isset($inputArr['image']) && $inputArr['image']) ? ($inputArr['image']) : (null),
-            'old_image' => $userObj->image
+            'image' => (isset($inputArr['image']) && $inputArr['image']) ? ($inputArr['image']) : (null)
         ];
+
+        if($userArr['image']){
+            $userArr['old_image'] = $userObj->image;
+        }
 
         $hasUpdated = $userObj->updateUser($userObj->id, $userArr);
         if(!$hasUpdated){
@@ -40,6 +45,7 @@ class AccountController extends Controller
         }
 
         $languagesArr = $request->get('languages');
+        //dd($languagesArr);
         if(is_array($languagesArr)){
             UserLanguage::where('user_id', $userObj->id)->delete();
             foreach ($languagesArr as $key => $languageId) {
@@ -47,22 +53,40 @@ class AccountController extends Controller
                     'user_id' => $userObj->id,
                     'language_id' => $languageId
                 ];
+               
                 $userLanguage->saveNewUserLanguages($userLanguageArr);
             }
-        }
-
+		}	
+  
         if($userObj->role == User::THERAPIST_ROLE){
+			
+			
+			 // print_r($qualificationsArr);die;
+			 $userQualificationArr=array();
+			 $qualificationsArr = $request->post('qualification');
+			  UserQualification::where('user_id', $userObj->id)->delete();
+					foreach ($qualificationsArr as $key => $qualificationId) {
+						$userQualificationArr = [
+							'user_id' => $userObj->id,
+							'qualification_id' => $qualificationId
+						];
+						$userqualification->saveNewUserQualification($userQualificationArr);
+					}
+				
+		 // print_r($userQualificationArr );die;
             $therapistPofileArr = [
                 'user_id' => $userObj->id,
                 'experience' => $request->get('experience'),
-                'qualification' => $request->get('qualification'),
-                'address' => $request->get('address'),
-                'latitude' => $request->get('latitude'),
-                'longitude' => $request->get('longitude')
+                // 'qualification' => $request->get('qualification')
+                // 'address' => $request->get('address'),
+                // 'latitude' => $request->get('latitude'),
+                // 'longitude' => $request->get('longitude')
             ];
             $therapistProfile->updateTherapistProfile($therapistPofileArr);
+        
 
             $therapistTypesArr = $request->get('specialism');
+           
             if(is_array($therapistTypesArr)){
                 UserTherapistType::where('user_id', $userObj->id)->delete();
                 foreach ($therapistTypesArr as $key => $therapistTypeId) {
@@ -89,6 +113,17 @@ class AccountController extends Controller
             return $this->notAuthorizedResponse('User is not authorized');
         }
         
+		// if(empty($userObj->stripe_connect_id)){
+			 // return $this->notAuthorizedResponse('Unable to connect stripe');
+		// }else{
+			// $accountInfo=$this->getAccountVerifyStripeOrNot($userObj->stripe_connect_id);
+			// if(empty($accountInfo)){
+				 // return $this->notAuthorizedResponse('Your stripe account not verified.'); 
+			// }
+		// }
+		
+		// print_r( );die('hh');
+		
         //Update latitude and longitude when change the status.
         if($userObj->therapistProfile){
             $profileObj = $userObj->therapistProfile;
@@ -223,4 +258,30 @@ class AccountController extends Controller
         $userObj->save();
         return returnSuccessResponse('User logged out successfully');
     }
+	
+	
+     /**
+     * Created By Anil Dogra
+     * Created At 31-03-2021
+     * @var $request object of request class
+     * @var $user object of user class
+     * @return object with registered user id
+     * This function use to get account verify stripe or not
+     */
+	 
+	public function getAccountVerifyStripeOrNot($accountID){
+		 $secretId = \Config::get('services.stripe.secret');
+		 $stripe = new \Stripe\StripeClient($secretId);
+		  $account=$stripe->accounts->all([]);
+		  // print_r($account);die;
+			foreach($account as $key=>$value){
+				$arrayAcount[]=$value->id;
+			}
+			
+			if(in_array($accountID, $arrayAcount)){
+				return true;
+			}else{
+				return false;
+			}
+	}
 }

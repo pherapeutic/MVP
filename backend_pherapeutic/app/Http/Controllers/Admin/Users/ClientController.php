@@ -30,7 +30,6 @@ class ClientController extends Controller
     {
         if ($request->ajax()) {
             $userColl = $user->getAllClients();
-            
             return datatables()->of($userColl)
                 ->addIndexColumn()
                 ->addColumn('id', function ($userObj) {
@@ -179,4 +178,5 @@ class ClientController extends Controller
 
         return returnErrorResponse('Something went wrong. Please try again later');
     }
+
 }
